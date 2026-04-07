@@ -1,4 +1,6 @@
-import { CheckCircle, Star } from "lucide-react";
+import React, { useState } from "react";
+import { CheckCircle, Play, ChevronDown, Star, Users, Globe, Award } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
 
 function Hero() {
   return (
