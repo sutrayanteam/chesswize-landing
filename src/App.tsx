@@ -172,7 +172,7 @@ function Hero() {
               whileHover={{ y: -5, scale: 1.02 }}
               className="p-5 rounded-[1rem] flex items-center justify-center gap-4 bg-[#1C1C1E] text-white shadow-[0_10px_30px_rgba(0,0,0,0.08)] flex-1 border border-black/5 dark:border-white/5 border-b-2 border-b-[#FFCC00] cursor-pointer"
             >
-              <Trophy className="w-10 h-10 text-[#FFCC00]" />
+              <img src="https://images.unsplash.com/photo-1563207153-f403bf289096?auto=format&fit=crop&w=200&q=80" alt="Experience" className="w-12 h-12 rounded-[0.8rem] object-cover shadow-sm border border-black/10" />
               <p className="font-medium text-lg leading-tight">
                 <span className="font-bold text-[#FFCC00] text-xl">
                   10+ Years
@@ -184,7 +184,7 @@ function Hero() {
               whileHover={{ y: -5, scale: 1.02 }}
               className="p-5 rounded-[1rem] flex items-center justify-center gap-4 bg-[#FF3B30] text-white shadow-[0_10px_30px_rgba(0,0,0,0.08)] flex-1 border border-black/5 dark:border-white/5 border-b-2 border-b-[#1C1C1E] cursor-pointer"
             >
-              <Target className="w-10 h-10 text-white" />
+              <img src="https://images.unsplash.com/photo-1504280613257-22f281e053f3?auto=format&fit=crop&w=200&q=80" alt="Structured Learning" className="w-12 h-12 rounded-[0.8rem] object-cover shadow-sm border border-black/10" />
               <p className="font-medium text-lg leading-tight">
                 <span className="font-bold text-white text-xl">Structured</span>
                 <br />
@@ -229,9 +229,9 @@ function ImpactNumbers() {
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   const stats = [
-    { num: "10+", label: "Years Experience", icon: Clock },
-    { num: "1000+", label: "Students Taught", icon: Users },
-    { num: "50+", label: "Tournament Winners", icon: Trophy },
+    { num: "10+", label: "Years Experience", image: "https://images.unsplash.com/photo-1501139082119-e14197628102?auto=format&fit=crop&w=200&q=80" },
+    { num: "1000+", label: "Students Taught", image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=200&q=80" },
+    { num: "50+", label: "Tournament Winners", image: "https://images.unsplash.com/photo-1563207153-f403bf289096?auto=format&fit=crop&w=200&q=80" },
   ];
 
   return (
@@ -267,11 +267,11 @@ function ImpactNumbers() {
               className="flex items-center gap-6 bg-white bg-dot-pattern p-6 rounded-[1.5rem] shadow-[0_20px_40px_rgba(0,0,0,0.12)] md:w-auto w-full max-w-sm justify-center border border-black/5 dark:border-white/5 border-b-2 cursor-pointer group"
             >
               <motion.div
-                whileHover={{ rotate: 360 }}
+                whileHover={{ rotate: 10 }}
                 transition={{ duration: 0.6 }}
-                className="bg-[#1C1C1E] p-4 rounded-[1rem] group-hover:bg-[#FF3B30] transition-colors border border-black/5 dark:border-white/5"
+                className="w-16 h-16 rounded-[1rem] bg-gray-100 overflow-hidden shadow-inner border border-black/5 dark:border-white/5"
               >
-                <stat.icon className="w-8 h-8 text-[#FFCC00] group-hover:text-white group-hover:scale-110 transition-all duration-300" />
+                <img src={stat.image} alt={stat.label} className="w-full h-full object-cover group-hover:scale-110 transition-all duration-500" />
               </motion.div>
               <div className="flex flex-col items-start">
                 <p className="text-4xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C]">
@@ -370,32 +370,32 @@ function LearningPath() {
 function WhatChildGains() {
   const items = [
     {
-      icon: Brain,
+      image: "https://images.unsplash.com/photo-1559757175-5700dde675bc?auto=format&fit=crop&w=200&q=80",
       text: "Sharpens Critical Thinking",
       desc: "Develops problem-solving skills that translate to academics.",
     },
     {
-      icon: Target,
+      image: "https://images.unsplash.com/photo-1504280613257-22f281e053f3?auto=format&fit=crop&w=200&q=80",
       text: "Improves Focus & Patience",
       desc: "Trains the mind to concentrate for extended periods.",
     },
     {
-      icon: BookOpen,
+      image: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=200&q=80",
       text: "Boosts Creativity",
       desc: "Encourages out-of-the-box thinking and pattern recognition.",
     },
     {
-      icon: Shield,
+      image: "https://images.unsplash.com/photo-1614332287897-cdc24cb7ca52?auto=format&fit=crop&w=200&q=80",
       text: "Builds Confidence",
       desc: "Teaches resilience through wins and losses.",
     },
     {
-      icon: Trophy,
+      image: "https://images.unsplash.com/photo-1563207153-f403bf289096?auto=format&fit=crop&w=200&q=80",
       text: "Prepares for Competitions",
       desc: "Instills a healthy competitive spirit and sportsmanship.",
     },
     {
-      icon: Clock,
+      image: "https://images.unsplash.com/photo-1501139082119-e14197628102?auto=format&fit=crop&w=200&q=80",
       text: "Time Management",
       desc: "Learning to make critical decisions under time pressure.",
     },
@@ -430,10 +430,10 @@ function WhatChildGains() {
             >
               <div className="flex items-center gap-4">
                 <motion.div
-                  whileHover={{ rotate: 15, scale: 1.1 }}
-                  className="bg-[#1C1C1E] p-4 rounded-[1rem] group-hover:bg-[#FF3B30] transition-colors duration-300 border border-black/5 dark:border-white/5"
+                  whileHover={{ rotate: 5, scale: 1.05 }}
+                  className="w-16 h-16 shrink-0 rounded-[1rem] bg-gray-100 overflow-hidden shadow-sm border border-black/5 dark:border-white/5"
                 >
-                  <item.icon className="w-8 h-8 text-[#FFCC00] group-hover:text-white group-hover:scale-110 transition-all duration-300 duration-300" />
+                  <img src={item.image} alt={item.text} className="w-full h-full object-cover group-hover:scale-110 transition-all duration-500" />
                 </motion.div>
                 <p className="text-xl font-bold text-gray-800 group-hover:text-white group-hover:scale-110 transition-all duration-300 duration-300">
                   {item.text}
@@ -681,17 +681,17 @@ function ClassModes() {
     {
       title: "Individual",
       desc: "1-on-1 personalized attention tailored to specific weaknesses.",
-      icon: Users,
+      image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=200&q=80",
     },
     {
       title: "Two on One",
       desc: "Learn with a peer to foster healthy competition and discussion.",
-      icon: Users,
+      image: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=200&q=80",
     },
     {
       title: "Group",
       desc: "Interactive group sessions focusing on broad concepts and practice.",
-      icon: Users,
+      image: "https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=200&q=80",
     },
   ];
 
@@ -724,11 +724,11 @@ function ClassModes() {
               <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               <div className="relative z-10">
                 <motion.div
-                  whileHover={{ rotate: [0, -10, 10, -10, 0] }}
+                  whileHover={{ scale: 1.05 }}
                   transition={{ duration: 0.5 }}
-                  className="w-20 h-20 mx-auto bg-[#1C1C1E] rounded-[1.5rem] flex items-center justify-center mb-6 transform rotate-3 group-hover:bg-[#FF3B30] transition-colors border border-black/5 dark:border-white/5"
+                  className="w-24 h-24 mx-auto rounded-[1.5rem] overflow-hidden mb-6 shadow-md border border-black/5 dark:border-white/5"
                 >
-                  <mode.icon className="w-10 h-10 text-[#FFCC00] transform -rotate-3 group-hover:text-white group-hover:scale-110 transition-all duration-300" />
+                  <img src={mode.image} alt={mode.title} className="w-full h-full object-cover group-hover:scale-110 transition-all duration-500" />
                 </motion.div>
                 <h3 className="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C] mb-4">
                   {mode.title}
@@ -1129,17 +1129,17 @@ function VideoDemo() {
 function WhyChooseUs() {
   const features = [
     {
-      icon: Award,
+      image: "https://images.unsplash.com/photo-1563207153-f403bf289096?auto=format&fit=crop&w=200&q=80",
       title: "Certified Coaches",
       desc: "All our trainers are FIDE rated and certified chess instructors.",
     },
     {
-      icon: Shield,
+      image: "https://images.unsplash.com/photo-1614332287897-cdc24cb7ca52?auto=format&fit=crop&w=200&q=80",
       title: "Safe Environment",
       desc: "100% secure, kid-friendly online learning platform.",
     },
     {
-      icon: Star,
+      image: "https://images.unsplash.com/photo-1501139082119-e14197628102?auto=format&fit=crop&w=200&q=80",
       title: "Proven Track Record",
       desc: "Hundreds of our students have won state and national titles.",
     },
@@ -1171,8 +1171,8 @@ function WhyChooseUs() {
               whileHover={{ y: -10 }}
               className="bg-gray-50 bg-dot-pattern p-8 rounded-[2rem] border border-black/5 dark:border-white/5 border-b-2 text-center hover:border-b-[#FF3B30] transition-colors group"
             >
-              <div className="w-20 h-20 mx-auto bg-white bg-dot-pattern rounded-full flex items-center justify-center mb-6 shadow-[0_8px_24px_rgba(0,0,0,0.06)] group-hover:bg-[#FF3B30] transition-colors border border-black/5 dark:border-white/5">
-                <f.icon className="w-10 h-10 text-[#FF3B30] group-hover:text-white group-hover:scale-110 transition-all duration-300" />
+              <div className="w-24 h-24 mx-auto rounded-[1.5rem] overflow-hidden mb-6 shadow-[0_8px_24px_rgba(0,0,0,0.06)] border border-black/5 dark:border-white/5">
+                <img src={f.image} alt={f.title} className="w-full h-full object-cover group-hover:scale-110 transition-all duration-500" />
               </div>
               <h3 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C] mb-4">
                 {f.title}
