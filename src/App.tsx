@@ -153,8 +153,7 @@ function Hero() {
           transition={{ duration: 0.8, type: "spring", bounce: 0.4 }}
           className="w-full lg:w-1/2 relative group"
         >
-          <div className="absolute inset-0 bg-[#FBBF24] rounded-[1.5rem] transform translate-x-4 translate-y-4 transition-transform group-hover:translate-x-6 group-hover:translate-y-6 duration-500 border border-black/5 dark:border-white/5"></div>
-          <div className="absolute inset-0 bg-[#0EA5E9] rounded-[1.5rem] transform -translate-x-4 -translate-y-4 transition-transform group-hover:-translate-x-6 group-hover:-translate-y-6 duration-500 -z-10 border border-black/5 dark:border-white/5"></div>
+          <div className="absolute inset-0 bg-[#0EA5E9] rounded-[1.5rem] transform translate-x-4 translate-y-4 transition-transform group-hover:translate-x-6 group-hover:translate-y-6 duration-500 -z-10 border border-black/5 dark:border-white/5"></div>
           <img
             src="/two-cute-children-playing-chess-at-home-2026-03-19-03-11-17-utc.jpg"
             alt="Chess Coaching"
@@ -208,17 +207,27 @@ function Hero() {
               .
             </p>
           </div>
-          <Magnetic><motion.button
-            whileHover={{ scale: 1.05, boxShadow: "0px 4px 0px #0284C7", y: 4 }}
-            whileTap={{ scale: 0.95, boxShadow: "0px 0px 0px #0284C7", y: 8 }}
-            className="relative overflow-hidden text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-semibold text-white px-6 md:px-10 py-4 md:py-5 rounded-full w-full md:w-auto shadow-[0_8px_0_#0369A1] bg-gradient-to-r from-[#0EA5E9] to-[#0284C7] transition-all flex items-center justify-center gap-2 group"
-          >
-              <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shine"></span>
-            Book Your Free Demo
-            <motion.span group-hover={{ x: 5 }} transition={{ type: "spring" }}>
-              <ChevronRight className="w-6 h-6" />
-            </motion.span>
-          </motion.button></Magnetic>
+          <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+            <Magnetic><motion.button
+              whileHover={{ scale: 1.05, boxShadow: "0px 4px 0px #0284C7", y: 4 }}
+              whileTap={{ scale: 0.95, boxShadow: "0px 0px 0px #0284C7", y: 8 }}
+              className="relative overflow-hidden text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-semibold text-white px-6 md:px-10 py-4 md:py-5 rounded-full w-full md:w-auto shadow-[0_8px_0_#0369A1] bg-gradient-to-r from-[#0EA5E9] to-[#0284C7] transition-all flex items-center justify-center gap-2 group"
+            >
+                <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shine"></span>
+              Book Your Free Demo
+              <motion.span group-hover={{ x: 5 }} transition={{ type: "spring" }}>
+                <ChevronRight className="w-6 h-6" />
+              </motion.span>
+            </motion.button></Magnetic>
+            
+            <Magnetic><motion.button
+              whileHover={{ scale: 1.05, boxShadow: "0px 4px 0px #D1D5DB", y: 4 }}
+              whileTap={{ scale: 0.95, boxShadow: "0px 0px 0px #D1D5DB", y: 8 }}
+              className="text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-semibold text-gray-700 bg-white border-2 border-gray-200 px-6 md:px-10 py-4 md:py-5 rounded-full w-full md:w-auto shadow-[0_8px_0_#E5E7EB] hover:bg-gray-50 hover:text-black transition-all flex items-center justify-center"
+            >
+              Explore Curriculum
+            </motion.button></Magnetic>
+          </div>
         </motion.div>
       </div>
     </div>
