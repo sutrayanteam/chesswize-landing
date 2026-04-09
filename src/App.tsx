@@ -238,7 +238,7 @@ function ImpactNumbers() {
   return (
     <section
       ref={ref}
-      className="relative bg-cover bg-center py-16 md:py-24 font-sans flex items-center bg-[#FF3B30] overflow-hidden"
+      className="relative bg-cover bg-center py-20 lg:py-32 font-sans flex items-center bg-[#FF3B30] overflow-hidden"
     >
       <motion.div
         animate={{ backgroundPosition: ["0% 0%", "100% 100%"] }}
@@ -310,7 +310,7 @@ function LearningPath() {
   ];
 
   return (
-    <div className="w-full py-16 md:py-24 bg-white bg-dot-pattern relative overflow-hidden">
+    <div className="w-full py-20 lg:py-32 bg-white bg-dot-pattern relative overflow-hidden">
       {/* Decorative background elements */}
       <motion.div animate={{ y: [0, -20, 0], x: [0, 10, 0] }} transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }} className="absolute top-20 left-10 w-64 h-64 bg-[#FFCC00] rounded-full mix-blend-multiply filter blur-[120px] opacity-10"></motion.div>
       <motion.div animate={{ y: [0, 20, 0], x: [0, -10, 0] }} transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }} className="absolute top-40 right-10 w-64 h-64 bg-[#FF3B30] rounded-full mix-blend-multiply filter blur-[120px] opacity-10"></motion.div>
@@ -402,7 +402,7 @@ function WhatChildGains() {
   ];
 
   return (
-    <div className="w-full py-16 md:py-24 bg-white bg-dot-pattern">
+    <div className="w-full py-20 lg:py-32 bg-white bg-dot-pattern">
       <div className="max-w-7xl mx-auto px-4">
         <motion.h2
           initial="hidden"
@@ -496,7 +496,7 @@ function ProgramDetails() {
   };
 
   return (
-    <div className="py-16 md:py-24 relative overflow-hidden bg-black font-sans">
+    <div className="py-20 lg:py-32 relative overflow-hidden bg-black font-sans">
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 z-0">
         <img
@@ -597,7 +597,7 @@ function ClassModes() {
   ];
 
   return (
-    <section className="py-16 md:py-24 bg-white bg-dot-pattern font-sans">
+    <section className="py-20 lg:py-32 bg-white bg-dot-pattern font-sans">
       <div className="max-w-7xl mx-auto px-4">
         <motion.h2
           initial="hidden"
@@ -665,7 +665,7 @@ function Coaches() {
   ];
 
   return (
-    <div className="w-full py-16 md:py-24 font-sans bg-white bg-dot-pattern">
+    <div className="w-full py-20 lg:py-32 font-sans bg-white bg-dot-pattern">
       <div className="max-w-7xl mx-auto px-4">
         <motion.h2
           initial="hidden"
@@ -750,7 +750,7 @@ function SuccessStories() {
   ];
 
   return (
-    <div className="w-full py-16 md:py-24 relative overflow-hidden bg-black">
+    <div className="w-full py-20 lg:py-32 relative overflow-hidden bg-black">
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 z-0">
         <img
@@ -846,7 +846,7 @@ function FAQ() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 0.8 }}
-      className="py-16 md:py-24 w-full flex justify-center font-sans bg-white bg-dot-pattern"
+      className="py-20 lg:py-32 w-full flex justify-center font-sans bg-white bg-dot-pattern"
     >
       <div className="max-w-4xl w-full px-4">
         <motion.h2
@@ -919,7 +919,7 @@ function FAQ() {
 
 function ReadyToImprove() {
   return (
-    <div className="relative font-sans py-16 md:py-24 px-4 bg-white bg-dot-pattern overflow-hidden">
+    <div className="relative font-sans py-20 lg:py-32 px-4 bg-white bg-dot-pattern overflow-hidden">
       <motion.div
         initial="hidden"
         whileInView="visible"
@@ -978,7 +978,7 @@ function ReadyToImprove() {
 
 function VideoDemo() {
   return (
-    <div className="w-full py-16 md:py-24 bg-white bg-dot-pattern font-sans relative overflow-hidden">
+    <div className="w-full py-20 lg:py-32 bg-white bg-dot-pattern font-sans relative overflow-hidden">
       <div className="max-w-full px-4 md:px-8 mx-auto relative z-10 text-center">
 
 
@@ -1024,7 +1024,7 @@ function WhyChooseUs() {
   ];
 
   return (
-    <div className="w-full py-16 md:py-24 bg-gray-50 bg-dot-pattern font-sans">
+    <div className="w-full py-20 lg:py-32 bg-gray-50 bg-dot-pattern font-sans">
       <div className="max-w-7xl mx-auto px-4">
         <motion.h2
           initial="hidden"
@@ -1118,7 +1118,7 @@ function Pricing() {
   ];
 
   return (
-    <div className="w-full py-16 md:py-24 bg-gray-50 bg-dot-pattern font-sans">
+    <div className="w-full py-20 lg:py-32 bg-gray-50 bg-dot-pattern font-sans">
       <div className="max-w-7xl mx-auto px-4">
         <motion.h2
           initial="hidden"
@@ -1201,7 +1201,7 @@ function ContactForm() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 0.8 }}
-      className="w-full py-16 md:py-24 bg-gray-50 bg-dot-pattern font-sans"
+      className="w-full py-20 lg:py-32 bg-gray-50 bg-dot-pattern font-sans"
     >
       <div className="max-w-7xl mx-auto px-4">
         <motion.h2
@@ -1389,21 +1389,7 @@ function StickyBottomBar() {
   );
 }
 
-function ScrollProgress() {
-  const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
-    restDelta: 0.001,
-  });
 
-  return (
-    <motion.div
-      className="fixed top-0 left-0 right-0 h-1.5 bg-[#FF3B30] origin-left z-[100]"
-      style={{ scaleX }}
-    />
-  );
-}
 
 function ScrollToTop() {
   const [isVisible, setIsVisible] = useState(false);
@@ -1510,7 +1496,7 @@ export default function App() {
       transition={{ duration: 1 }}
       className="min-h-screen flex flex-col bg-white bg-dot-pattern pb-24 selection:bg-[#FF3B30] selection:text-white"
     >
-      <ScrollProgress />
+
       <ScrollToTop />
       <TopMarquee />
       <Hero />
