@@ -155,7 +155,7 @@ function Hero() {
           <div className="absolute inset-0 bg-[#FFCC00] rounded-[1.5rem] transform translate-x-4 translate-y-4 transition-transform group-hover:translate-x-6 group-hover:translate-y-6 duration-500 border border-black/5 dark:border-white/5"></div>
           <div className="absolute inset-0 bg-[#FF3B30] rounded-[1.5rem] transform -translate-x-4 -translate-y-4 transition-transform group-hover:-translate-x-6 group-hover:-translate-y-6 duration-500 -z-10 border border-black/5 dark:border-white/5"></div>
           <img
-            src="https://images.unsplash.com/photo-1529699211952-734e80c4d42b?auto=format&fit=crop&w=800&q=80"
+            src="/two-cute-children-playing-chess-at-home-2026-03-19-03-11-17-utc.jpg"
             alt="Chess Coaching"
             className="w-full h-auto rounded-[1.5rem] shadow-[0_20px_40px_rgba(0,0,0,0.12)] relative z-10 border-2 border-black/5 transition-transform duration-500 group-hover:scale-[1.02]"
           />
