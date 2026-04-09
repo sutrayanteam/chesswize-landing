@@ -209,8 +209,8 @@ function Hero() {
             </p>
           </div>
           <Magnetic><motion.button
-            whileHover={{ scale: 1.05, boxShadow: "0px 4px 0px #D70015", y: 4 }}
-            whileTap={{ scale: 0.95, boxShadow: "0px 0px 0px #D70015", y: 8 }}
+            whileHover={{ scale: 1.05, boxShadow: "0px 4px 0px #0284C7", y: 4 }}
+            whileTap={{ scale: 0.95, boxShadow: "0px 0px 0px #0284C7", y: 8 }}
             className="relative overflow-hidden text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-semibold text-white px-6 md:px-10 py-4 md:py-5 rounded-full w-full md:w-auto shadow-[0_8px_0_#0369A1] bg-gradient-to-r from-[#0EA5E9] to-[#0284C7] transition-all flex items-center justify-center gap-2 group"
           >
               <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shine"></span>
@@ -540,7 +540,7 @@ function ProgramDetails() {
               variants={cardVariants}
               initial="rest"
               whileHover="hover"
-              className="bg-[#1C1C1E]/80 backdrop-blur-md rounded-[2rem] p-8 border border-white/5 border-b-2 border-b-[#FF3B30] shadow-[0_20px_40px_rgba(0,0,0,0.12)] relative overflow-hidden cursor-pointer group hover:border-gray-500 hover:border-b-[#FBBF24] transition-colors"
+              className="bg-[#1C1C1E]/80 backdrop-blur-md rounded-[2rem] p-8 border border-white/5 border-b-2 border-b-[#0EA5E9] shadow-[0_20px_40px_rgba(0,0,0,0.12)] relative overflow-hidden cursor-pointer group hover:border-gray-500 hover:border-b-[#FBBF24] transition-colors"
             >
               <motion.div
                 className="absolute top-0 left-0 w-full h-2 bg-[#0EA5E9] origin-left"
@@ -642,7 +642,7 @@ function ClassModes() {
                 <Magnetic><motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="relative overflow-hidden w-full px-8 py-4 rounded-full text-[16px] md:text-[18px] font-semibold text-white bg-[#D70015] hover:bg-white hover:text-[#D70015] transition-colors shadow-[0_4px_12px_rgba(0,0,0,0.2)]"
+                  className="relative overflow-hidden w-full px-8 py-4 rounded-full text-[16px] md:text-[18px] font-semibold text-white bg-[#0284C7] hover:bg-white hover:text-[#0284C7] transition-colors shadow-[0_4px_12px_rgba(0,0,0,0.2)]"
                 >
                   <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shine"></span>
                   Select Mode
@@ -697,7 +697,7 @@ function Coaches() {
               key={i}
               variants={fadeInUp}
               whileHover={{ y: -15 }}
-              className="bg-white bg-dot-pattern rounded-[2rem] p-6 text-center border border-black/5 dark:border-white/5 border-b-2 shadow-[0_8px_24px_rgba(14,165,233,0.3)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.12)] hover:border-b-[#FF3B30] transition-all group"
+              className="bg-white bg-dot-pattern rounded-[2rem] p-6 text-center border border-black/5 dark:border-white/5 border-b-2 shadow-[0_8px_24px_rgba(14,165,233,0.3)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.12)] hover:border-b-[#0EA5E9] transition-all group"
             >
               <div className="w-32 h-32 mx-auto bg-gray-200 rounded-full mb-6 border-2 border-black/5 overflow-hidden relative">
                 <img
@@ -876,7 +876,7 @@ function FAQ() {
               whileInView="visible"
               viewport={{ once: true, amount: 0.2 }}
               variants={fadeInUp}
-              className={`border border-black/5 dark:border-white/5 p-6 cursor-pointer rounded-[1.5rem] transition-all shadow-sm ${openIndex === index ? "bg-white bg-dot-pattern border-b-2 border-b-[#FBBF24] shadow-[0_4px_12px_rgba(0,0,0,0.04)]" : "bg-gray-50 bg-dot-pattern border-b-2 hover:border-b-2 hover:border-b-[#FF3B30]"}`}
+              className={`border border-black/5 dark:border-white/5 p-6 cursor-pointer rounded-[1.5rem] transition-all shadow-sm ${openIndex === index ? "bg-white bg-dot-pattern border-b-2 border-b-[#FBBF24] shadow-[0_4px_12px_rgba(0,0,0,0.04)]" : "bg-gray-50 bg-dot-pattern border-b-2 hover:border-b-2 hover:border-b-[#0EA5E9]"}`}
               onClick={() => setOpenIndex(openIndex === index ? null : index)}
             >
               <div className="flex justify-between items-center">
@@ -925,7 +925,7 @@ function ReadyToImprove() {
         whileInView="visible"
         viewport={{ once: true, amount: 0.2 }}
         variants={fadeInUp}
-        className="max-w-5xl w-full mx-auto p-6 md:p-12 lg:p-20 rounded-[3rem] relative z-10 overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.12)] bg-black border-2 border-white/5 border-b-4 border-b-[#FF3B30]"
+        className="max-w-5xl w-full mx-auto p-6 md:p-12 lg:p-20 rounded-[3rem] relative z-10 overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.12)] bg-black border-2 border-white/5 border-b-4 border-b-[#0EA5E9]"
       >
         {/* Background Image with Overlay */}
         <div className="absolute inset-0 z-0">
@@ -960,8 +960,8 @@ function ReadyToImprove() {
             they need to succeed in chess and life.
           </p>
           <Magnetic><motion.button
-            whileHover={{ scale: 1.05, boxShadow: "0px 4px 0px #D70015", y: 4 }}
-            whileTap={{ scale: 0.95, boxShadow: "0px 0px 0px #D70015", y: 8 }}
+            whileHover={{ scale: 1.05, boxShadow: "0px 4px 0px #0284C7", y: 4 }}
+            whileTap={{ scale: 0.95, boxShadow: "0px 0px 0px #0284C7", y: 8 }}
             className="relative overflow-hidden text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-semibold text-white py-5 px-12 rounded-full transition shadow-[0_8px_0_#0369A1] md:w-auto w-full flex items-center justify-center gap-2 mx-auto group bg-gradient-to-r from-[#0EA5E9] to-[#0284C7]"
           >
               <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shine"></span>
