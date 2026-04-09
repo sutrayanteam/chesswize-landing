@@ -108,7 +108,7 @@ function Hero() {
   const opacityText = useTransform(scrollY, [0, 500], [1, 0]);
 
   return (
-    <div className="mx-auto p-4 md:p-8 bg-white bg-dot-pattern rounded-lg mt-2 font-sans max-w-7xl overflow-hidden relative border border-gray-100 shadow-sm">
+    <div className="mx-auto p-4 md:p-8 mb-12 md:mb-16 bg-white bg-dot-pattern rounded-lg mt-2 font-sans max-w-7xl overflow-hidden relative border border-gray-100 shadow-sm">
       <motion.div
         style={{ y: yText, opacity: opacityText }}
         className="relative z-20"
@@ -315,7 +315,7 @@ function LearningPath() {
   ];
 
   return (
-    <div className="w-full py-16 md:py-24 bg-gray-50 bg-dot-pattern relative overflow-hidden">
+    <div className="w-full py-16 md:py-24 bg-white bg-dot-pattern relative overflow-hidden">
       {/* Decorative background elements */}
       <motion.div animate={{ y: [0, -20, 0], x: [0, 10, 0] }} transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }} className="absolute top-20 left-10 w-64 h-64 bg-[#FFCC00] rounded-full mix-blend-multiply filter blur-[120px] opacity-10"></motion.div>
       <motion.div animate={{ y: [0, 20, 0], x: [0, -10, 0] }} transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }} className="absolute top-40 right-10 w-64 h-64 bg-[#FF3B30] rounded-full mix-blend-multiply filter blur-[120px] opacity-10"></motion.div>
@@ -755,7 +755,7 @@ function Coaches() {
   ];
 
   return (
-    <div className="w-full py-16 md:py-24 font-sans bg-gray-50 bg-dot-pattern">
+    <div className="w-full py-16 md:py-24 font-sans bg-white bg-dot-pattern">
       <div className="max-w-7xl mx-auto px-4">
         <motion.h2
           initial="hidden"
@@ -1141,7 +1141,7 @@ function WhyChooseUs() {
   ];
 
   return (
-    <div className="w-full py-16 md:py-24 bg-white bg-dot-pattern font-sans">
+    <div className="w-full py-16 md:py-24 bg-gray-50 bg-dot-pattern font-sans">
       <div className="max-w-7xl mx-auto px-4">
         <motion.h2
           initial="hidden"
@@ -1300,7 +1300,7 @@ function ContactForm() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 0.8 }}
-      className="w-full py-16 md:py-24 bg-white bg-dot-pattern font-sans"
+      className="w-full py-16 md:py-24 bg-gray-50 bg-dot-pattern font-sans"
     >
       <div className="max-w-7xl mx-auto px-4">
         <motion.h2
