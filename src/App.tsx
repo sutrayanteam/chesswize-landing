@@ -1122,17 +1122,17 @@ function VideoDemo() {
 function WhyChooseUs() {
   const features = [
     {
-      image: "https://images.unsplash.com/photo-1586165368502-1bad197a6461?auto=format&fit=crop&w=800&q=80",
+      image: "/star-badge.png",
       title: "Certified Coaches",
       desc: "All our trainers are FIDE rated and certified chess instructors.",
     },
     {
-      image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80",
-      title: "Safe Environment",
-      desc: "100% secure, kid-friendly online learning platform.",
+      image: "/calendar-appointment.png",
+      title: "Flexible Scheduling",
+      desc: "Easily book classes at times that work best for your child's routine.",
     },
     {
-      image: "https://images.unsplash.com/photo-1580541832626-2a7131ee809f?auto=format&fit=crop&w=800&q=80",
+      image: "/gold-thropy.png",
       title: "Proven Track Record",
       desc: "Hundreds of our students have won state and national titles.",
     },
