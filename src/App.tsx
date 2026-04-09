@@ -887,18 +887,17 @@ function SuccessStories() {
               key={i}
               variants={fadeInUp}
               whileHover={{ y: -8, scale: 1.02 }}
-              className="relative aspect-[9/16] rounded-3xl overflow-hidden shadow-2xl group border border-white/10 bg-black/50 cursor-pointer"
+              className="bg-[#1C1C1E]/80 backdrop-blur-sm rounded-[2rem] p-4 border border-white/5 shadow-[0_20px_40px_rgba(0,0,0,0.12)] hover:border-gray-500 transition-colors group flex flex-col gap-4"
             >
-              <video
-                src={t.src}
-                autoPlay
-                muted
-                loop
-                playsInline
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 will-change-transform"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
-              <div className="absolute bottom-6 left-6 right-6 z-10">
+              <div className="relative aspect-[9/16] rounded-2xl overflow-hidden bg-black w-full">
+                <video
+                  src={t.src}
+                  controls
+                  playsInline
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+              </div>
+              <div className="flex flex-col px-2 pb-2">
                 <div className="flex gap-1 mb-2">
                   {[...Array(5)].map((_, j) => (
                     <Star
