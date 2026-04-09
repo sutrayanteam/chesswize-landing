@@ -109,7 +109,7 @@ function Hero() {
   const opacityText = useTransform(scrollY, [0, 500], [1, 0]);
 
   return (
-    <div className="mx-auto p-4 md:p-8 mb-12 md:mb-16 bg-white bg-dot-pattern rounded-lg mt-2 font-sans max-w-7xl overflow-hidden relative border border-gray-100 shadow-sm">
+    <div className="mx-auto p-4 md:p-8 mb-12 md:mb-10 md:mb-12 bg-white bg-dot-pattern rounded-lg mt-2 font-sans max-w-7xl overflow-hidden relative border border-gray-100 shadow-sm">
       <motion.div
         style={{ y: yText, opacity: opacityText }}
         className="relative z-20"
@@ -238,7 +238,7 @@ function ImpactNumbers() {
   return (
     <section
       ref={ref}
-      className="relative bg-cover bg-center py-20 lg:py-32 font-sans flex items-center bg-[#0F172A] overflow-hidden"
+      className="relative bg-cover bg-center py-12 md:py-20 font-sans flex items-center bg-[#0F172A] overflow-hidden"
     >
       <motion.div
         animate={{ backgroundPosition: ["0% 0%", "100% 100%"] }}
@@ -250,7 +250,7 @@ function ImpactNumbers() {
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}
           variants={fadeInUp}
-          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tighter text-white mb-16"
+          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tighter text-white mb-10 md:mb-12"
         >
           Our Impact in <span className="text-[#EAB308]">Numbers</span>
         </motion.h2>
@@ -310,7 +310,7 @@ function LearningPath() {
   ];
 
   return (
-    <div className="w-full py-20 lg:py-32 bg-white bg-dot-pattern relative overflow-hidden">
+    <div className="w-full py-12 md:py-20 bg-white bg-dot-pattern relative overflow-hidden">
       {/* Decorative background elements */}
       <motion.div animate={{ y: [0, -20, 0], x: [0, 10, 0] }} transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }} className="absolute top-20 left-10 w-64 h-64 bg-[#EAB308] rounded-full mix-blend-multiply filter blur-[120px] opacity-10"></motion.div>
       <motion.div animate={{ y: [0, 20, 0], x: [0, -10, 0] }} transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }} className="absolute top-40 right-10 w-64 h-64 bg-[#0F172A] rounded-full mix-blend-multiply filter blur-[120px] opacity-10"></motion.div>
@@ -330,7 +330,7 @@ function LearningPath() {
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
           variants={fadeInUp}
-          className="text-[16px] md:text-[20px] text-gray-500 max-w-2xl mx-auto text-center mb-16 px-4"
+          className="text-[16px] md:text-[20px] text-gray-500 max-w-2xl mx-auto text-center mb-10 md:mb-12 px-4"
         >
           From the first move to advanced tournament strategies, our curriculum provides a clear roadmap for your child's success.
         </motion.p>
@@ -402,14 +402,14 @@ function WhatChildGains() {
   ];
 
   return (
-    <div className="w-full py-20 lg:py-32 bg-slate-50 relative overflow-hidden"><div className="absolute top-0 left-1/4 w-96 h-96 bg-[#D4AF37]/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div className="w-full py-12 md:py-20 bg-slate-50 relative overflow-hidden"><div className="absolute top-0 left-1/4 w-96 h-96 bg-[#D4AF37]/10 rounded-full blur-3xl pointer-events-none"></div>
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         <motion.h2
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
           variants={fadeInUp}
-          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tighter text-center mb-16 bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C]"
+          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tighter text-center mb-10 md:mb-12 bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C]"
         >
           What Your Child{" "}
           <span className="text-[#D4AF37]">Gains With Chess!</span>
@@ -496,7 +496,7 @@ function ProgramDetails() {
   };
 
   return (
-    <div className="py-20 lg:py-32 relative overflow-hidden bg-black font-sans">
+    <div className="py-12 md:py-20 relative overflow-hidden bg-black font-sans">
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 z-0">
         <img
@@ -523,7 +523,7 @@ function ProgramDetails() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
           variants={fadeInUp}
-          className="text-[16px] md:text-[20px] text-[#EBEBF5]/60 max-w-2xl mx-auto text-center mb-16 px-4"
+          className="text-[16px] md:text-[20px] text-[#EBEBF5]/60 max-w-2xl mx-auto text-center mb-10 md:mb-12 px-4"
         >
           A comprehensive breakdown of exactly what your child will learn and master during their journey.
         </motion.p>
@@ -597,7 +597,7 @@ function ClassModes() {
   ];
 
   return (
-    <section className="py-20 lg:py-32 bg-slate-50 font-sans relative overflow-hidden"><div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#0F172A]/5 rounded-full blur-3xl pointer-events-none"></div>
+    <section className="py-12 md:py-20 bg-slate-50 font-sans relative overflow-hidden"><div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#0F172A]/5 rounded-full blur-3xl pointer-events-none"></div>
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         <motion.h2
           initial="hidden"
@@ -613,7 +613,7 @@ function ClassModes() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
           variants={fadeInUp}
-          className="text-[16px] md:text-[20px] text-[#5A5873] max-w-2xl mx-auto text-center mb-16 px-4"
+          className="text-[16px] md:text-[20px] text-[#5A5873] max-w-2xl mx-auto text-center mb-10 md:mb-12 px-4"
         >
           Choose a learning environment perfectly attuned to your child's social and competitive needs.
         </motion.p>
@@ -665,7 +665,7 @@ function Coaches() {
   ];
 
   return (
-    <div className="w-full py-20 lg:py-32 font-sans bg-white bg-dot-pattern">
+    <div className="w-full py-12 md:py-20 font-sans bg-white bg-dot-pattern">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         <motion.h2
           initial="hidden"
@@ -681,7 +681,7 @@ function Coaches() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
           variants={fadeInUp}
-          className="text-[16px] md:text-[20px] text-[#5A5873] max-w-2xl mx-auto text-center mb-16 px-4"
+          className="text-[16px] md:text-[20px] text-[#5A5873] max-w-2xl mx-auto text-center mb-10 md:mb-12 px-4"
         >
           Our FIDE-rated instructors bring decades of competitive experience to accelerate your mastery.
         </motion.p>
@@ -750,7 +750,7 @@ function SuccessStories() {
   ];
 
   return (
-    <div className="w-full py-20 lg:py-32 relative overflow-hidden bg-black">
+    <div className="w-full py-12 md:py-20 relative overflow-hidden bg-black">
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 z-0">
         <img
@@ -778,7 +778,7 @@ function SuccessStories() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
           variants={fadeInUp}
-          className="text-[16px] md:text-[20px] text-[#EBEBF5]/60 max-w-2xl mx-auto text-center mb-16"
+          className="text-[16px] md:text-[20px] text-[#EBEBF5]/60 max-w-2xl mx-auto text-center mb-10 md:mb-12"
         >
           Hear directly from families whose children have transformed their strategic thinking and focus.
         </motion.p>
@@ -846,7 +846,7 @@ function FAQ() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 0.8 }}
-      className="py-20 lg:py-32 w-full flex justify-center font-sans bg-white bg-dot-pattern"
+      className="py-12 md:py-20 w-full flex justify-center font-sans bg-white bg-dot-pattern"
     >
       <div className="max-w-4xl w-full px-4">
         <motion.h2
@@ -864,7 +864,7 @@ function FAQ() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
           variants={fadeInUp}
-          className="text-[16px] md:text-[20px] text-gray-500 max-w-2xl mx-auto text-center mb-16 px-4"
+          className="text-[16px] md:text-[20px] text-gray-500 max-w-2xl mx-auto text-center mb-10 md:mb-12 px-4"
         >
           Find clear answers regarding our platform, session schedules, and elite coaching methodology.
         </motion.p>
@@ -919,7 +919,7 @@ function FAQ() {
 
 function ReadyToImprove() {
   return (
-    <div className="relative font-sans py-20 lg:py-32 px-4 bg-white bg-dot-pattern overflow-hidden">
+    <div className="relative font-sans py-12 md:py-20 px-4 bg-white bg-dot-pattern overflow-hidden">
       <motion.div
         initial="hidden"
         whileInView="visible"
@@ -978,7 +978,7 @@ function ReadyToImprove() {
 
 function VideoDemo() {
   return (
-    <div className="w-full py-20 lg:py-32 bg-white bg-dot-pattern font-sans relative overflow-hidden">
+    <div className="w-full py-12 md:py-20 bg-white bg-dot-pattern font-sans relative overflow-hidden">
       <div className="max-w-full px-4 md:px-8 mx-auto relative z-10 text-center">
 
 
@@ -1024,7 +1024,7 @@ function WhyChooseUs() {
   ];
 
   return (
-    <div className="w-full py-20 lg:py-32 bg-gray-50 bg-dot-pattern font-sans">
+    <div className="w-full py-12 md:py-20 bg-gray-50 bg-dot-pattern font-sans">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         <motion.h2
           initial="hidden"
@@ -1040,7 +1040,7 @@ function WhyChooseUs() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
           variants={fadeInUp}
-          className="text-[16px] md:text-[20px] text-gray-500 max-w-2xl mx-auto text-center mb-16 px-4"
+          className="text-[16px] md:text-[20px] text-gray-500 max-w-2xl mx-auto text-center mb-10 md:mb-12 px-4"
         >
           We blend interactive cognitive exercises with proven curriculum frameworks to keep students deeply engaged.
         </motion.p>
@@ -1118,7 +1118,7 @@ function Pricing() {
   ];
 
   return (
-    <div className="w-full py-20 lg:py-32 bg-gray-50 bg-dot-pattern font-sans">
+    <div className="w-full py-12 md:py-20 bg-gray-50 bg-dot-pattern font-sans">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         <motion.h2
           initial="hidden"
@@ -1134,7 +1134,7 @@ function Pricing() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
           variants={fadeInUp}
-          className="text-[16px] md:text-[20px] text-[#5A5873] max-w-2xl mx-auto text-center mb-16 px-4"
+          className="text-[16px] md:text-[20px] text-[#5A5873] max-w-2xl mx-auto text-center mb-10 md:mb-12 px-4"
         >
           Accessible monthly plans designed to scale with your child's commitment and ambition.
         </motion.p>
@@ -1201,7 +1201,7 @@ function ContactForm() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 0.8 }}
-      className="w-full py-20 lg:py-32 bg-gray-50 bg-dot-pattern font-sans"
+      className="w-full py-12 md:py-20 bg-gray-50 bg-dot-pattern font-sans"
     >
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         <motion.h2
@@ -1218,7 +1218,7 @@ function ContactForm() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
           variants={fadeInUp}
-          className="text-[16px] md:text-[20px] text-[#5A5873] max-w-2xl mx-auto text-center mb-16 px-4"
+          className="text-[16px] md:text-[20px] text-[#5A5873] max-w-2xl mx-auto text-center mb-10 md:mb-12 px-4"
         >
           Have questions before enrolling? Our support team is ready to guide you anytime.
         </motion.p>
