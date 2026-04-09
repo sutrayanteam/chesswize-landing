@@ -20,6 +20,7 @@ import {
   Phone,
   MapPin,
   Send,
+  ArrowRight,
 } from "lucide-react";
 import {
   motion,
@@ -469,39 +470,62 @@ function CoachingProcess() {
   ];
 
   return (
-    <section className="py-16 md:py-24 bg-white font-sans overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4">
-        <motion.h2
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-          variants={fadeInUp}
-          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tight mb-20 text-center bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C]"
-        >
-          Our <span className="text-[#FF3B30]">Process</span>
-        </motion.h2>
+    <section className="py-24 bg-gray-50/50 font-sans overflow-visible">
+      <div className="max-w-7xl flex flex-col lg:flex-row gap-16 mx-auto px-6 items-start">
+        <div className="w-full lg:w-1/3 lg:sticky lg:top-32 shrink-0">
+          <motion.h2
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            variants={fadeInUp}
+            className="text-[36px] md:text-[48px] leading-[44px] md:leading-[56px] font-bold tracking-tight mb-6 text-[#1C1C1E]"
+          >
+            Our <span className="text-[#FF3B30] block">Process</span>
+          </motion.h2>
+          <motion.p
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            variants={fadeInUp}
+            className="text-[16px] md:text-[18px] text-[#5A5873] mb-8 leading-relaxed font-medium"
+          >
+            A seamless journey from your first enquiry to your child's first triumphant checkmate. We've optimized every step.
+          </motion.p>
+          <motion.button
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            variants={fadeInUp}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="bg-[#FF3B30] text-white px-8 py-4 rounded-full font-bold shadow-xl hover:bg-[#D70015] transition-colors duration-300 flex items-center gap-2 w-max"
+          >
+            Book Assessment
+            <ArrowRight className="w-5 h-5" />
+          </motion.button>
+        </div>
 
         <motion.div
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
           variants={staggerContainer}
-          className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-10 max-w-6xl mx-auto"
+          className="w-full lg:w-2/3 grid grid-cols-1 sm:grid-cols-2 gap-6"
         >
           {steps.map((step, i) => (
             <motion.div
               key={i}
               variants={fadeInUp}
               whileHover={{ y: -8 }}
-              className="bg-[#FAFAFF] border-2 border-[#F0EDFF] rounded-[1.5rem] p-8 md:p-10 flex flex-col items-center text-center shadow-[0_8px_30px_rgba(0,0,0,0.02)] transition-all duration-300"
+              className="bg-white border border-gray-100/80 rounded-[2rem] p-8 flex flex-col items-start text-left shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all duration-300"
             >
-              <div className="w-14 h-14 rounded-full bg-[#f99339] flex items-center justify-center text-white text-2xl font-black mb-8 shadow-sm">
+              <div className="w-12 h-12 rounded-2xl bg-[#FFF5F4] flex items-center justify-center text-[#FF3B30] text-xl font-bold mb-6 shadow-sm border border-[#FFEBE9]">
                 {step.id}
               </div>
-              <h3 className="text-xl md:text-2xl font-extrabold text-[#2D2A4A] mb-4">
+              <h3 className="text-xl font-bold text-[#1C1C1E] mb-3">
                 {step.title}
               </h3>
-              <p className="text-[#5A5873] text-[15px] md:text-[16px] leading-relaxed font-medium">
+              <p className="text-[#5A5873] text-[15px] leading-relaxed">
                 {step.desc}
               </p>
             </motion.div>
@@ -665,10 +689,19 @@ function ClassModes() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
           variants={fadeInUp}
-          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tight text-center mb-16 bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C]"
+          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tight text-center mb-4 bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C]"
         >
-          Flexible <span className="text-[#FF3B30]">Class Modes</span>
+          Flexible <span className="text-[#FF3B30]">Class Models</span>
         </motion.h2>
+        <motion.p
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          variants={fadeInUp}
+          className="text-[16px] md:text-[20px] text-[#5A5873] max-w-2xl mx-auto text-center mb-16 px-4"
+        >
+          Choose a learning environment perfectly attuned to your child's social and competitive needs.
+        </motion.p>
         <motion.div
           initial="hidden"
           whileInView="visible"
@@ -724,10 +757,19 @@ function Coaches() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
           variants={fadeInUp}
-          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tight text-center mb-16 bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C]"
+          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tight text-center mb-4 bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C]"
         >
-          Learn from <span className="text-[#FF3B30]">Experienced Coaches</span>
+          Learn from <span className="text-[#FF3B30]">Expert Coaches</span>
         </motion.h2>
+        <motion.p
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          variants={fadeInUp}
+          className="text-[16px] md:text-[20px] text-[#5A5873] max-w-2xl mx-auto text-center mb-16 px-4"
+        >
+          Our FIDE-rated instructors bring decades of competitive experience to accelerate your mastery.
+        </motion.p>
         <motion.div
           initial="hidden"
           whileInView="visible"
@@ -1168,10 +1210,19 @@ function Pricing() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
           variants={fadeInUp}
-          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tight text-center mb-16 bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C]"
+          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tight text-center mb-4 bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C]"
         >
           Simple, Transparent <span className="text-[#FF3B30]">Pricing</span>
         </motion.h2>
+        <motion.p
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          variants={fadeInUp}
+          className="text-[16px] md:text-[20px] text-[#5A5873] max-w-2xl mx-auto text-center mb-16 px-4"
+        >
+          Accessible monthly plans designed to scale with your child's commitment and ambition.
+        </motion.p>
         <motion.div
           initial="hidden"
           whileInView="visible"
@@ -1243,10 +1294,19 @@ function ContactForm() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
           variants={fadeInUp}
-          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tight text-center mb-16 bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C]"
+          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tight text-center mb-4 bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C]"
         >
           Get In <span className="text-[#FF3B30]">Touch</span>
         </motion.h2>
+        <motion.p
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          variants={fadeInUp}
+          className="text-[16px] md:text-[20px] text-[#5A5873] max-w-2xl mx-auto text-center mb-16 px-4"
+        >
+          Have questions before enrolling? Our support team is ready to guide you anytime.
+        </motion.p>
         <div className="flex flex-col lg:flex-row gap-12">
           <motion.div
             initial={{ opacity: 0, x: -50 }}
