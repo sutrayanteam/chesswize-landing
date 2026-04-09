@@ -127,7 +127,7 @@ function Hero() {
         >
           <motion.div initial="hidden" animate="visible" variants={fadeInUp} className="mb-8">
             <span className="px-4 py-1.5 rounded-full border border-onyx-900/10 text-sm font-semibold tracking-widest uppercase text-onyx-800 bg-white/50 backdrop-blur-md">
-              Elite Online Coaching
+              Elite Online Chess Coaching
             </span>
           </motion.div>
           <motion.h1
@@ -136,8 +136,8 @@ function Hero() {
             variants={fadeInUp}
             className="text-[40px] md:text-[64px] lg:text-[76px] leading-[1.05] font-serif font-medium tracking-tight text-[#1C1C1E] mb-8"
           >
-            Forging Strategic <i className="text-[#D70015] italic">Leaders</i> <br className="hidden md:block"/>
-            through the Art of Chess.
+            Premium <i className="text-[#D70015] italic">Online Chess</i> <br className="hidden md:block"/>
+            Masterclasses for Kids.
           </motion.h1>
           <motion.p
             initial="hidden"
@@ -145,7 +145,7 @@ function Hero() {
             variants={fadeInUp}
             className="text-[18px] md:text-[22px] leading-[32px] font-normal text-gray-700 mb-12 max-w-3xl"
           >
-            More than just a game. We instill unwavering discipline, unshakeable focus, and lethal critical thinking in children through data-driven masterclasses.
+            Give your child the ultimate cognitive edge. We teach expert-level chess strategies that build unbreakable focus, logical thinking, and lifelong confidence. 
           </motion.p>
           
           <motion.div initial="hidden" animate="visible" variants={fadeInUp} className="flex flex-col sm:flex-row gap-6 w-full justify-center">
@@ -154,13 +154,14 @@ function Hero() {
               className="relative overflow-hidden text-[16px] md:text-[18px] font-semibold text-white px-10 py-5 rounded-full w-full md:w-auto bg-[#1C1C1E] transition-all flex items-center justify-center gap-3 group hover:bg-[#D70015]"
             >
               <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-shine"></span>
-              Secure Assessment Slot
+              Book Free Trial Class
               <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </button></Magnetic>
             <Magnetic><button
+              onClick={() => document.getElementById('programs')?.scrollIntoView({ behavior: 'smooth' })}
               className="relative overflow-hidden text-[16px] md:text-[18px] font-semibold text-[#1C1C1E] px-10 py-5 rounded-full w-full md:w-auto bg-transparent border border-onyx-900/20 transition-all flex items-center justify-center gap-3 group hover:border-onyx-900"
             >
-              Explore Methodology
+              View Our Programs
             </button></Magnetic>
           </motion.div>
         </motion.div>
@@ -1197,10 +1198,10 @@ function ContactForm() {
       <div className="max-w-5xl mx-auto px-4 flex flex-col md:flex-row gap-16">
         <div className="w-full md:w-5/12">
           <h2 className="text-[40px] md:text-[56px] leading-[1.1] font-serif font-medium mb-6">
-            Secure Your <br/><span className="text-[#D70015] italic">Legacy.</span>
+            Book Your <br/><span className="text-[#D70015] italic">Free Trial.</span>
           </h2>
           <p className="text-xl text-white/60 mb-12">
-            Take the first step towards elite cognitive development. Fill out the application for a complimentary strategy assessment.
+            Experience our premium chess coaching firsthand. Fill out the application below to schedule your child's free 1-on-1 evaluation and trial class.
           </p>
           
           <div className="space-y-8">
@@ -1232,9 +1233,9 @@ function ContactForm() {
             <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
                {step === 1 && (
                  <motion.div initial={{opacity:0, x:20}} animate={{opacity:1, x:0}} exit={{opacity:0, x:-20}} className="space-y-6">
-                    <h3 className="text-2xl font-serif mb-6">Candidate Details</h3>
+                    <h3 className="text-2xl font-serif mb-6">Student Details</h3>
                     <div>
-                      <label className="block text-sm font-medium text-white/70 mb-2">Student's Full Name</label>
+                      <label className="block text-sm font-medium text-white/70 mb-2">Child's Full Name</label>
                       <input type="text" className="w-full bg-transparent border-b border-white/20 px-0 py-3 focus:border-[#D70015] focus:outline-none transition-colors text-xl font-serif placeholder:text-white/20 placeholder-[var(--font-serif)]" placeholder="e.g. Alexander Petrov" />
                     </div>
                     <div className="grid grid-cols-2 gap-8">
@@ -1248,13 +1249,13 @@ function ContactForm() {
                        </div>
                     </div>
                     <button type="button" onClick={() => setStep(2)} className="mt-8 bg-white text-[#111111] px-8 py-4 rounded-full font-bold uppercase tracking-widest text-sm hover:bg-[#D70015] hover:text-white transition-colors w-full md:w-auto">
-                       Continue Application
+                       Next Step
                     </button>
                  </motion.div>
                )}
                {step === 2 && (
                  <motion.div initial={{opacity:0, x:20}} animate={{opacity:1, x:0}} exit={{opacity:0, x:-20}} className="space-y-6">
-                    <h3 className="text-2xl font-serif mb-6">Contact & Finalization</h3>
+                    <h3 className="text-2xl font-serif mb-6">Parent Contact Info</h3>
                     <div>
                       <label className="block text-sm font-medium text-white/70 mb-2">Parent/Guardian Email</label>
                       <input type="email" className="w-full bg-transparent border-b border-white/20 px-0 py-3 focus:border-[#D70015] focus:outline-none transition-colors text-xl font-serif placeholder:text-white/20 placeholder-[var(--font-serif)]" placeholder="parent@elite.com" />
@@ -1266,7 +1267,7 @@ function ContactForm() {
                     <div className="flex gap-4 pt-4">
                        <button type="button" onClick={() => setStep(1)} className="text-white/50 px-6 py-4 font-bold hover:text-white transition-colors">Back</button>
                        <button type="button" className="bg-[#D70015] text-white flex-1 py-4 rounded-full font-bold uppercase tracking-widest text-sm hover:bg-white hover:text-[#111111] transition-colors shadow-[0_0_20px_rgba(215,0,21,0.4)]">
-                          Submit Application
+                          Confirm Free Trial
                        </button>
                     </div>
                  </motion.div>
