@@ -580,17 +580,17 @@ function ClassModes() {
     {
       title: "Individual",
       desc: "1-on-1 personalized attention tailored to specific weaknesses.",
-      image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=200&q=80",
+      image: "/father-and-son-playing-chess-game-at-home-childre-2026-03-17-07-11-24-utc.jpg",
     },
     {
       title: "Two on One",
       desc: "Learn with a peer to foster healthy competition and discussion.",
-      image: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=200&q=80",
+      image: "/intellectual-board-games-2026-03-16-00-42-30-utc.jpg",
     },
     {
       title: "Group",
       desc: "Interactive group sessions focusing on broad concepts and practice.",
-      image: "https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=200&q=80",
+      image: "/child-s-hand-moves-the-horse-during-a-chess-tourna-2026-03-26-03-58-25-utc.jpg",
     },
   ];
 
