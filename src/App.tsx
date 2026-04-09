@@ -1072,15 +1072,14 @@ function ReadyToImprove() {
 
 function VideoDemo() {
   return (
-    <div className="w-full py-16 md:py-24 bg-[#1C1C1E] font-sans relative overflow-hidden">
-      <div className="absolute top-0 left-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1529699211952-734e80c4d42b?auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center opacity-10 mix-blend-overlay"></div>
-      <div className="max-w-5xl mx-auto px-4 relative z-10 text-center">
+    <div className="w-full py-16 md:py-24 bg-white bg-dot-pattern font-sans relative overflow-hidden">
+      <div className="max-w-full px-4 md:px-8 mx-auto relative z-10 text-center">
         <motion.h2
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
           variants={fadeInUp}
-          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tight text-white mb-8"
+          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C] mb-8"
         >
           See Our <span className="text-[#FF3B30]">Coaching in Action</span>
         </motion.h2>
@@ -1089,7 +1088,7 @@ function VideoDemo() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
           variants={fadeInUp}
-          className="text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-normal text-[#EBEBF5]/60 mb-12 max-w-2xl mx-auto"
+          className="text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-normal text-gray-500 mb-12 max-w-2xl mx-auto"
         >
           Watch a quick snippet of how our interactive online classes keep kids
           engaged and learning.
@@ -1100,20 +1099,22 @@ function VideoDemo() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.8 }}
-          className="relative rounded-[2rem] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] border-2 border-[#FF3B30] group cursor-pointer aspect-video bg-black flex items-center justify-center hover:border-[#FFCC00] transition-colors duration-500"
+          className="relative max-w-7xl mx-auto rounded-[2rem] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.2)] border-2 border-[#FF3B30] group cursor-pointer aspect-video bg-black flex items-center justify-center hover:border-[#FFCC00] transition-colors duration-500"
         >
-          <img
-            src="https://images.unsplash.com/photo-1580541832626-2a7131ee809f?auto=format&fit=crop&w=1200&q=80"
-            alt="Video Thumbnail"
-            loading="lazy"
-            decoding="async"
-            className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-opacity duration-500 will-change-transform"
+          <video
+            src="/playing-chess-in-the-university-2025-12-17-10-35-30-utc.mov"
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 will-change-transform"
           />
+          <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors duration-500"></div>
           <motion.div
             whileHover={{ scale: 1.1 }}
-            className="w-24 h-24 bg-[#FF3B30] rounded-full flex items-center justify-center z-10 shadow-[0_0_0_10px_rgba(211,47,47,0.3)] group-hover:shadow-[0_0_0_20px_rgba(211,47,47,0.4)] transition-all duration-300 border border-black/5 dark:border-white/5"
+            className="w-20 md:w-24 h-20 md:h-24 bg-[#FF3B30] rounded-full flex items-center justify-center z-10 shadow-[0_0_0_10px_rgba(211,47,47,0.3)] group-hover:shadow-[0_0_0_20px_rgba(211,47,47,0.4)] transition-all duration-300 border border-white/20"
           >
-            <Play className="w-10 h-10 text-white ml-2" />
+            <Play className="w-8 h-8 md:w-10 md:h-10 text-white ml-2" />
           </motion.div>
         </motion.div>
       </div>
