@@ -1059,19 +1059,18 @@ function WhyChooseUs() {
             <motion.div
               key={i}
               variants={fadeInUp}
-              className="flex flex-col items-center text-center group"
+              className="group relative h-[400px] rounded-[2rem] overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.08)] cursor-default"
             >
-              <div className="mb-8 relative">
-                 <div className="w-32 h-32 rounded-full flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
-                   <img src={f.image} className="w-32 h-32 rounded-full object-cover shadow-[0_10px_30px_rgba(0,0,0,0.12)] border-4 border-white" />
-                 </div>
+              <img src={f.image} alt={f.title} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#1C1C1E] via-[#1C1C1E]/60 to-transparent"></div>
+              <div className="absolute bottom-0 left-0 right-0 p-8 flex flex-col justify-end text-left">
+                <h3 className="text-2xl md:text-3xl font-black text-white mb-3 group-hover:text-[#FFCC00] transition-colors">
+                  {f.title}
+                </h3>
+                <p className="text-[16px] md:text-[18px] leading-relaxed text-white/90">
+                  {f.desc}
+                </p>
               </div>
-              <h3 className="text-2xl md:text-3xl font-black bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C] mb-4">
-                {f.title}
-              </h3>
-              <p className="text-[16px] md:text-[20px] leading-[26px] font-medium text-gray-600 px-4">
-                {f.desc}
-              </p>
             </motion.div>
           ))}
         </motion.div>
