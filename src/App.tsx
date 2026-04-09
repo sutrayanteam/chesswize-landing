@@ -718,30 +718,23 @@ function ClassModes() {
             <motion.div
               key={i}
               variants={fadeInUp}
-              whileHover={{ scale: 1.05, y: -10 }}
-              className="bg-gray-50 bg-dot-pattern p-10 rounded-[2rem] shadow-[0_10px_30px_rgba(0,0,0,0.08)] text-center border border-black/5 dark:border-white/5 border-b-2 hover:border-b-[#FFCC00] transition-colors relative overflow-hidden group"
+              className="group relative h-[450px] rounded-[2rem] overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.08)] cursor-default flex flex-col justify-end"
             >
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              <div className="relative z-10">
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ duration: 0.5 }}
-                  className="w-24 h-24 mx-auto rounded-[1.5rem] overflow-hidden mb-6 shadow-md border border-black/5 dark:border-white/5"
-                >
-                  <img src={mode.image} alt={mode.title} className="w-full h-full object-cover group-hover:scale-110 transition-all duration-500" />
-                </motion.div>
-                <h3 className="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C] mb-4">
+              <img src={mode.image} alt={mode.title} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#1C1C1E] via-[#1C1C1E]/70 to-transparent"></div>
+              <div className="relative z-10 p-8 text-left w-full">
+                <h3 className="text-2xl md:text-3xl font-black text-white mb-4 group-hover:text-[#FF3B30] transition-colors">
                   {mode.title}
                 </h3>
-                <p className="text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-normal text-black mb-8">
+                <p className="text-[16px] md:text-[18px] leading-relaxed text-white/90 mb-8">
                   {mode.desc}
                 </p>
                 <Magnetic><motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="relative overflow-hidden w-full py-4 rounded-full text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-semibold text-white bg-gradient-to-r from-[#FF3B30] to-[#D70015] hover:from-red-700 hover:to-red-900 transition-colors shadow-[0_4px_12px_rgba(0,0,0,0.04)] border border-black/5 dark:border-white/5"
+                  className="relative overflow-hidden w-full py-4 rounded-full text-[16px] md:text-[18px] font-semibold text-white bg-[#D70015] hover:bg-white hover:text-[#D70015] transition-colors shadow-[0_4px_12px_rgba(0,0,0,0.2)]"
                 >
-              <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shine"></span>
+                  <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shine"></span>
                   Select Mode
                 </motion.button></Magnetic>
               </div>
