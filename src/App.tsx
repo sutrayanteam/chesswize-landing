@@ -848,18 +848,7 @@ function SuccessStories() {
                   className="absolute inset-0 w-full h-full object-cover"
                 />
               </div>
-              <div className="flex flex-col px-2 pb-2">
-                <div className="flex gap-1 mb-2">
-                  {[...Array(5)].map((_, j) => (
-                    <Star
-                      key={j}
-                      className="w-4 h-4 fill-[#FFCC00] text-[#FFCC00]"
-                    />
-                  ))}
-                </div>
-                <p className="text-white font-bold text-lg leading-tight group-hover:text-[#FFCC00] transition-colors">{t.name}</p>
-                <p className="text-[#EBEBF5]/80 text-sm">{t.title}</p>
-              </div>
+
             </motion.div>
           ))}
         </motion.div>
@@ -1034,25 +1023,7 @@ function VideoDemo() {
   return (
     <div className="w-full py-16 md:py-24 bg-white bg-dot-pattern font-sans relative overflow-hidden">
       <div className="max-w-full px-4 md:px-8 mx-auto relative z-10 text-center">
-        <motion.h2
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-          variants={fadeInUp}
-          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C] mb-8"
-        >
-          See Our <span className="text-[#FF3B30]">Coaching in Action</span>
-        </motion.h2>
-        <motion.p
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-          variants={fadeInUp}
-          className="text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-normal text-gray-500 mb-12 max-w-2xl mx-auto"
-        >
-          Watch a quick snippet of how our interactive online classes keep kids
-          engaged and learning.
-        </motion.p>
+
 
         <motion.div
           initial={{ opacity: 0, y: 50 }}
