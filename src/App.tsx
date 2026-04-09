@@ -172,7 +172,7 @@ function Hero() {
               whileHover={{ y: -5, scale: 1.02 }}
               className="p-5 rounded-[1rem] flex items-center justify-center gap-4 bg-[#1C1C1E] text-white shadow-[0_10px_30px_rgba(0,0,0,0.08)] flex-1 border border-black/5 dark:border-white/5 border-b-2 border-b-[#FFCC00] cursor-pointer"
             >
-              <img src="https://images.unsplash.com/photo-1563207153-f403bf289096?auto=format&fit=crop&w=200&q=80" alt="Experience" className="w-12 h-12 rounded-[0.8rem] object-cover shadow-sm border border-black/10" />
+              <Award className="w-12 h-12 text-[#FFCC00] mb-1" />
               <p className="font-medium text-lg leading-tight">
                 <span className="font-bold text-[#FFCC00] text-xl">
                   10+ Years
@@ -184,7 +184,7 @@ function Hero() {
               whileHover={{ y: -5, scale: 1.02 }}
               className="p-5 rounded-[1rem] flex items-center justify-center gap-4 bg-[#FF3B30] text-white shadow-[0_10px_30px_rgba(0,0,0,0.08)] flex-1 border border-black/5 dark:border-white/5 border-b-2 border-b-[#1C1C1E] cursor-pointer"
             >
-              <img src="https://images.unsplash.com/photo-1504280613257-22f281e053f3?auto=format&fit=crop&w=200&q=80" alt="Structured Learning" className="w-12 h-12 rounded-[0.8rem] object-cover shadow-sm border border-black/10" />
+              <BookOpen className="w-12 h-12 text-white mb-1" />
               <p className="font-medium text-lg leading-tight">
                 <span className="font-bold text-white text-xl">Structured</span>
                 <br />
@@ -1602,11 +1602,9 @@ export default function App() {
       <ScrollToTop />
       <TopMarquee />
       <Hero />
-      <ImpactNumbers />
       <WhyChooseUs />
       <VideoDemo />
       <LearningPath />
-      <WhatChildGains />
       <CoachingProcess />
       <ProgramDetails />
       <ClassModes />
