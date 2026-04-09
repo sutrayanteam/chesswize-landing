@@ -1103,12 +1103,6 @@ function VideoDemo() {
             className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 will-change-transform"
           />
           <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors duration-500"></div>
-          <motion.div
-            whileHover={{ scale: 1.1 }}
-            className="w-20 md:w-24 h-20 md:h-24 bg-[#FF3B30] rounded-full flex items-center justify-center z-10 shadow-[0_0_0_10px_rgba(211,47,47,0.3)] group-hover:shadow-[0_0_0_20px_rgba(211,47,47,0.4)] transition-all duration-300 border border-white/20"
-          >
-            <Play className="w-8 h-8 md:w-10 md:h-10 text-white ml-2" />
-          </motion.div>
         </motion.div>
       </div>
     </div>
