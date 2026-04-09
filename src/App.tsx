@@ -326,10 +326,19 @@ function LearningPath() {
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
           variants={fadeInUp}
-          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C] text-center mb-16"
+          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C] text-center mb-4"
         >
           Our Structured <span className="text-[#FF3B30]">Learning Path</span>
         </motion.h2>
+        <motion.p
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={fadeInUp}
+          className="text-[16px] md:text-[20px] text-gray-500 max-w-2xl mx-auto text-center mb-16 px-4"
+        >
+          From the first move to advanced tournament strategies, our curriculum provides a clear roadmap for your child's success.
+        </motion.p>
         <motion.div
           initial="hidden"
           whileInView="visible"
@@ -615,10 +624,19 @@ function ProgramDetails() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
           variants={fadeInUp}
-          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tight text-center mb-16 text-white"
+          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tight text-center mb-4 text-white"
         >
           Deep Dive Into <span className="text-[#FFCC00]">Our Programs</span>
         </motion.h2>
+        <motion.p
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          variants={fadeInUp}
+          className="text-[16px] md:text-[20px] text-[#EBEBF5]/60 max-w-2xl mx-auto text-center mb-16 px-4"
+        >
+          A comprehensive breakdown of exactly what your child will learn and master during their journey.
+        </motion.p>
         <motion.div
           initial="hidden"
           whileInView="visible"
@@ -802,37 +820,26 @@ function Coaches() {
 function SuccessStories() {
   const testimonials = [
     {
-      quote:
-        "My son's focus has improved tremendously since joining ChessWize. The structured approach really works!",
+      src: "/20250924_224436.mp4",
       name: "Priya S.",
       title: "Parent of 8yo",
-      rating: 5,
     },
     {
-      quote:
-        "The coaches are incredibly patient and skilled. My daughter won her first local tournament last month!",
+      src: "/VID-20250914-WA0001.mp4",
       name: "Rahul M.",
       title: "Parent of 10yo",
-      rating: 5,
     },
     {
-      quote:
-        "Excellent curriculum. It's not just about moving pieces, it's about deep strategic thinking.",
+      src: "/VID-20250914-WA0002.mp4",
       name: "Anita K.",
       title: "Parent of 12yo",
-      rating: 5,
     },
     {
-      quote:
-        "We tried other academies, but ChessWize's level-based system is by far the most effective.",
+      src: "/VID-20250916-WA0013.mp4",
       name: "Vikram D.",
       title: "Parent of 9yo",
-      rating: 5,
     },
   ];
-
-  // Duplicate the array to create a seamless infinite scroll effect
-  const duplicatedTestimonials = [...testimonials, ...testimonials];
 
   return (
     <div className="w-full py-16 md:py-24 relative overflow-hidden bg-black">
@@ -847,63 +854,64 @@ function SuccessStories() {
         <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black"></div>
       </div>
 
-      {/* Decorative quotes */}
-      <Quote className="absolute top-10 left-10 w-40 h-40 text-gray-800 opacity-30 -z-0" />
-      <Quote className="absolute bottom-10 right-10 w-40 h-40 text-gray-800 opacity-30 -z-0 rotate-180" />
-
-      <div className="relative z-10 w-full text-white">
+      <div className="relative z-10 w-full text-white px-4">
         <motion.h2
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
           variants={fadeInUp}
-          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tight text-center mb-16 px-4"
+          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tight text-center mb-4"
         >
           Success Stories -{" "}
           <span className="text-[#FFCC00]">What Parents Say</span>
         </motion.h2>
-
-        {/* Carousel Container */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
+        <motion.p
+          initial="hidden"
+          whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.8 }}
-          className="w-full overflow-hidden flex"
+          variants={fadeInUp}
+          className="text-[16px] md:text-[20px] text-[#EBEBF5]/60 max-w-2xl mx-auto text-center mb-16"
         >
-          <div className="flex gap-6 px-3 w-max marquee-left hover:[animation-play-state:paused]">
-            {duplicatedTestimonials.map((t, i) => (
-              <div
-                key={i}
-                className="relative w-[300px] md:w-[400px] rounded-[2rem] p-8 bg-[#1C1C1E]/80 backdrop-blur-sm border border-white/5 border-b-2 border-b-[#FFCC00] shrink-0 flex flex-col justify-between shadow-[0_20px_40px_rgba(0,0,0,0.12)] hover:border-gray-500 hover:border-b-[#FF3B30] transition-colors group cursor-pointer"
-              >
-                <div>
-                  <div className="flex gap-1 mb-6">
-                    {[...Array(t.rating)].map((_, j) => (
-                      <Star
-                        key={j}
-                        className="w-5 h-5 fill-[#FFCC00] text-[#FFCC00]"
-                      />
-                    ))}
-                  </div>
-                  <h3 className="text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-normal text-[#EBEBF5]/80 group-hover:text-white group-hover:scale-110 transition-all duration-300">
-                    "{t.quote}"
-                  </h3>
+          Hear directly from families whose children have transformed their strategic thinking and focus.
+        </motion.p>
+
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          variants={staggerContainer}
+          className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+        >
+          {testimonials.map((t, i) => (
+            <motion.div
+              key={i}
+              variants={fadeInUp}
+              whileHover={{ y: -8, scale: 1.02 }}
+              className="relative aspect-[9/16] rounded-3xl overflow-hidden shadow-2xl group border border-white/10 bg-black/50 cursor-pointer"
+            >
+              <video
+                src={t.src}
+                autoPlay
+                muted
+                loop
+                playsInline
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 will-change-transform"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
+              <div className="absolute bottom-6 left-6 right-6 z-10">
+                <div className="flex gap-1 mb-2">
+                  {[...Array(5)].map((_, j) => (
+                    <Star
+                      key={j}
+                      className="w-4 h-4 fill-[#FFCC00] text-[#FFCC00]"
+                    />
+                  ))}
                 </div>
-                <div className="mt-8 flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-full bg-[#FF3B30] flex items-center justify-center text-2xl font-bold text-white border border-[#FFCC00] shadow-[0_8px_24px_rgba(0,0,0,0.06)]">
-                    {t.name.charAt(0)}
-                  </div>
-                  <div>
-                    <p className="text-lg font-bold text-white">{t.name}</p>
-                    <p className="text-sm text-[#FFCC00] font-medium">
-                      {t.title}
-                    </p>
-                  </div>
-                </div>
+                <p className="text-white font-bold text-lg leading-tight group-hover:text-[#FFCC00] transition-colors">{t.name}</p>
+                <p className="text-[#EBEBF5]/80 text-sm">{t.title}</p>
               </div>
-            ))}
-          </div>
+            </motion.div>
+          ))}
         </motion.div>
       </div>
     </div>
@@ -950,11 +958,20 @@ function FAQ() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
           variants={fadeInUp}
-          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tight text-center mb-16 bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C]"
+          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tight text-center mb-4 bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C]"
         >
           Got Questions?{" "}
           <span className="text-[#FF3B30]">We've Got Answers!</span>
         </motion.h2>
+        <motion.p
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          variants={fadeInUp}
+          className="text-[16px] md:text-[20px] text-gray-500 max-w-2xl mx-auto text-center mb-16 px-4"
+        >
+          Find clear answers regarding our platform, session schedules, and elite coaching methodology.
+        </motion.p>
         <div className="space-y-4">
           {faqs.map((faq, index) => (
             <motion.div
@@ -1136,10 +1153,19 @@ function WhyChooseUs() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
           variants={fadeInUp}
-          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tight text-center mb-16 bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C]"
+          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tight text-center mb-4 bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C]"
         >
           Why Choose <span className="text-[#FFCC00]">ChessWize?</span>
         </motion.h2>
+        <motion.p
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          variants={fadeInUp}
+          className="text-[16px] md:text-[20px] text-gray-500 max-w-2xl mx-auto text-center mb-16 px-4"
+        >
+          We blend interactive cognitive exercises with proven curriculum frameworks to keep students deeply engaged.
+        </motion.p>
         <motion.div
           initial="hidden"
           whileInView="visible"
