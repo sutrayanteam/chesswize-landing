@@ -1026,7 +1026,7 @@ function WhyChooseUs() {
       desc: "All our trainers are FIDE rated and certified chess instructors.",
     },
     {
-      image: "https://images.unsplash.com/photo-1528822501061-f3b392e2764b?auto=format&fit=crop&w=1000&q=80",
+      image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1000&q=80",
       title: "Safe Environment",
       desc: "100% secure, kid-friendly online learning platform.",
     },
