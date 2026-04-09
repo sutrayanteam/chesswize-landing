@@ -450,40 +450,26 @@ function WhatChildGains() {
 }
 
 function CoachingProcess() {
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start center", "end center"],
-  });
-
-  const pathHeight = useSpring(scrollYProgress, { stiffness: 50, damping: 20 });
-
   const steps = [
     {
       id: 1,
       title: "Submit Enquiry",
-      desc: "Fill out a simple form to let us know your child's current chess level and goals.",
-      image:
-        "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80",
+      desc: "Fill the form with your child's age and current level. Our team reaches out within 24 hours.",
     },
     {
       id: 2,
       title: "Attend Structured Demo",
-      desc: "A free interactive session to assess skills and introduce our unique teaching methodology.",
-      image:
-        "https://images.unsplash.com/photo-1586165368502-1bad197a6461?auto=format&fit=crop&w=800&q=80",
+      desc: "Your child attends a live FREE assessment session. We evaluate their strengths and growth areas.",
     },
     {
       id: 3,
       title: "Enrollment & Batch Allocation",
-      desc: "Get placed in the perfect batch based on skill level, age group, and your preferred schedule.",
-      image:
-        "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80",
+      desc: "If there's a great fit, we allocate a batch that matches your child's level and schedule.",
     },
   ];
 
   return (
-    <section className="py-16 md:py-24 bg-gray-50 bg-dot-pattern font-sans overflow-hidden">
+    <section className="py-16 md:py-24 bg-white font-sans overflow-hidden">
       <div className="max-w-7xl mx-auto px-4">
         <motion.h2
           initial="hidden"
@@ -492,67 +478,35 @@ function CoachingProcess() {
           variants={fadeInUp}
           className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tight mb-20 text-center bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C]"
         >
-          How Our <span className="text-[#FF3B30]">Coaching Process</span> Works
+          Our <span className="text-[#FF3B30]">Process</span>
         </motion.h2>
 
-        <div ref={ref} className="relative">
-          {/* Animated Timeline Line */}
-          <div className="absolute left-10 md:left-1/2 top-0 bottom-0 w-1.5 bg-gray-200 rounded-full transform md:-translate-x-1/2"></div>
-          <motion.div
-            style={{ scaleY: pathHeight, originY: 0 }}
-            className="absolute left-10 md:left-1/2 top-0 bottom-0 w-1.5 bg-[#FF3B30] rounded-full transform md:-translate-x-1/2 z-10"
-          ></motion.div>
-
-          <div className="space-y-24 relative z-20">
-            {steps.map((step, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 0.6, delay: i * 0.2 }}
-                className={`flex flex-col md:flex-row items-center gap-12 ${i % 2 === 0 ? "md:flex-row-reverse" : ""}`}
-              >
-                {/* Content Box */}
-                <div className="w-full md:w-1/2 flex justify-center pl-24 md:pl-0">
-                  <motion.div
-                    whileHover={{ scale: 1.03, y: -5 }}
-                    className="bg-white bg-dot-pattern p-8 rounded-[2rem] border border-black/5 dark:border-white/5 border-b-2 shadow-[0_10px_30px_rgba(0,0,0,0.08)] hover:border-b-[#FFCC00] transition-colors w-full max-w-md relative group"
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-br from-white to-gray-50 rounded-[2rem] -z-10"></div>
-                    <h3 className="text-2xl font-bold mb-3 text-[#1C1C1E] group-hover:text-[#FF3B30] group-hover:scale-110 transition-all duration-300">
-                      {step.title}
-                    </h3>
-                    <p className="text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-normal text-black">
-                      {step.desc}
-                    </p>
-                  </motion.div>
-                </div>
-
-                {/* Center Number */}
-                <div className="absolute left-10 md:left-1/2 transform -translate-x-1/2 w-16 h-16 shrink-0 rounded-full bg-[#1C1C1E] flex items-center justify-center text-2xl font-black text-[#FFCC00] shadow-[0_0_0_8px_rgba(249,250,251,1)] border-2 border-black/5 z-30">
-                  {step.id}
-                </div>
-
-                {/* Image Box */}
-                <div className="w-full md:w-1/2 flex justify-center pl-24 md:pl-0">
-                  <motion.div
-                    whileHover={{ scale: 1.05, rotate: i % 2 === 0 ? -2 : 2 }}
-                    className="relative w-full max-w-md aspect-video rounded-[2rem] overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.12)] border-2 border-black/5"
-                  >
-                    <img
-                      src={step.image}
-                      alt={step.title}
-                      className="w-full h-full object-cover"
-                      referrerPolicy="no-referrer"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
-                  </motion.div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          variants={staggerContainer}
+          className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-10 max-w-6xl mx-auto"
+        >
+          {steps.map((step, i) => (
+            <motion.div
+              key={i}
+              variants={fadeInUp}
+              whileHover={{ y: -8 }}
+              className="bg-[#FAFAFF] border-2 border-[#F0EDFF] rounded-[1.5rem] p-8 md:p-10 flex flex-col items-center text-center shadow-[0_8px_30px_rgba(0,0,0,0.02)] transition-all duration-300"
+            >
+              <div className="w-14 h-14 rounded-full bg-[#f99339] flex items-center justify-center text-white text-2xl font-black mb-8 shadow-sm">
+                {step.id}
+              </div>
+              <h3 className="text-xl md:text-2xl font-extrabold text-[#2D2A4A] mb-4">
+                {step.title}
+              </h3>
+              <p className="text-[#5A5873] text-[15px] md:text-[16px] leading-relaxed font-medium">
+                {step.desc}
+              </p>
+            </motion.div>
+          ))}
+        </motion.div>
       </div>
     </section>
   );
