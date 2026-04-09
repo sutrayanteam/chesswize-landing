@@ -296,18 +296,21 @@ function LearningPath() {
       name: "Beginner",
       focus: "Rules & Basics",
       type: "Foundation",
+      image: "/young-boy-developing-chess-strategy-playing-chess-2026-03-19-07-06-56-utc.jpg",
     },
     {
       level: "Level 2",
       name: "Intermediate",
       focus: "Tactics & Strategy",
       type: "Development",
+      image: "/brain-gym-2026-03-13-01-47-11-utc.jpg",
     },
     {
       level: "Level 3",
       name: "Advanced",
       focus: "Positional Play",
       type: "Competitive",
+      image: "/young-man-deep-in-thought-while-playing-game-of-ch-2026-01-09-00-57-38-utc.jpg",
     },
   ];
 
@@ -339,14 +342,17 @@ function LearningPath() {
               key={i}
               variants={fadeInUp}
               whileHover={{ y: -15, scale: 1.03 }}
-              className="bg-white bg-dot-pattern border border-black/5 dark:border-white/5 border-b-2 rounded-[1.5rem] p-6 text-center w-[calc(50%-0.75rem)] sm:w-[calc(33.333%-1rem)] md:flex-1 min-w-[160px] shadow-[0_10px_30px_rgba(0,0,0,0.08)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.12)] transition-all hover:border-b-[#FFCC00] group relative overflow-hidden"
+              className="bg-white border border-black/5 dark:border-white/5 border-b-2 rounded-[1.5rem] overflow-hidden text-center w-[calc(50%-0.75rem)] sm:w-[calc(33.333%-1rem)] md:flex-1 min-w-[200px] shadow-[0_10px_30px_rgba(0,0,0,0.08)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.12)] transition-all hover:border-b-[#FFCC00] group flex flex-col"
             >
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              <div className="relative z-10">
-                <div className="font-bold text-sm md:text-lg text-[#FF3B30] mb-2 uppercase tracking-wider group-hover:scale-110 transition-all duration-300">
+              <div className="w-full h-48 md:h-56 relative overflow-hidden bg-gray-100">
+                <img src={l.image} alt={l.name} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 will-change-transform" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+                <div className="absolute top-4 right-4 font-bold text-xs md:text-sm rounded-full py-1.5 px-3 bg-[#FFCC00] text-[#1C1C1E] shadow-sm z-10">
                   {l.level}
                 </div>
-                <div className="font-black text-xl md:text-2xl bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C] mb-3">
+              </div>
+              <div className="relative z-10 p-6 flex flex-col flex-1 bg-dot-pattern">
+                <div className="font-black text-xl md:text-2xl bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C] mb-3 mt-2">
                   {l.name}
                 </div>
                 <div className="text-[#FF3B30] font-semibold text-sm md:text-base mb-6 h-10 flex items-center justify-center">
@@ -354,7 +360,7 @@ function LearningPath() {
                 </div>
                 <motion.div
                   whileHover={{ scale: 1.1 }}
-                  className="text-[#1C1C1E] font-bold text-xs md:text-sm rounded-full py-2 px-4 bg-[#FFCC00] inline-block shadow-sm border border-black/5 dark:border-white/5"
+                  className="text-white font-bold text-xs md:text-sm rounded-full py-2 px-4 bg-gradient-to-r from-[#FF3B30] to-[#D70015] inline-block shadow-sm mx-auto w-max"
                 >
                   {l.type}
                 </motion.div>
