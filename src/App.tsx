@@ -1021,17 +1021,17 @@ function VideoDemo() {
 function WhyChooseUs() {
   const features = [
     {
-      image: "https://images.unsplash.com/photo-1563207153-f403bf289096?auto=format&fit=crop&w=200&q=80",
+      image: "https://images.unsplash.com/photo-1586165368502-1bad197a6461?auto=format&fit=crop&w=1000&q=80",
       title: "Certified Coaches",
       desc: "All our trainers are FIDE rated and certified chess instructors.",
     },
     {
-      image: "https://images.unsplash.com/photo-1614332287897-cdc24cb7ca52?auto=format&fit=crop&w=200&q=80",
+      image: "https://images.unsplash.com/photo-1528822501061-f3b392e2764b?auto=format&fit=crop&w=1000&q=80",
       title: "Safe Environment",
       desc: "100% secure, kid-friendly online learning platform.",
     },
     {
-      image: "https://images.unsplash.com/photo-1501139082119-e14197628102?auto=format&fit=crop&w=200&q=80",
+      image: "https://images.unsplash.com/photo-1580541832626-2a7131ee809f?auto=format&fit=crop&w=1000&q=80",
       title: "Proven Track Record",
       desc: "Hundreds of our students have won state and national titles.",
     },
