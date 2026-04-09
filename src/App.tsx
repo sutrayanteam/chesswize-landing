@@ -71,7 +71,7 @@ function TextReveal({ text, className }: { text: string; className?: string }) {
               transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] },
             },
           }}
-          className={`inline-block mr-[0.25em] ${word.toLowerCase() === "online" || word.toLowerCase() === "chess" ? "text-[#FF3B30]" : ""}`}
+          className={`inline-block mr-[0.25em] ${word.toLowerCase() === "online" || word.toLowerCase() === "chess" ? "text-[#D4AF37]" : ""}`}
         >
           {word}
         </motion.span>
@@ -82,17 +82,17 @@ function TextReveal({ text, className }: { text: string; className?: string }) {
 
 function TopMarquee() {
   return (
-    <div className="w-full py-3 overflow-hidden bg-[#FF3B30] relative z-50">
+    <div className="w-full py-3 overflow-hidden bg-[#0F172A] relative z-50">
       <div className="flex items-center animate-marquee whitespace-nowrap">
         {[...Array(15)].map((_, i) => (
           <span key={i} className="flex items-center">
-            <span className="font-bold text-xl mx-3 text-[#FFCC00]">♔</span>
+            <span className="font-bold text-xl mx-3 text-[#EAB308]">♔</span>
             <span className="font-semibold text-lg text-white tracking-wide">
-              Professional <span className="text-[#FF3B30]">Online Chess</span>{" "}
+              Professional <span className="text-[#D4AF37]">Online Chess</span>{" "}
               Coaching
             </span>
-            <span className="font-bold text-xl mx-3 text-[#FFCC00]">♕</span>
-            <span className="font-semibold text-lg text-[#FFCC00] tracking-wide">
+            <span className="font-bold text-xl mx-3 text-[#EAB308]">♕</span>
+            <span className="font-semibold text-lg text-[#EAB308] tracking-wide">
               Book Your Free Demo
             </span>
           </span>
@@ -131,9 +131,9 @@ function Hero() {
           initial="hidden"
           animate="visible"
           variants={fadeInUp}
-          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tight text-center mb-6 text-[#1C1C1E]"
+          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tighter text-center mb-6 text-[#1C1C1E]"
         >
-          Professional <span className="text-[#FF3B30]">Online Chess</span> Coaching for Kids
+          Professional <span className="text-[#D4AF37]">Online Chess</span> Coaching for Kids
         </motion.h1>
         <motion.h2
           initial="hidden"
@@ -153,8 +153,8 @@ function Hero() {
           transition={{ duration: 0.8, type: "spring", bounce: 0.4 }}
           className="w-full lg:w-1/2 relative group"
         >
-          <div className="absolute inset-0 bg-[#FFCC00] rounded-[1.5rem] transform translate-x-4 translate-y-4 transition-transform group-hover:translate-x-6 group-hover:translate-y-6 duration-500 border border-black/5 dark:border-white/5"></div>
-          <div className="absolute inset-0 bg-[#FF3B30] rounded-[1.5rem] transform -translate-x-4 -translate-y-4 transition-transform group-hover:-translate-x-6 group-hover:-translate-y-6 duration-500 -z-10 border border-black/5 dark:border-white/5"></div>
+          <div className="absolute inset-0 bg-[#EAB308] rounded-[1.5rem] transform translate-x-4 translate-y-4 transition-transform group-hover:translate-x-6 group-hover:translate-y-6 duration-500 border border-black/5 dark:border-white/5"></div>
+          <div className="absolute inset-0 bg-[#0F172A] rounded-[1.5rem] transform -translate-x-4 -translate-y-4 transition-transform group-hover:-translate-x-6 group-hover:-translate-y-6 duration-500 -z-10 border border-black/5 dark:border-white/5"></div>
           <img
             src="/two-cute-children-playing-chess-at-home-2026-03-19-03-11-17-utc.jpg"
             alt="Chess Coaching"
@@ -171,11 +171,11 @@ function Hero() {
           <div className="flex flex-col sm:flex-row gap-4 mb-8 w-full">
             <motion.div
               whileHover={{ y: -5, scale: 1.02 }}
-              className="p-5 rounded-[1rem] flex items-center justify-center gap-4 bg-[#1C1C1E] text-white shadow-[0_10px_30px_rgba(0,0,0,0.08)] flex-1 border border-black/5 dark:border-white/5 border-b-2 border-b-[#FFCC00] cursor-pointer"
+              className="p-5 rounded-[1rem] flex items-center justify-center gap-4 bg-[#1C1C1E] text-white shadow-[0_10px_30px_rgba(0,0,0,0.08)] flex-1 border border-black/5 dark:border-white/5 border-b-2 border-b-[#EAB308] cursor-pointer"
             >
-              <Award className="w-12 h-12 text-[#FFCC00] mb-1" />
+              <Award className="w-12 h-12 text-[#EAB308] mb-1" />
               <p className="font-medium text-lg leading-tight">
-                <span className="font-bold text-[#FFCC00] text-xl">
+                <span className="font-bold text-[#EAB308] text-xl">
                   10+ Years
                 </span>
                 <br /> Experience
@@ -183,7 +183,7 @@ function Hero() {
             </motion.div>
             <motion.div
               whileHover={{ y: -5, scale: 1.02 }}
-              className="p-5 rounded-[1rem] flex items-center justify-center gap-4 bg-[#FF3B30] text-white shadow-[0_10px_30px_rgba(0,0,0,0.08)] flex-1 border border-black/5 dark:border-white/5 border-b-2 border-b-[#1C1C1E] cursor-pointer"
+              className="p-5 rounded-[1rem] flex items-center justify-center gap-4 bg-[#0F172A] text-white shadow-[0_10px_30px_rgba(0,0,0,0.08)] flex-1 border border-black/5 dark:border-white/5 border-b-2 border-b-[#1C1C1E] cursor-pointer"
             >
               <BookOpen className="w-12 h-12 text-white mb-1" />
               <p className="font-medium text-lg leading-tight">
@@ -193,16 +193,16 @@ function Hero() {
               </p>
             </motion.div>
           </div>
-          <div className="w-full mb-8 bg-gray-50 bg-dot-pattern p-6 rounded-[1rem] border-l-4 border-[#FF3B30] shadow-[0_4px_12px_rgba(0,0,0,0.04)] relative overflow-hidden group">
+          <div className="w-full mb-8 bg-gray-50 bg-dot-pattern p-6 rounded-[1rem] border-l-4 border-[#D4AF37] shadow-[0_4px_12px_rgba(0,0,0,0.04)] relative overflow-hidden group">
             <motion.div className="absolute inset-0 bg-gradient-to-r from-red-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             <p className="text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-normal text-black relative z-10">
               Structured, level-based chess training designed to build{" "}
-              <span className="font-bold text-[#FF3B30]">
+              <span className="font-bold text-[#D4AF37]">
                 strategic thinking
               </span>
-              , <span className="font-bold text-[#FF3B30]">discipline</span>,
+              , <span className="font-bold text-[#D4AF37]">discipline</span>,
               and{" "}
-              <span className="font-bold text-[#FF3B30]">
+              <span className="font-bold text-[#D4AF37]">
                 competitive confidence
               </span>
               .
@@ -211,7 +211,7 @@ function Hero() {
           <Magnetic><motion.button
             whileHover={{ scale: 1.05, boxShadow: "0px 4px 0px #D70015", y: 4 }}
             whileTap={{ scale: 0.95, boxShadow: "0px 0px 0px #D70015", y: 8 }}
-            className="relative overflow-hidden text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-semibold text-white px-6 md:px-10 py-4 md:py-5 rounded-full w-full md:w-auto shadow-[0_8px_0_#D70015] bg-gradient-to-r from-[#FF3B30] to-[#D70015] transition-all flex items-center justify-center gap-2 group"
+            className="relative overflow-hidden text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-semibold text-white px-6 md:px-10 py-4 md:py-5 rounded-full w-full md:w-auto shadow-[0_8px_0_#020617] bg-gradient-to-r from-[#1E293B] to-[#0F172A] transition-all flex items-center justify-center gap-2 group"
           >
               <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shine"></span>
             Book Your Free Demo
@@ -238,7 +238,7 @@ function ImpactNumbers() {
   return (
     <section
       ref={ref}
-      className="relative bg-cover bg-center py-20 lg:py-32 font-sans flex items-center bg-[#FF3B30] overflow-hidden"
+      className="relative bg-cover bg-center py-20 lg:py-32 font-sans flex items-center bg-[#0F172A] overflow-hidden"
     >
       <motion.div
         animate={{ backgroundPosition: ["0% 0%", "100% 100%"] }}
@@ -250,9 +250,9 @@ function ImpactNumbers() {
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}
           variants={fadeInUp}
-          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tight text-white mb-16"
+          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tighter text-white mb-16"
         >
-          Our Impact in <span className="text-[#FFCC00]">Numbers</span>
+          Our Impact in <span className="text-[#EAB308]">Numbers</span>
         </motion.h2>
         <motion.div
           variants={staggerContainer}
@@ -275,7 +275,7 @@ function ImpactNumbers() {
                 <img src={stat.image} alt={stat.label} className="w-full h-full object-cover group-hover:scale-110 transition-all duration-500" />
               </motion.div>
               <div className="flex flex-col items-start">
-                <p className="text-4xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C]">
+                <p className="text-4xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C]">
                   {stat.num}
                 </p>
                 <p className="text-lg font-bold text-[#8E8E93] uppercase tracking-wide">
@@ -312,8 +312,8 @@ function LearningPath() {
   return (
     <div className="w-full py-20 lg:py-32 bg-white bg-dot-pattern relative overflow-hidden">
       {/* Decorative background elements */}
-      <motion.div animate={{ y: [0, -20, 0], x: [0, 10, 0] }} transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }} className="absolute top-20 left-10 w-64 h-64 bg-[#FFCC00] rounded-full mix-blend-multiply filter blur-[120px] opacity-10"></motion.div>
-      <motion.div animate={{ y: [0, 20, 0], x: [0, -10, 0] }} transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }} className="absolute top-40 right-10 w-64 h-64 bg-[#FF3B30] rounded-full mix-blend-multiply filter blur-[120px] opacity-10"></motion.div>
+      <motion.div animate={{ y: [0, -20, 0], x: [0, 10, 0] }} transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }} className="absolute top-20 left-10 w-64 h-64 bg-[#EAB308] rounded-full mix-blend-multiply filter blur-[120px] opacity-10"></motion.div>
+      <motion.div animate={{ y: [0, 20, 0], x: [0, -10, 0] }} transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }} className="absolute top-40 right-10 w-64 h-64 bg-[#0F172A] rounded-full mix-blend-multiply filter blur-[120px] opacity-10"></motion.div>
 
       <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
         <motion.h2
@@ -321,9 +321,9 @@ function LearningPath() {
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
           variants={fadeInUp}
-          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C] text-center mb-4"
+          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tighter bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C] text-center mb-4"
         >
-          Our Structured <span className="text-[#FF3B30]">Learning Path</span>
+          Our Structured <span className="text-[#D4AF37]">Learning Path</span>
         </motion.h2>
         <motion.p
           initial="hidden"
@@ -352,7 +352,7 @@ function LearningPath() {
                 <img src={l.image} alt={l.name} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover object-[center_15%] group-hover:scale-105 transition-transform duration-1000 ease-out will-change-transform" />
               </div>
               <div className="relative z-10 p-5 md:p-6 flex flex-col flex-1 bg-white items-center justify-center">
-                <div className="font-extrabold text-lg md:text-2xl tracking-tight text-[#1C1C1E]">
+                <div className="font-extrabold text-lg md:text-2xl tracking-tighter text-[#1C1C1E]">
                   {l.name}
                 </div>
                 <p className="text-[#8E8E93] text-[15px] text-center mt-3 leading-relaxed max-w-[240px]">
@@ -402,17 +402,17 @@ function WhatChildGains() {
   ];
 
   return (
-    <div className="w-full py-20 lg:py-32 bg-white bg-dot-pattern">
+    <div className="w-full py-20 lg:py-32 bg-slate-50 relative overflow-hidden"><div className="absolute top-0 left-1/4 w-96 h-96 bg-[#D4AF37]/10 rounded-full blur-3xl pointer-events-none"></div>
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         <motion.h2
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
           variants={fadeInUp}
-          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tight text-center mb-16 bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C]"
+          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tighter text-center mb-16 bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C]"
         >
           What Your Child{" "}
-          <span className="text-[#FF3B30]">Gains With Chess!</span>
+          <span className="text-[#D4AF37]">Gains With Chess!</span>
         </motion.h2>
         <motion.div
           initial="hidden"
@@ -514,9 +514,9 @@ function ProgramDetails() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
           variants={fadeInUp}
-          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tight text-center mb-4 text-white"
+          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tighter text-center mb-4 text-white"
         >
-          Deep Dive Into <span className="text-[#FFCC00]">Our Programs</span>
+          Deep Dive Into <span className="text-[#EAB308]">Our Programs</span>
         </motion.h2>
         <motion.p
           initial="hidden"
@@ -540,19 +540,19 @@ function ProgramDetails() {
               variants={cardVariants}
               initial="rest"
               whileHover="hover"
-              className="bg-[#1C1C1E]/80 backdrop-blur-md rounded-[2rem] p-8 border border-white/5 border-b-2 border-b-[#FF3B30] shadow-[0_20px_40px_rgba(0,0,0,0.12)] relative overflow-hidden cursor-pointer group hover:border-gray-500 hover:border-b-[#FFCC00] transition-colors"
+              className="bg-[#1C1C1E]/80 backdrop-blur-md rounded-[2rem] p-8 border border-white/5 border-b-2 border-b-[#FF3B30] shadow-[0_20px_40px_rgba(0,0,0,0.12)] relative overflow-hidden cursor-pointer group hover:border-gray-500 hover:border-b-[#EAB308] transition-colors"
             >
               <motion.div
-                className="absolute top-0 left-0 w-full h-2 bg-[#FF3B30] origin-left"
+                className="absolute top-0 left-0 w-full h-2 bg-[#0F172A] origin-left"
                 initial={{ scaleX: 0 }}
                 whileInView={{ scaleX: 1 }}
                 transition={{ duration: 0.8, delay: i * 0.2 }}
                 viewport={{ once: true, amount: 0.2 }}
               ></motion.div>
-              <div className="absolute top-0 right-0 w-32 h-32 bg-[#FFCC00] rounded-full filter blur-[80px] opacity-0 group-hover:opacity-20 transition-opacity duration-500"></div>
+              <div className="absolute top-0 right-0 w-32 h-32 bg-[#EAB308] rounded-full filter blur-[80px] opacity-0 group-hover:opacity-20 transition-opacity duration-500"></div>
 
               <h3 className="text-2xl font-black text-white mb-2">{p.title}</h3>
-              <p className="text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-normal text-[#FFCC00] mb-8 pb-4 border-b border-white/5">
+              <p className="text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-normal text-[#EAB308] mb-8 pb-4 border-b border-white/5">
                 {p.subtitle}
               </p>
               <ul className="space-y-4">
@@ -562,7 +562,7 @@ function ProgramDetails() {
                     variants={itemVariants}
                     className="flex items-start gap-3"
                   >
-                    <CheckCircle className="w-6 h-6 text-[#FF3B30] shrink-0" />
+                    <CheckCircle className="w-6 h-6 text-[#D4AF37] shrink-0" />
                     <span className="text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-normal text-[#EBEBF5]/80">
                       {point}
                     </span>
@@ -597,16 +597,16 @@ function ClassModes() {
   ];
 
   return (
-    <section className="py-20 lg:py-32 bg-white bg-dot-pattern font-sans">
+    <section className="py-20 lg:py-32 bg-slate-50 font-sans relative overflow-hidden"><div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#0F172A]/5 rounded-full blur-3xl pointer-events-none"></div>
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         <motion.h2
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
           variants={fadeInUp}
-          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tight text-center mb-4 bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C]"
+          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tighter text-center mb-4 bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C]"
         >
-          Flexible <span className="text-[#FF3B30]">Class Models</span>
+          Flexible <span className="text-[#D4AF37]">Class Models</span>
         </motion.h2>
         <motion.p
           initial="hidden"
@@ -633,7 +633,7 @@ function ClassModes() {
               <img src={mode.image} alt={mode.title} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 will-change-transform" />
               <div className="absolute inset-0 bg-gradient-to-t from-[#1C1C1E] via-[#1C1C1E]/70 to-transparent"></div>
               <div className="relative z-10 p-8 text-left w-full">
-                <h3 className="text-2xl md:text-3xl font-black text-white mb-4 group-hover:text-[#FF3B30] transition-colors">
+                <h3 className="text-2xl md:text-3xl font-black text-white mb-4 group-hover:text-[#D4AF37] transition-colors">
                   {mode.title}
                 </h3>
                 <p className="text-[16px] md:text-[18px] leading-relaxed text-white/90 mb-8">
@@ -672,9 +672,9 @@ function Coaches() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
           variants={fadeInUp}
-          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tight text-center mb-4 bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C]"
+          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tighter text-center mb-4 bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C]"
         >
-          Learn from <span className="text-[#FF3B30]">Expert Coaches</span>
+          Learn from <span className="text-[#D4AF37]">Expert Coaches</span>
         </motion.h2>
         <motion.p
           initial="hidden"
@@ -706,15 +706,15 @@ function Coaches() {
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <span className="text-white font-bold text-sm bg-[#FF3B30] px-2 py-1 rounded-full border border-black/5 dark:border-white/5">
+                  <span className="text-white font-bold text-sm bg-[#0F172A] px-2 py-1 rounded-full border border-black/5 dark:border-white/5">
                     FIDE {c.rating}
                   </span>
                 </div>
               </div>
-              <h3 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C] mb-2 group-hover:text-[#FF3B30] group-hover:scale-110 transition-all duration-300">
+              <h3 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C] mb-2 group-hover:text-[#D4AF37] group-hover:scale-110 transition-all duration-300">
                 {c.name}
               </h3>
-              <p className="text-[#FF3B30] font-semibold bg-red-50 py-1 px-3 rounded-full inline-block border border-[#FF3B30]">
+              <p className="text-[#D4AF37] font-semibold bg-red-50 py-1 px-3 rounded-full inline-block border border-[#D4AF37]">
                 {c.exp} Experience
               </p>
             </motion.div>
@@ -768,10 +768,10 @@ function SuccessStories() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
           variants={fadeInUp}
-          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tight text-center mb-4"
+          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tighter text-center mb-4"
         >
           Success Stories -{" "}
-          <span className="text-[#FFCC00]">What Parents Say</span>
+          <span className="text-[#EAB308]">What Parents Say</span>
         </motion.h2>
         <motion.p
           initial="hidden"
@@ -854,10 +854,10 @@ function FAQ() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
           variants={fadeInUp}
-          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tight text-center mb-4 bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C]"
+          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tighter text-center mb-4 bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C]"
         >
           Got Questions?{" "}
-          <span className="text-[#FF3B30]">We've Got Answers!</span>
+          <span className="text-[#D4AF37]">We've Got Answers!</span>
         </motion.h2>
         <motion.p
           initial="hidden"
@@ -876,12 +876,12 @@ function FAQ() {
               whileInView="visible"
               viewport={{ once: true, amount: 0.2 }}
               variants={fadeInUp}
-              className={`border border-black/5 dark:border-white/5 p-6 cursor-pointer rounded-[1.5rem] transition-all shadow-sm ${openIndex === index ? "bg-white bg-dot-pattern border-b-2 border-b-[#FFCC00] shadow-[0_4px_12px_rgba(0,0,0,0.04)]" : "bg-gray-50 bg-dot-pattern border-b-2 hover:border-b-2 hover:border-b-[#FF3B30]"}`}
+              className={`border border-black/5 dark:border-white/5 p-6 cursor-pointer rounded-[1.5rem] transition-all shadow-sm ${openIndex === index ? "bg-white bg-dot-pattern border-b-2 border-b-[#EAB308] shadow-[0_4px_12px_rgba(0,0,0,0.04)]" : "bg-gray-50 bg-dot-pattern border-b-2 hover:border-b-2 hover:border-b-[#FF3B30]"}`}
               onClick={() => setOpenIndex(openIndex === index ? null : index)}
             >
               <div className="flex justify-between items-center">
                 <p
-                  className={`text-lg md:text-xl font-bold pr-4 transition-colors ${openIndex === index ? "text-[#FF3B30]" : "bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C]"}`}
+                  className={`text-lg md:text-xl font-bold pr-4 transition-colors ${openIndex === index ? "text-[#D4AF37]" : "bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C]"}`}
                 >
                   {faq.question}
                 </p>
@@ -890,7 +890,7 @@ function FAQ() {
                   transition={{ duration: 0.3 }}
                 >
                   <ChevronDown
-                    className={`w-6 h-6 shrink-0 ${openIndex === index ? "text-[#FF3B30]" : "bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C]"}`}
+                    className={`w-6 h-6 shrink-0 ${openIndex === index ? "text-[#D4AF37]" : "bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C]"}`}
                   />
                 </motion.div>
               </div>
@@ -942,18 +942,18 @@ function ReadyToImprove() {
         <motion.div
           animate={{ scale: [1, 1.2, 1], rotate: [0, 90, 0] }}
           transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-          className="absolute top-0 right-0 w-64 h-64 bg-[#FF3B30] rounded-full blur-[100px] opacity-50"
+          className="absolute top-0 right-0 w-64 h-64 bg-[#0F172A] rounded-full blur-[100px] opacity-50"
         ></motion.div>
         <motion.div
           animate={{ scale: [1, 1.5, 1], rotate: [0, -90, 0] }}
           transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          className="absolute bottom-0 left-0 w-64 h-64 bg-[#FFCC00] rounded-full blur-[100px] opacity-20"
+          className="absolute bottom-0 left-0 w-64 h-64 bg-[#EAB308] rounded-full blur-[100px] opacity-20"
         ></motion.div>
 
         <div className="text-center relative z-20">
-          <h2 className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tight mb-8 text-white">
+          <h2 className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tighter mb-8 text-white">
             Ready to Help Your Child{" "}
-            <span className="text-[#FFCC00]">Improve Systematically?</span>
+            <span className="text-[#EAB308]">Improve Systematically?</span>
           </h2>
           <p className="text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-normal text-[#EBEBF5]/80 mb-12 max-w-2xl mx-auto">
             Join ChessWize today and give your child the strategic advantage
@@ -962,7 +962,7 @@ function ReadyToImprove() {
           <Magnetic><motion.button
             whileHover={{ scale: 1.05, boxShadow: "0px 4px 0px #D70015", y: 4 }}
             whileTap={{ scale: 0.95, boxShadow: "0px 0px 0px #D70015", y: 8 }}
-            className="relative overflow-hidden text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-semibold text-white py-5 px-12 rounded-full transition shadow-[0_8px_0_#D70015] md:w-auto w-full flex items-center justify-center gap-2 mx-auto group bg-gradient-to-r from-[#FF3B30] to-[#D70015]"
+            className="relative overflow-hidden text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-semibold text-white py-5 px-12 rounded-full transition shadow-[0_8px_0_#020617] md:w-auto w-full flex items-center justify-center gap-2 mx-auto group bg-gradient-to-r from-[#1E293B] to-[#0F172A]"
           >
               <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shine"></span>
             Book Your Demo Now
@@ -1031,9 +1031,9 @@ function WhyChooseUs() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
           variants={fadeInUp}
-          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tight text-center mb-4 bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C]"
+          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tighter text-center mb-4 bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C]"
         >
-          Why Choose <span className="text-[#FFCC00]">ChessWize?</span>
+          Why Choose <span className="text-[#EAB308]">ChessWize?</span>
         </motion.h2>
         <motion.p
           initial="hidden"
@@ -1056,7 +1056,7 @@ function WhyChooseUs() {
               key={i}
               variants={fadeInUp}
               whileHover={{ y: -12, scale: 1.02, transition: { type: "spring", stiffness: 300 } }}
-              className="bg-white p-8 rounded-[2rem] border-2 border-gray-200 text-center hover:border-[#FF3B30] hover:shadow-[0_20px_40px_rgba(255,59,48,0.08)] transition-all duration-300 group cursor-default"
+              className="bg-white p-8 rounded-[2rem] border-2 border-gray-200 text-center hover:border-[#D4AF37] hover:shadow-[0_20px_40px_rgba(255,59,48,0.08)] transition-all duration-300 group cursor-default"
             >
               <div className="w-24 h-24 mx-auto rounded-[1.5rem] overflow-hidden mb-6 shadow-[0_8px_24px_rgba(0,0,0,0.06)] border border-black/5 dark:border-white/5 bg-white flex items-center justify-center p-4">
                 <img src={f.image} alt={f.title} loading="lazy" decoding="async" className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500 will-change-transform" />
@@ -1125,9 +1125,9 @@ function Pricing() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
           variants={fadeInUp}
-          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tight text-center mb-4 bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C]"
+          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tighter text-center mb-4 bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C]"
         >
-          Simple, Transparent <span className="text-[#FF3B30]">Pricing</span>
+          Simple, Transparent <span className="text-[#D4AF37]">Pricing</span>
         </motion.h2>
         <motion.p
           initial="hidden"
@@ -1150,10 +1150,10 @@ function Pricing() {
               key={i}
               variants={fadeInUp}
               whileHover={{ y: -10 }}
-              className={`bg-white bg-dot-pattern rounded-[2rem] p-8 shadow-[0_10px_30px_rgba(0,0,0,0.08)] relative border border-black/5 dark:border-white/5 border-b-2 ${plan.popular ? "border-b-[#FFCC00] md:scale-105 z-10" : "border-b-gray-300"}`}
+              className={`bg-white/60 backdrop-blur-2xl bg-dot-pattern rounded-[2rem] p-8 border border-white/50 shadow-xl shadow-[0_10px_30px_rgba(0,0,0,0.08)] relative border border-black/5 dark:border-white/5 border-b-2 ${plan.popular ? "border-b-[#EAB308] md:scale-105 z-10" : "border-b-gray-300"}`}
             >
               {plan.popular && (
-                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#FFCC00] text-[#1C1C1E] font-bold px-4 py-1 rounded-full text-sm uppercase tracking-wide border border-black/5 dark:border-white/5">
+                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#EAB308] text-[#1C1C1E] font-bold px-4 py-1 rounded-full text-sm uppercase tracking-wide border border-black/5 dark:border-white/5">
                   Most Popular
                 </div>
               )}
@@ -1161,7 +1161,7 @@ function Pricing() {
                 {plan.name}
               </h3>
               <div className="text-center mb-8">
-                <span className="text-4xl md:text-5xl font-black tracking-tight text-[#FF3B30]">
+                <span className="text-4xl md:text-5xl font-black tracking-tighter text-[#D4AF37]">
                   {plan.price}
                 </span>
                 <span className="text-[#8E8E93] font-medium">
@@ -1171,7 +1171,7 @@ function Pricing() {
               <ul className="space-y-4 mb-8">
                 {plan.features.map((feature, j) => (
                   <li key={j} className="flex items-center gap-3">
-                    <CheckCircle className="w-5 h-5 text-[#FFCC00] shrink-0" />
+                    <CheckCircle className="w-5 h-5 text-[#EAB308] shrink-0" />
                     <span className="text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-normal text-black">
                       {feature}
                     </span>
@@ -1181,7 +1181,7 @@ function Pricing() {
               <Magnetic><motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="relative overflow-hidden w-full px-8 py-4 rounded-full text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-semibold text-white transition-colors border border-black/5 dark:border-white/5 bg-gradient-to-r from-[#FF3B30] to-[#D70015] hover:from-red-700 hover:to-red-900"
+                className="relative overflow-hidden w-full px-8 py-4 rounded-full text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-semibold text-white transition-colors border border-black/5 dark:border-white/5 bg-gradient-to-r from-[#1E293B] to-[#0F172A] hover:from-[#0F172A] hover:to-[#020617]"
               >
               <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shine"></span>
                 Choose Plan
@@ -1209,9 +1209,9 @@ function ContactForm() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
           variants={fadeInUp}
-          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tight text-center mb-4 bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C]"
+          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tighter text-center mb-4 bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C]"
         >
-          Get In <span className="text-[#FF3B30]">Touch</span>
+          Get In <span className="text-[#D4AF37]">Touch</span>
         </motion.h2>
         <motion.p
           initial="hidden"
@@ -1230,13 +1230,13 @@ function ContactForm() {
             transition={{ duration: 0.6 }}
             className="w-full lg:w-1/3 space-y-8"
           >
-            <div className="bg-gray-50 bg-dot-pattern p-8 rounded-[2rem] border border-black/5 dark:border-white/5 border-b-2 border-b-[#FFCC00]">
+            <div className="bg-gray-50 bg-dot-pattern p-8 rounded-[2rem] border border-black/5 dark:border-white/5 border-b-2 border-b-[#EAB308]">
               <h3 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C] mb-6">
                 Contact Information
               </h3>
               <div className="space-y-6">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-[#FFCC00] rounded-full flex items-center justify-center shrink-0 border border-black/5 dark:border-white/5">
+                  <div className="w-12 h-12 bg-[#EAB308] rounded-full flex items-center justify-center shrink-0 border border-black/5 dark:border-white/5">
                     <Phone className="w-6 h-6 text-[#1C1C1E]" />
                   </div>
                   <div>
@@ -1249,7 +1249,7 @@ function ContactForm() {
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-[#FFCC00] rounded-full flex items-center justify-center shrink-0">
+                  <div className="w-12 h-12 bg-[#EAB308] rounded-full flex items-center justify-center shrink-0">
                     <Mail className="w-6 h-6 text-[#1C1C1E]" />
                   </div>
                   <div>
@@ -1262,7 +1262,7 @@ function ContactForm() {
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-[#FFCC00] rounded-full flex items-center justify-center shrink-0">
+                  <div className="w-12 h-12 bg-[#EAB308] rounded-full flex items-center justify-center shrink-0">
                     <MapPin className="w-6 h-6 text-[#1C1C1E]" />
                   </div>
                   <div>
@@ -1293,7 +1293,7 @@ function ContactForm() {
                   </label>
                   <input
                     type="text"
-                    className="w-full px-4 py-3 rounded-[1rem] border border-gray-200 focus:border-[#FF3B30] focus:outline-none focus:ring-4 focus:ring-[#FF3B30]/20 transition-colors bg-white bg-dot-pattern"
+                    className="w-full px-4 py-3 rounded-[1rem] border border-gray-200 focus:border-[#D4AF37] focus:outline-none focus:ring-4 focus:ring-[#D4AF37]/20 transition-colors bg-white bg-dot-pattern"
                     placeholder="John Doe"
                   />
                 </div>
@@ -1303,7 +1303,7 @@ function ContactForm() {
                   </label>
                   <input
                     type="number"
-                    className="w-full px-4 py-3 rounded-[1rem] border border-gray-200 focus:border-[#FF3B30] focus:outline-none focus:ring-4 focus:ring-[#FF3B30]/20 transition-colors bg-white bg-dot-pattern"
+                    className="w-full px-4 py-3 rounded-[1rem] border border-gray-200 focus:border-[#D4AF37] focus:outline-none focus:ring-4 focus:ring-[#D4AF37]/20 transition-colors bg-white bg-dot-pattern"
                     placeholder="8"
                   />
                 </div>
@@ -1315,7 +1315,7 @@ function ContactForm() {
                   </label>
                   <input
                     type="email"
-                    className="w-full px-4 py-3 rounded-[1rem] border border-gray-200 focus:border-[#FF3B30] focus:outline-none focus:ring-4 focus:ring-[#FF3B30]/20 transition-colors bg-white bg-dot-pattern"
+                    className="w-full px-4 py-3 rounded-[1rem] border border-gray-200 focus:border-[#D4AF37] focus:outline-none focus:ring-4 focus:ring-[#D4AF37]/20 transition-colors bg-white bg-dot-pattern"
                     placeholder="john@example.com"
                   />
                 </div>
@@ -1325,7 +1325,7 @@ function ContactForm() {
                   </label>
                   <input
                     type="tel"
-                    className="w-full px-4 py-3 rounded-[1rem] border border-gray-200 focus:border-[#FF3B30] focus:outline-none focus:ring-4 focus:ring-[#FF3B30]/20 transition-colors bg-white bg-dot-pattern"
+                    className="w-full px-4 py-3 rounded-[1rem] border border-gray-200 focus:border-[#D4AF37] focus:outline-none focus:ring-4 focus:ring-[#D4AF37]/20 transition-colors bg-white bg-dot-pattern"
                     placeholder="+1 (555) 000-0000"
                   />
                 </div>
@@ -1336,14 +1336,14 @@ function ContactForm() {
                 </label>
                 <textarea
                   rows={4}
-                  className="w-full px-4 py-3 rounded-[1rem] border border-gray-200 focus:border-[#FF3B30] focus:outline-none focus:ring-4 focus:ring-[#FF3B30]/20 transition-colors bg-white bg-dot-pattern resize-none"
+                  className="w-full px-4 py-3 rounded-[1rem] border border-gray-200 focus:border-[#D4AF37] focus:outline-none focus:ring-4 focus:ring-[#D4AF37]/20 transition-colors bg-white bg-dot-pattern resize-none"
                   placeholder="Tell us about your child's chess experience..."
                 ></textarea>
               </div>
               <Magnetic><motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="relative overflow-hidden w-full px-8 py-4 rounded-[1rem] text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-semibold text-white bg-gradient-to-r from-[#FF3B30] to-[#D70015] hover:from-red-700 hover:to-red-900 transition-colors flex items-center justify-center gap-2"
+                className="relative overflow-hidden w-full px-8 py-4 rounded-[1rem] text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-semibold text-white bg-gradient-to-r from-[#1E293B] to-[#0F172A] hover:from-[#0F172A] hover:to-[#020617] transition-colors flex items-center justify-center gap-2"
               >
               <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shine"></span>
                 Send Message <Send className="w-5 h-5" />
@@ -1362,7 +1362,7 @@ function StickyBottomBar() {
       initial={{ y: 100 }}
       animate={{ y: 0 }}
       transition={{ delay: 1, type: "spring", stiffness: 100 }}
-      className="z-50 font-sans fixed bottom-0 left-0 right-0 bg-white bg-dot-pattern/90 backdrop-blur-md shadow-[0_-10px_30px_rgba(0,0,0,0.1)] px-4 sm:px-6 md:px-10 py-4 flex items-center justify-between border-t-4 border-[#FF3B30]"
+      className="z-50 font-sans fixed bottom-0 left-0 right-0 bg-white bg-dot-pattern/90 backdrop-blur-md shadow-[0_-10px_30px_rgba(0,0,0,0.1)] px-4 sm:px-6 md:px-10 py-4 flex items-center justify-between border-t-4 border-[#D4AF37]"
     >
       <div className="hidden md:flex flex-col gap-1">
         <p className="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C]">
@@ -1376,7 +1376,7 @@ function StickyBottomBar() {
         <Magnetic><motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="relative overflow-hidden text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-semibold text-white px-8 py-4 rounded-full w-full md:w-80 shadow-[0_8px_24px_rgba(0,0,0,0.06)] bg-gradient-to-r from-[#FF3B30] to-[#D70015] hover:from-red-700 hover:to-red-900 transition-colors flex justify-center items-center gap-2 group"
+          className="relative overflow-hidden text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-semibold text-white px-8 py-4 rounded-full w-full md:w-80 shadow-[0_8px_24px_rgba(0,0,0,0.06)] bg-gradient-to-r from-[#1E293B] to-[#0F172A] hover:from-[#0F172A] hover:to-[#020617] transition-colors flex justify-center items-center gap-2 group"
         >
               <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shine"></span>
           Book Free Demo
@@ -1424,7 +1424,7 @@ function ScrollToTop() {
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           onClick={scrollToTop}
-          className="fixed bottom-28 right-6 z-50 p-4 bg-[#1C1C1E] text-[#FFCC00] rounded-full shadow-[0_20px_40px_rgba(0,0,0,0.12)] border border-[#FFCC00] hover:bg-[#FF3B30] hover:text-white transition-colors"
+          className="fixed bottom-28 right-6 z-50 p-4 bg-[#1C1C1E] text-[#EAB308] rounded-full shadow-[0_20px_40px_rgba(0,0,0,0.12)] border border-[#EAB308] hover:bg-[#0F172A] hover:text-white transition-colors"
         >
           <ChevronUp className="w-6 h-6" />
         </motion.button>
@@ -1494,7 +1494,7 @@ export default function App() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 1 }}
-      className="min-h-screen flex flex-col bg-white bg-dot-pattern pb-24 selection:bg-[#FF3B30] selection:text-white"
+      className="min-h-screen flex flex-col bg-white bg-dot-pattern pb-24 selection:bg-[#0F172A] selection:text-white"
     >
 
       <ScrollToTop />
