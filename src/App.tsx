@@ -839,7 +839,7 @@ function SuccessStories() {
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 z-0">
         <img
-          src="https://images.unsplash.com/photo-1528819622765-d6bcf132f793?auto=format&fit=crop&w=1920&q=80"
+          src="/planning-his-next-move-2026-03-25-02-46-24-utc.jpg"
           alt="Chess Background"
           className="w-full h-full object-cover opacity-30"
           referrerPolicy="no-referrer"
@@ -1092,7 +1092,7 @@ function VideoDemo() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.8 }}
-          className="relative max-w-7xl mx-auto rounded-[2rem] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.2)] border-2 border-[#FF3B30] group cursor-pointer aspect-video bg-black flex items-center justify-center hover:border-[#FFCC00] transition-colors duration-500"
+          className="relative max-w-7xl mx-auto rounded-[2rem] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.2)] border-2 border-[#FF3B30] group cursor-pointer aspect-[21/9] md:aspect-[24/9] bg-black flex items-center justify-center hover:border-[#FFCC00] transition-colors duration-500"
         >
           <video
             src="/playing-chess-in-the-university-2025-12-17-10-35-30-utc.mov"
