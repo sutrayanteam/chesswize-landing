@@ -732,7 +732,7 @@ function ClassModes() {
                 <Magnetic><motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="relative overflow-hidden w-full py-4 rounded-full text-[16px] md:text-[18px] font-semibold text-white bg-[#D70015] hover:bg-white hover:text-[#D70015] transition-colors shadow-[0_4px_12px_rgba(0,0,0,0.2)]"
+                  className="relative overflow-hidden w-full px-8 py-4 rounded-full text-[16px] md:text-[18px] font-semibold text-white bg-[#D70015] hover:bg-white hover:text-[#D70015] transition-colors shadow-[0_4px_12px_rgba(0,0,0,0.2)]"
                 >
                   <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shine"></span>
                   Select Mode
@@ -1278,7 +1278,7 @@ function Pricing() {
               <Magnetic><motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="relative overflow-hidden w-full py-4 rounded-full text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-semibold text-white transition-colors border border-black/5 dark:border-white/5 bg-gradient-to-r from-[#FF3B30] to-[#D70015] hover:from-red-700 hover:to-red-900"
+                className="relative overflow-hidden w-full px-8 py-4 rounded-full text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-semibold text-white transition-colors border border-black/5 dark:border-white/5 bg-gradient-to-r from-[#FF3B30] to-[#D70015] hover:from-red-700 hover:to-red-900"
               >
               <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shine"></span>
                 Choose Plan
@@ -1431,7 +1431,7 @@ function ContactForm() {
               <Magnetic><motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="relative overflow-hidden w-full py-4 rounded-[1rem] text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-semibold text-white bg-gradient-to-r from-[#FF3B30] to-[#D70015] hover:from-red-700 hover:to-red-900 transition-colors flex items-center justify-center gap-2"
+                className="relative overflow-hidden w-full px-8 py-4 rounded-[1rem] text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-semibold text-white bg-gradient-to-r from-[#FF3B30] to-[#D70015] hover:from-red-700 hover:to-red-900 transition-colors flex items-center justify-center gap-2"
               >
               <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shine"></span>
                 Send Message <Send className="w-5 h-5" />
