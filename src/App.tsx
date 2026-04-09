@@ -450,91 +450,6 @@ function WhatChildGains() {
   );
 }
 
-function CoachingProcess() {
-  const steps = [
-    {
-      id: 1,
-      title: "Submit Enquiry",
-      desc: "Fill the form with your child's age and current level. Our team reaches out within 24 hours.",
-    },
-    {
-      id: 2,
-      title: "Attend Structured Demo",
-      desc: "Your child attends a live FREE assessment session. We evaluate their strengths and growth areas.",
-    },
-    {
-      id: 3,
-      title: "Enrollment & Batch Allocation",
-      desc: "If there's a great fit, we allocate a batch that matches your child's level and schedule.",
-    },
-  ];
-
-  return (
-    <section className="py-24 bg-gray-50/50 font-sans overflow-visible">
-      <div className="max-w-7xl flex flex-col lg:flex-row gap-16 mx-auto px-6 items-start">
-        <div className="w-full lg:w-1/3 lg:sticky lg:top-32 shrink-0">
-          <motion.h2
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.2 }}
-            variants={fadeInUp}
-            className="text-[36px] md:text-[48px] leading-[44px] md:leading-[56px] font-bold tracking-tight mb-6 text-[#1C1C1E]"
-          >
-            Our <span className="text-[#FF3B30] block">Process</span>
-          </motion.h2>
-          <motion.p
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.2 }}
-            variants={fadeInUp}
-            className="text-[16px] md:text-[18px] text-[#5A5873] mb-8 leading-relaxed font-medium"
-          >
-            A seamless journey from your first enquiry to your child's first triumphant checkmate. We've optimized every step.
-          </motion.p>
-          <motion.button
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.2 }}
-            variants={fadeInUp}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="bg-[#FF3B30] text-white px-8 py-4 rounded-full font-bold shadow-xl hover:bg-[#D70015] transition-colors duration-300 flex items-center gap-2 w-max"
-          >
-            Book Assessment
-            <ArrowRight className="w-5 h-5" />
-          </motion.button>
-        </div>
-
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-          variants={staggerContainer}
-          className="w-full lg:w-2/3 grid grid-cols-1 sm:grid-cols-2 gap-6"
-        >
-          {steps.map((step, i) => (
-            <motion.div
-              key={i}
-              variants={fadeInUp}
-              whileHover={{ y: -8 }}
-              className="bg-white border border-gray-100/80 rounded-[2rem] p-8 flex flex-col items-start text-left shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all duration-300"
-            >
-              <div className="w-12 h-12 rounded-2xl bg-[#FFF5F4] flex items-center justify-center text-[#FF3B30] text-xl font-bold mb-6 shadow-sm border border-[#FFEBE9]">
-                {step.id}
-              </div>
-              <h3 className="text-xl font-bold text-[#1C1C1E] mb-3">
-                {step.title}
-              </h3>
-              <p className="text-[#5A5873] text-[15px] leading-relaxed">
-                {step.desc}
-              </p>
-            </motion.div>
-          ))}
-        </motion.div>
-      </div>
-    </section>
-  );
-}
 
 function ProgramDetails() {
   const programs = [
@@ -1602,7 +1517,7 @@ export default function App() {
       <WhyChooseUs />
       <VideoDemo />
       <LearningPath />
-      <CoachingProcess />
+
       <ProgramDetails />
       <ClassModes />
       <Pricing />
