@@ -1190,7 +1190,7 @@ function Pricing() {
                 {plan.name}
               </h3>
               <div className="text-center mb-8">
-                <span className="text-4xl md:text-5xl font-black tracking-tighter text-[#FBBF24]">
+                <span className="text-4xl md:text-4xl md:text-5xl font-black tracking-tighter text-[#FBBF24]">
                   {plan.price}
                 </span>
                 <span className="text-[#8E8E93] font-medium">
