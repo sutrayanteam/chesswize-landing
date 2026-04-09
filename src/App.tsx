@@ -341,23 +341,16 @@ function LearningPath() {
             <motion.div
               key={i}
               variants={fadeInUp}
-              whileHover={{ y: -15, scale: 1.03 }}
-              className="bg-white border border-black/5 dark:border-white/5 border-b-2 rounded-[1.5rem] overflow-hidden text-center w-[calc(50%-0.75rem)] sm:w-[calc(33.333%-1rem)] md:flex-1 min-w-[200px] shadow-[0_10px_30px_rgba(0,0,0,0.08)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.12)] transition-all hover:border-b-[#FFCC00] group flex flex-col"
+              whileHover={{ y: -8, scale: 1.02 }}
+              className="bg-white rounded-[1.25rem] overflow-hidden text-center w-[calc(50%-0.75rem)] sm:w-[calc(33.333%-1rem)] md:flex-1 min-w-[200px] shadow-[0_4px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_15px_40px_rgba(0,0,0,0.08)] transition-all duration-500 group flex flex-col border border-gray-100/80"
             >
-              <div className="w-full h-48 md:h-56 relative overflow-hidden bg-gray-100">
-                <img src={l.image} alt={l.name} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 will-change-transform" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent group-hover:opacity-0 transition-opacity"></div>
+              <div className="w-full aspect-[4/3] sm:aspect-auto sm:h-48 md:h-60 relative overflow-hidden bg-gray-50">
+                <img src={l.image} alt={l.name} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover object-[center_15%] group-hover:scale-105 transition-transform duration-1000 ease-out will-change-transform" />
               </div>
-              <div className="relative z-10 p-6 flex flex-col flex-1 bg-dot-pattern">
-                <div className="font-black text-xl md:text-2xl bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C] mb-4 mt-2">
+              <div className="relative z-10 p-5 md:p-6 flex flex-col flex-1 bg-white items-center justify-center">
+                <div className="font-extrabold text-lg md:text-2xl tracking-tight text-[#1C1C1E]">
                   {l.name}
                 </div>
-                <motion.div
-                  whileHover={{ scale: 1.1 }}
-                  className="text-white font-bold text-xs md:text-sm rounded-full py-2 px-6 bg-gradient-to-r from-[#FF3B30] to-[#D70015] inline-block shadow-sm mx-auto w-max mb-2"
-                >
-                  {l.type}
-                </motion.div>
               </div>
             </motion.div>
           ))}
