@@ -929,12 +929,12 @@ function FAQ() {
     {
       question: "What platform do you use for online coaching?",
       answer:
-        "We use interactive platforms like Zoom or Google Meet combined with online chess boards like Lichess or Chess.com for a seamless learning experience.",
+        "We will now be using our own AI-based platform for a seamless and interactive learning experience.",
     },
     {
       question: "How long is each session?",
       answer:
-        "Sessions typically range from 45 minutes to 1 hour, depending on the age and level of the student.",
+        "50 minutes",
     },
     {
       question: "Do you prepare students for tournaments?",
