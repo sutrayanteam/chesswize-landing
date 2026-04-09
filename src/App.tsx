@@ -315,7 +315,7 @@ function LearningPath() {
       <motion.div animate={{ y: [0, -20, 0], x: [0, 10, 0] }} transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }} className="absolute top-20 left-10 w-64 h-64 bg-[#FFCC00] rounded-full mix-blend-multiply filter blur-[120px] opacity-10"></motion.div>
       <motion.div animate={{ y: [0, 20, 0], x: [0, -10, 0] }} transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }} className="absolute top-40 right-10 w-64 h-64 bg-[#FF3B30] rounded-full mix-blend-multiply filter blur-[120px] opacity-10"></motion.div>
 
-      <div className="max-w-7xl mx-auto px-4 relative z-10">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
         <motion.h2
           initial="hidden"
           whileInView="visible"
@@ -403,7 +403,7 @@ function WhatChildGains() {
 
   return (
     <div className="w-full py-20 lg:py-32 bg-white bg-dot-pattern">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-6 md:px-12">
         <motion.h2
           initial="hidden"
           whileInView="visible"
@@ -508,7 +508,7 @@ function ProgramDetails() {
         <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black"></div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 relative z-10">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
         <motion.h2
           initial="hidden"
           whileInView="visible"
@@ -598,7 +598,7 @@ function ClassModes() {
 
   return (
     <section className="py-20 lg:py-32 bg-white bg-dot-pattern font-sans">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-6 md:px-12">
         <motion.h2
           initial="hidden"
           whileInView="visible"
@@ -666,7 +666,7 @@ function Coaches() {
 
   return (
     <div className="w-full py-20 lg:py-32 font-sans bg-white bg-dot-pattern">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-6 md:px-12">
         <motion.h2
           initial="hidden"
           whileInView="visible"
@@ -987,7 +987,7 @@ function VideoDemo() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.8 }}
-          className="relative max-w-7xl mx-auto rounded-[2rem] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.2)] border-2 border-[#FF3B30] group cursor-pointer aspect-[21/9] md:aspect-[24/9] bg-black flex items-center justify-center hover:border-[#FFCC00] transition-colors duration-500"
+          className="relative max-w-7xl mx-auto rounded-[2rem] overflow-hidden shadow-2xl group cursor-pointer aspect-[21/9] md:aspect-[24/9] bg-black flex items-center justify-center transition-all duration-500"
         >
           <video
             src="/playing-chess-in-the-university-2025-12-17-10-35-30-utc.mov"
@@ -1025,7 +1025,7 @@ function WhyChooseUs() {
 
   return (
     <div className="w-full py-20 lg:py-32 bg-gray-50 bg-dot-pattern font-sans">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-6 md:px-12">
         <motion.h2
           initial="hidden"
           whileInView="visible"
@@ -1056,7 +1056,7 @@ function WhyChooseUs() {
               key={i}
               variants={fadeInUp}
               whileHover={{ y: -12, scale: 1.02, transition: { type: "spring", stiffness: 300 } }}
-              className="bg-gray-50 bg-dot-pattern p-8 rounded-[2rem] border border-black/5 dark:border-white/5 border-b-2 border-b-transparent text-center hover:border-b-[#FF3B30] hover:shadow-[0_20px_40px_rgba(255,59,48,0.08)] transition-all duration-300 group cursor-default"
+              className="bg-white p-8 rounded-[2rem] border-2 border-gray-200 text-center hover:border-[#FF3B30] hover:shadow-[0_20px_40px_rgba(255,59,48,0.08)] transition-all duration-300 group cursor-default"
             >
               <div className="w-24 h-24 mx-auto rounded-[1.5rem] overflow-hidden mb-6 shadow-[0_8px_24px_rgba(0,0,0,0.06)] border border-black/5 dark:border-white/5 bg-white flex items-center justify-center p-4">
                 <img src={f.image} alt={f.title} loading="lazy" decoding="async" className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500 will-change-transform" />
@@ -1119,7 +1119,7 @@ function Pricing() {
 
   return (
     <div className="w-full py-20 lg:py-32 bg-gray-50 bg-dot-pattern font-sans">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-6 md:px-12">
         <motion.h2
           initial="hidden"
           whileInView="visible"
@@ -1203,7 +1203,7 @@ function ContactForm() {
       transition={{ duration: 0.8 }}
       className="w-full py-20 lg:py-32 bg-gray-50 bg-dot-pattern font-sans"
     >
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-6 md:px-12">
         <motion.h2
           initial="hidden"
           whileInView="visible"
