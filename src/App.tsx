@@ -720,7 +720,7 @@ function ClassModes() {
               variants={fadeInUp}
               className="group relative h-[450px] rounded-[2rem] overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.08)] cursor-default flex flex-col justify-end"
             >
-              <img src={mode.image} alt={mode.title} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+              <img src={mode.image} alt={mode.title} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 will-change-transform" />
               <div className="absolute inset-0 bg-gradient-to-t from-[#1C1C1E] via-[#1C1C1E]/70 to-transparent"></div>
               <div className="relative z-10 p-8 text-left w-full">
                 <h3 className="text-2xl md:text-3xl font-black text-white mb-4 group-hover:text-[#FF3B30] transition-colors">
@@ -1105,7 +1105,9 @@ function VideoDemo() {
           <img
             src="https://images.unsplash.com/photo-1580541832626-2a7131ee809f?auto=format&fit=crop&w=1200&q=80"
             alt="Video Thumbnail"
-            className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-opacity duration-500"
+            loading="lazy"
+            decoding="async"
+            className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-opacity duration-500 will-change-transform"
           />
           <motion.div
             whileHover={{ scale: 1.1 }}
@@ -1161,11 +1163,11 @@ function WhyChooseUs() {
             <motion.div
               key={i}
               variants={fadeInUp}
-              whileHover={{ y: -10 }}
-              className="bg-gray-50 bg-dot-pattern p-8 rounded-[2rem] border border-black/5 dark:border-white/5 border-b-2 text-center hover:border-b-[#FF3B30] transition-colors group"
+              whileHover={{ y: -12, scale: 1.02, transition: { type: "spring", stiffness: 300 } }}
+              className="bg-gray-50 bg-dot-pattern p-8 rounded-[2rem] border border-black/5 dark:border-white/5 border-b-2 border-b-transparent text-center hover:border-b-[#FF3B30] hover:shadow-[0_20px_40px_rgba(255,59,48,0.08)] transition-all duration-300 group cursor-default"
             >
-              <div className="w-24 h-24 mx-auto rounded-[1.5rem] overflow-hidden mb-6 shadow-[0_8px_24px_rgba(0,0,0,0.06)] border border-black/5 dark:border-white/5">
-                <img src={f.image} alt={f.title} className="w-full h-full object-cover group-hover:scale-110 transition-all duration-500" />
+              <div className="w-24 h-24 mx-auto rounded-[1.5rem] overflow-hidden mb-6 shadow-[0_8px_24px_rgba(0,0,0,0.06)] border border-black/5 dark:border-white/5 bg-white flex items-center justify-center p-4">
+                <img src={f.image} alt={f.title} loading="lazy" decoding="async" className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500 will-change-transform" />
               </div>
               <h3 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C] mb-4">
                 {f.title}
