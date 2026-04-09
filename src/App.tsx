@@ -346,21 +346,15 @@ function LearningPath() {
             >
               <div className="w-full h-48 md:h-56 relative overflow-hidden bg-gray-100">
                 <img src={l.image} alt={l.name} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 will-change-transform" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
-                <div className="absolute top-4 right-4 font-bold text-xs md:text-sm rounded-full py-1.5 px-3 bg-[#FFCC00] text-[#1C1C1E] shadow-sm z-10">
-                  {l.level}
-                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent group-hover:opacity-0 transition-opacity"></div>
               </div>
               <div className="relative z-10 p-6 flex flex-col flex-1 bg-dot-pattern">
-                <div className="font-black text-xl md:text-2xl bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C] mb-3 mt-2">
+                <div className="font-black text-xl md:text-2xl bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C] mb-4 mt-2">
                   {l.name}
-                </div>
-                <div className="text-[#FF3B30] font-semibold text-sm md:text-base mb-6 h-10 flex items-center justify-center">
-                  {l.focus}
                 </div>
                 <motion.div
                   whileHover={{ scale: 1.1 }}
-                  className="text-white font-bold text-xs md:text-sm rounded-full py-2 px-4 bg-gradient-to-r from-[#FF3B30] to-[#D70015] inline-block shadow-sm mx-auto w-max"
+                  className="text-white font-bold text-xs md:text-sm rounded-full py-2 px-6 bg-gradient-to-r from-[#FF3B30] to-[#D70015] inline-block shadow-sm mx-auto w-max mb-2"
                 >
                   {l.type}
                 </motion.div>
