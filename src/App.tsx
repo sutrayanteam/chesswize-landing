@@ -426,7 +426,7 @@ function WhatChildGains() {
               key={i}
               variants={fadeInUp}
               whileHover={{ y: -8, scale: 1.02 }}
-              className="bg-gray-50 bg-dot-pattern p-8 rounded-[1.5rem] shadow-[0_8px_24px_rgba(14,165,233,0.3)] border border-black/5 dark:border-white/5 border-b-2 flex flex-col gap-4 group hover:bg-[#1C1C1E] transition-colors duration-300"
+              className="bg-gray-50 bg-dot-pattern p-8 rounded-[1.5rem] shadow-[0_8px_24px_rgba(14,165,233,0.1)] border border-black/5 dark:border-white/5 border-b-2 flex flex-col gap-4 group hover:bg-[#1C1C1E] transition-colors duration-300"
             >
               <div className="flex items-center gap-4">
                 <motion.div
@@ -697,7 +697,7 @@ function Coaches() {
               key={i}
               variants={fadeInUp}
               whileHover={{ y: -15 }}
-              className="bg-white bg-dot-pattern rounded-[2rem] p-6 text-center border border-black/5 dark:border-white/5 border-b-2 shadow-[0_8px_24px_rgba(14,165,233,0.3)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.12)] hover:border-b-[#0EA5E9] transition-all group"
+              className="bg-white bg-dot-pattern rounded-[2rem] p-6 text-center border border-black/5 dark:border-white/5 border-b-2 shadow-[0_8px_24px_rgba(14,165,233,0.1)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.12)] hover:border-b-[#0EA5E9] transition-all group"
             >
               <div className="w-32 h-32 mx-auto bg-gray-200 rounded-full mb-6 border-2 border-black/5 overflow-hidden relative">
                 <img
@@ -1056,9 +1056,9 @@ function WhyChooseUs() {
               key={i}
               variants={fadeInUp}
               whileHover={{ y: -12, scale: 1.02, transition: { type: "spring", stiffness: 300 } }}
-              className="bg-white p-8 rounded-[2rem] border-2 border-gray-200 text-center hover:border-[#FBBF24] hover:shadow-[0_20px_40px_rgba(255,59,48,0.08)] transition-all duration-300 group cursor-default"
+              className="bg-white p-8 rounded-[2rem] border-2 border-gray-200 text-center hover:border-[#FBBF24] hover:shadow-[0_20px_40px_rgba(14,165,233,0.1)] transition-all duration-300 group cursor-default"
             >
-              <div className="w-24 h-24 mx-auto rounded-[1.5rem] overflow-hidden mb-6 shadow-[0_8px_24px_rgba(14,165,233,0.3)] border border-black/5 dark:border-white/5 bg-white flex items-center justify-center p-4">
+              <div className="w-24 h-24 mx-auto rounded-[1.5rem] overflow-hidden mb-6 shadow-[0_8px_24px_rgba(14,165,233,0.1)] border border-black/5 dark:border-white/5 bg-white flex items-center justify-center p-4">
                 <img src={f.image} alt={f.title} loading="lazy" decoding="async" className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500 will-change-transform" />
               </div>
               <h3 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C] mb-4">
@@ -1285,7 +1285,7 @@ function ContactForm() {
             transition={{ duration: 0.6 }}
             className="w-full lg:w-2/3"
           >
-            <form className="bg-gray-50 bg-dot-pattern p-8 md:p-12 rounded-[2rem] border border-gray-100 shadow-[0_8px_24px_rgba(14,165,233,0.3)]">
+            <form className="bg-gray-50 bg-dot-pattern p-8 md:p-12 rounded-[2rem] border border-gray-100 shadow-[0_8px_24px_rgba(14,165,233,0.1)]">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">
@@ -1376,7 +1376,7 @@ function StickyBottomBar() {
         <Magnetic><motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="relative overflow-hidden text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-semibold text-white px-8 py-4 rounded-full w-full md:w-80 shadow-[0_8px_24px_rgba(14,165,233,0.3)] bg-gradient-to-r from-[#0EA5E9] to-[#0284C7] hover:from-[#0284C7] hover:to-[#0369A1] transition-colors flex justify-center items-center gap-2 group"
+          className="relative overflow-hidden text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-semibold text-white px-8 py-4 rounded-full w-full md:w-80 shadow-[0_8px_24px_rgba(14,165,233,0.1)] bg-gradient-to-r from-[#0EA5E9] to-[#0284C7] hover:from-[#0284C7] hover:to-[#0369A1] transition-colors flex justify-center items-center gap-2 group"
         >
               <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shine"></span>
           Book Free Demo
