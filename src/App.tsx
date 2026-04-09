@@ -667,14 +667,14 @@ function ClassModes() {
 
 function Coaches() {
   const coaches = [
-    { name: "Coach Rahul Sharma", exp: "8+ Years", rating: "2200+" },
-    { name: "Coach Arjun Mehta", exp: "10+ Years", rating: "2350+" },
-    { name: "Coach Sneha Patel", exp: "6+ Years", rating: "2100+" },
-    { name: "Coach Vikram Nair", exp: "12+ Years", rating: "2400+" },
+    { name: "Rahul Sharma", role: "FIDE Master", exp: "8+ Years", rating: "2200", bg: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=800" },
+    { name: "Arjun Mehta", role: "Grandmaster", exp: "10+ Years", rating: "2550", bg: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=800" },
+    { name: "Sneha Patel", role: "National Champ", exp: "6+ Years", rating: "2100", bg: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=800" },
+    { name: "Vikram Nair", role: "Senior Tactics Coach", exp: "12+ Years", rating: "2400", bg: "https://images.unsplash.com/photo-1517482811406-3bc556204c94?auto=format&fit=crop&q=80&w=800" },
   ];
 
   return (
-    <div className="w-full py-12 md:py-20 font-sans bg-white bg-dot-pattern">
+    <div className="w-full py-12 md:py-20 font-sans bg-gray-50 bg-dot-pattern overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         <motion.h2
           initial="hidden"
@@ -683,7 +683,7 @@ function Coaches() {
           variants={fadeInUp}
           className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tighter text-center mb-4 bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C]"
         >
-          Learn from <span className="text-[#FBBF24]">Expert Coaches</span>
+          Meet Your <span className="text-[#0EA5E9]">Grandmasters</span>
         </motion.h2>
         <motion.p
           initial="hidden"
@@ -692,43 +692,63 @@ function Coaches() {
           variants={fadeInUp}
           className="text-[16px] md:text-[20px] text-[#5A5873] max-w-2xl mx-auto text-center mb-10 md:mb-12 px-4"
         >
-          Our FIDE-rated instructors bring decades of competitive experience to accelerate your mastery.
+          Train with elite FIDE-rated instructors who bring decades of competitive experience to accelerate your child's mastery.
         </motion.p>
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-          variants={staggerContainer}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"
-        >
+        
+        <div className="flex flex-col lg:flex-row gap-4 h-auto lg:h-[500px]">
           {coaches.map((c, i) => (
             <motion.div
               key={i}
-              variants={fadeInUp}
-              whileHover={{ y: -15 }}
-              className="bg-white bg-dot-pattern rounded-[2rem] p-6 text-center border border-black/5 dark:border-white/5 border-b-2 shadow-[0_8px_24px_rgba(14,165,233,0.1)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.12)] hover:border-b-[#0EA5E9] transition-all group"
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: i * 0.1 }}
+              viewport={{ once: true }}
+              className="relative rounded-[2rem] overflow-hidden flex-1 lg:hover:flex-[2.5] transition-all duration-700 ease-in-out cursor-pointer group min-h-[350px] lg:min-h-full shadow-[0_8px_24px_rgba(14,165,233,0.1)] border border-black/5"
             >
-              <div className="w-32 h-32 mx-auto bg-gray-200 rounded-full mb-6 border-2 border-black/5 overflow-hidden relative">
-                <img
-                  src={`https://i.pravatar.cc/150?img=${i + 11}`}
-                  alt={c.name}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <span className="text-white font-bold text-sm bg-[#0EA5E9] px-2 py-1 rounded-full border border-black/5 dark:border-white/5">
-                    FIDE {c.rating}
-                  </span>
+              {/* Background Image */}
+              <img src={c.bg} alt={c.name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
+              
+              {/* Gradient Overlays */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
+              <div className="absolute inset-0 bg-[#0EA5E9]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+              {/* Dynamic Top Badge */}
+              <div className="absolute top-6 right-6 opacity-0 translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500 delay-100">
+                <span className="bg-[#FBBF24] text-black font-extrabold px-4 py-2 rounded-full text-xs md:text-sm shadow-xl flex items-center gap-1">
+                  ⭐ FIDE {c.rating}
+                </span>
+              </div>
+              
+              {/* Bottom Content Block */}
+              <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col justify-end w-full">
+                <div className="flex flex-col gap-1 mb-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                  <h3 className="text-2xl md:text-3xl font-bold text-white truncate drop-shadow-md">
+                    {c.name}
+                  </h3>
+                  <p className="text-[#FBBF24] font-bold text-sm md:text-md uppercase tracking-wider drop-shadow-md">
+                    {c.role}
+                  </p>
+                </div>
+                
+                {/* Expanding Stats Panel */}
+                <div className="max-h-0 opacity-0 group-hover:max-h-32 group-hover:opacity-100 transition-all duration-700 ease-in-out overflow-hidden mt-2">
+                  <div className="flex gap-3 pt-2">
+                    <div className="bg-white/10 backdrop-blur-xl rounded-[1rem] p-3 md:p-4 border border-white/10 flex-1 relative overflow-hidden">
+                      <div className="absolute top-0 right-0 w-16 h-16 bg-[#0EA5E9] rounded-full blur-2xl opacity-30 -mr-8 -mt-8"></div>
+                      <p className="text-white/80 text-[10px] md:text-xs uppercase font-extrabold tracking-wider mb-1">Experience</p>
+                      <p className="text-white font-black text-sm md:text-lg">{c.exp}</p>
+                    </div>
+                    <div className="bg-white/10 backdrop-blur-xl rounded-[1rem] p-3 md:p-4 border border-white/10 flex-1 relative overflow-hidden">
+                       <div className="absolute top-0 right-0 w-16 h-16 bg-[#FBBF24] rounded-full blur-2xl opacity-30 -mr-8 -mt-8"></div>
+                      <p className="text-white/80 text-[10px] md:text-xs uppercase font-extrabold tracking-wider mb-1">Students</p>
+                      <p className="text-white font-black text-sm md:text-lg">Avg 300+</p>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <h3 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C] mb-2 group-hover:text-[#FBBF24] group-hover:scale-110 transition-all duration-300">
-                {c.name}
-              </h3>
-              <p className="text-[#FBBF24] font-semibold bg-red-50 py-1 px-3 rounded-full inline-block border border-[#FBBF24]">
-                {c.exp} Experience
-              </p>
             </motion.div>
           ))}
-        </motion.div>
+        </div>
       </div>
     </div>
   );
