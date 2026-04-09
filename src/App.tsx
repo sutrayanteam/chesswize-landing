@@ -292,24 +292,18 @@ function ImpactNumbers() {
 function LearningPath() {
   const levels = [
     {
-      level: "Level 1",
-      name: "Beginner",
-      focus: "Rules & Basics",
-      type: "Foundation",
+      name: "Beginner Program",
+      desc: "chess fundamentals, basic tactics, focus and discipline.",
       image: "/young-boy-developing-chess-strategy-playing-chess-2026-03-19-07-06-56-utc.jpg",
     },
     {
-      level: "Level 2",
-      name: "Intermediate",
-      focus: "Tactics & Strategy",
-      type: "Development",
+      name: "Intermediate Program",
+      desc: "tactical combinations, strategic planning, game analysis.",
       image: "/brain-gym-2026-03-13-01-47-11-utc.jpg",
     },
     {
-      level: "Level 3",
-      name: "Advanced",
-      focus: "Positional Play",
-      type: "Competitive",
+      name: "Advanced Program",
+      desc: "tournament preparation, advanced positional play, competitive improvement.",
       image: "/young-man-deep-in-thought-while-playing-game-of-ch-2026-01-09-00-57-38-utc.jpg",
     },
   ];
@@ -360,6 +354,9 @@ function LearningPath() {
                 <div className="font-extrabold text-lg md:text-2xl tracking-tight text-[#1C1C1E]">
                   {l.name}
                 </div>
+                <p className="text-[#8E8E93] text-[15px] text-center mt-3 leading-relaxed max-w-[240px]">
+                  {l.desc}
+                </p>
               </div>
             </motion.div>
           ))}
