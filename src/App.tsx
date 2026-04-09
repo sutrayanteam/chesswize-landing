@@ -108,76 +108,117 @@ function Hero() {
   const opacityText = useTransform(scrollY, [0, 500], [1, 0]);
 
   return (
-    <div className="mx-auto mt-2 font-sans overflow-hidden relative">
-      {/* Background Image / Atmosphere */}
-      <div className="absolute inset-0 z-0">
-        <img
-          src="https://images.unsplash.com/photo-1529699211952-734e80c4d42b?auto=format&fit=crop&w=2000&q=80"
-          alt="Chess Grandmaster Atmosphere"
-          className="w-full h-full object-cover opacity-15 grayscale"
-          referrerPolicy="no-referrer"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-[var(--color-parchment)]/90 via-[var(--color-parchment)]/60 to-[var(--color-parchment)]"></div>
-      </div>
-
-      <div className="relative z-20 max-w-7xl mx-auto px-4 md:px-8 py-20 lg:py-32 flex flex-col items-center">
+    <div className="mx-auto p-4 md:p-8 bg-white bg-dot-pattern rounded-lg mt-2 font-sans max-w-7xl overflow-hidden relative border border-gray-100 shadow-sm">
+      <motion.div
+        style={{ y: yText, opacity: opacityText }}
+        className="relative z-20"
+      >
         <motion.div
-          style={{ y: yText, opacity: opacityText }}
-          className="flex flex-col items-center w-full max-w-5xl text-center"
+          initial="hidden"
+          animate="visible"
+          variants={fadeInUp}
+          className="flex justify-center mb-8"
         >
-          <motion.div initial="hidden" animate="visible" variants={fadeInUp} className="mb-8">
-            <span className="px-4 py-1.5 rounded-full border border-onyx-900/10 text-sm font-semibold tracking-widest uppercase text-onyx-800 bg-white/50 backdrop-blur-md">
-              Elite Online Chess Coaching
-            </span>
-          </motion.div>
-          <motion.h1
-            initial="hidden"
-            animate="visible"
-            variants={fadeInUp}
-            className="text-[40px] md:text-[64px] lg:text-[76px] leading-[1.05] font-serif font-medium tracking-tight text-[#1C1C1E] mb-8"
-          >
-            Premium <i className="text-[#D70015] italic">Online Chess</i> <br className="hidden md:block"/>
-            Masterclasses for Kids.
-          </motion.h1>
-          <motion.p
-            initial="hidden"
-            animate="visible"
-            variants={fadeInUp}
-            className="text-[18px] md:text-[22px] leading-[32px] font-normal text-gray-700 mb-12 max-w-3xl"
-          >
-            Give your child the ultimate cognitive edge. We teach expert-level chess strategies that build unbreakable focus, logical thinking, and lifelong confidence. 
-          </motion.p>
-          
-          <motion.div initial="hidden" animate="visible" variants={fadeInUp} className="flex flex-col sm:flex-row gap-6 w-full justify-center">
-            <Magnetic><button
-              onClick={() => document.getElementById('contact-form')?.scrollIntoView({ behavior: 'smooth' })}
-              className="relative overflow-hidden text-[16px] md:text-[18px] font-semibold text-white px-10 py-5 rounded-full w-full md:w-auto bg-[#1C1C1E] transition-all flex items-center justify-center gap-3 group hover:bg-[#D70015]"
-            >
-              <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-shine"></span>
-              Book Free Trial Class
-              <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </button></Magnetic>
-            <Magnetic><button
-              onClick={() => document.getElementById('programs')?.scrollIntoView({ behavior: 'smooth' })}
-              className="relative overflow-hidden text-[16px] md:text-[18px] font-semibold text-[#1C1C1E] px-10 py-5 rounded-full w-full md:w-auto bg-transparent border border-onyx-900/20 transition-all flex items-center justify-center gap-3 group hover:border-onyx-900"
-            >
-              View Our Programs
-            </button></Magnetic>
-          </motion.div>
+          <img
+            src="/IMG_2257.jpg"
+            alt="ChessWize Logo"
+            className="h-24 md:h-32 w-auto object-contain"
+            referrerPolicy="no-referrer"
+          />
         </motion.div>
-      </div>
-      
-      {/* Trust Bar below Hero */}
-      <div className="w-full relative z-20 border-t border-b border-onyx-900/5 bg-white/30 backdrop-blur-md py-8">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-8 opacity-60 grayscale hover:grayscale-0 transition-all duration-700">
-           <p className="text-sm font-bold uppercase tracking-widest text-[#1C1C1E]">Curriculum Aligned With:</p>
-           <div className="flex flex-wrap justify-center gap-8 md:gap-16 items-center font-serif text-xl md:text-2xl font-bold">
-              <span>FIDE Training</span>
-              <span>US Chess Federation</span>
-              <span>Chess.com</span>
-              <span>Lichess Integration</span>
-           </div>
-        </div>
+        <motion.h1
+          initial="hidden"
+          animate="visible"
+          variants={fadeInUp}
+          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tight text-center mb-6 text-[#1C1C1E]"
+        >
+          Professional <span className="text-[#FF3B30]">Online Chess</span> Coaching for Kids
+        </motion.h1>
+        <motion.h2
+          initial="hidden"
+          animate="visible"
+          variants={fadeInUp}
+          className="text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-normal text-black text-center mb-12 max-w-4xl mx-auto"
+        >
+          We don't just play games; we build minds. Our 10+ years of experience
+          ensures a structured development path for every student.
+        </motion.h2>
+      </motion.div>
+
+      <div className="flex flex-col lg:flex-row items-center justify-center lg:gap-16 gap-8 relative z-10">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9, rotate: -2 }}
+          animate={{ opacity: 1, scale: 1, rotate: 0 }}
+          transition={{ duration: 0.8, type: "spring", bounce: 0.4 }}
+          className="w-full lg:w-1/2 relative group"
+        >
+          <div className="absolute inset-0 bg-[#FFCC00] rounded-[1.5rem] transform translate-x-4 translate-y-4 transition-transform group-hover:translate-x-6 group-hover:translate-y-6 duration-500 border border-black/5 dark:border-white/5"></div>
+          <div className="absolute inset-0 bg-[#FF3B30] rounded-[1.5rem] transform -translate-x-4 -translate-y-4 transition-transform group-hover:-translate-x-6 group-hover:-translate-y-6 duration-500 -z-10 border border-black/5 dark:border-white/5"></div>
+          <img
+            src="https://images.unsplash.com/photo-1529699211952-734e80c4d42b?auto=format&fit=crop&w=800&q=80"
+            alt="Chess Coaching"
+            className="w-full h-auto rounded-[1.5rem] shadow-[0_20px_40px_rgba(0,0,0,0.12)] relative z-10 border-2 border-black/5 transition-transform duration-500 group-hover:scale-[1.02]"
+          />
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, x: 50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="flex flex-col items-center lg:items-start w-full lg:w-1/2"
+        >
+          <div className="flex flex-col sm:flex-row gap-4 mb-8 w-full">
+            <motion.div
+              whileHover={{ y: -5, scale: 1.02 }}
+              className="p-5 rounded-[1rem] flex items-center justify-center gap-4 bg-[#1C1C1E] text-white shadow-[0_10px_30px_rgba(0,0,0,0.08)] flex-1 border border-black/5 dark:border-white/5 border-b-2 border-b-[#FFCC00] cursor-pointer"
+            >
+              <img src="https://images.unsplash.com/photo-1563207153-f403bf289096?auto=format&fit=crop&w=200&q=80" alt="Experience" className="w-12 h-12 rounded-[0.8rem] object-cover shadow-sm border border-black/10" />
+              <p className="font-medium text-lg leading-tight">
+                <span className="font-bold text-[#FFCC00] text-xl">
+                  10+ Years
+                </span>
+                <br /> Experience
+              </p>
+            </motion.div>
+            <motion.div
+              whileHover={{ y: -5, scale: 1.02 }}
+              className="p-5 rounded-[1rem] flex items-center justify-center gap-4 bg-[#FF3B30] text-white shadow-[0_10px_30px_rgba(0,0,0,0.08)] flex-1 border border-black/5 dark:border-white/5 border-b-2 border-b-[#1C1C1E] cursor-pointer"
+            >
+              <img src="https://images.unsplash.com/photo-1504280613257-22f281e053f3?auto=format&fit=crop&w=200&q=80" alt="Structured Learning" className="w-12 h-12 rounded-[0.8rem] object-cover shadow-sm border border-black/10" />
+              <p className="font-medium text-lg leading-tight">
+                <span className="font-bold text-white text-xl">Structured</span>
+                <br />
+                Learning Path
+              </p>
+            </motion.div>
+          </div>
+          <div className="w-full mb-8 bg-gray-50 bg-dot-pattern p-6 rounded-[1rem] border-l-4 border-[#FF3B30] shadow-[0_4px_12px_rgba(0,0,0,0.04)] relative overflow-hidden group">
+            <motion.div className="absolute inset-0 bg-gradient-to-r from-red-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <p className="text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-normal text-black relative z-10">
+              Structured, level-based chess training designed to build{" "}
+              <span className="font-bold text-[#FF3B30]">
+                strategic thinking
+              </span>
+              , <span className="font-bold text-[#FF3B30]">discipline</span>,
+              and{" "}
+              <span className="font-bold text-[#FF3B30]">
+                competitive confidence
+              </span>
+              .
+            </p>
+          </div>
+          <Magnetic><motion.button
+            whileHover={{ scale: 1.05, boxShadow: "0px 4px 0px #D70015", y: 4 }}
+            whileTap={{ scale: 0.95, boxShadow: "0px 0px 0px #D70015", y: 8 }}
+            className="relative overflow-hidden text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-semibold text-white px-6 md:px-10 py-4 md:py-5 rounded-full w-full md:w-auto shadow-[0_8px_0_#D70015] bg-gradient-to-r from-[#FF3B30] to-[#D70015] transition-all flex items-center justify-center gap-2 group"
+          >
+              <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shine"></span>
+            Book Your Free Demo
+            <motion.span group-hover={{ x: 5 }} transition={{ type: "spring" }}>
+              <ChevronRight className="w-6 h-6" />
+            </motion.span>
+          </motion.button></Magnetic>
+        </motion.div>
       </div>
     </div>
   );
@@ -188,24 +229,61 @@ function ImpactNumbers() {
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   const stats = [
-    { num: "10+", label: "Years Experience" },
-    { num: "1500+", label: "Avg. ELO Gain" },
-    { num: "50+", label: "Tournament Wins" },
+    { num: "10+", label: "Years Experience", image: "https://images.unsplash.com/photo-1501139082119-e14197628102?auto=format&fit=crop&w=200&q=80" },
+    { num: "1000+", label: "Students Taught", image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=200&q=80" },
+    { num: "50+", label: "Tournament Winners", image: "https://images.unsplash.com/photo-1563207153-f403bf289096?auto=format&fit=crop&w=200&q=80" },
   ];
 
   return (
-    <section ref={ref} className="py-20 font-sans border-b border-onyx-900/5 relative overflow-hidden bg-[#1C1C1E]">
-      <div className="container relative z-10 mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-12 divide-y md:divide-y-0 md:divide-x divide-white/10">
-        {stats.map((stat, i) => (
-          <motion.div key={i} variants={fadeInUp} initial="hidden" animate={isInView ? "visible" : "hidden"} className="flex flex-col items-center justify-center py-8 text-center group cursor-default">
-            <p className="text-6xl md:text-7xl font-serif font-medium text-white mb-4 group-hover:text-[#D70015] transition-colors duration-500">
-              {stat.num}
-            </p>
-            <p className="text-sm font-bold text-white/50 uppercase tracking-[0.2em]">
-              {stat.label}
-            </p>
-          </motion.div>
-        ))}
+    <section
+      ref={ref}
+      className="relative bg-cover bg-center py-16 md:py-24 font-sans flex items-center bg-[#FF3B30] overflow-hidden"
+    >
+      <motion.div
+        animate={{ backgroundPosition: ["0% 0%", "100% 100%"] }}
+        transition={{ duration: 20, repeat: Infinity, repeatType: "reverse" }}
+        className="absolute inset-0 opacity-10 bg-[url('https://images.unsplash.com/photo-1580541832626-2a7131ee809f?auto=format&fit=crop&w=1200&q=80')] bg-cover mix-blend-multiply"
+      ></motion.div>
+      <div className="container relative z-10 mx-auto text-center px-4">
+        <motion.h2
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
+          variants={fadeInUp}
+          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tight text-white mb-16"
+        >
+          Our Impact in <span className="text-[#FFCC00]">Numbers</span>
+        </motion.h2>
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
+          className="flex flex-col md:flex-row justify-center items-center gap-8"
+        >
+          {stats.map((stat, i) => (
+            <motion.div
+              key={i}
+              variants={fadeInUp}
+              whileHover={{ y: -10, scale: 1.05 }}
+              className="flex items-center gap-6 bg-white bg-dot-pattern p-6 rounded-[1.5rem] shadow-[0_20px_40px_rgba(0,0,0,0.12)] md:w-auto w-full max-w-sm justify-center border border-black/5 dark:border-white/5 border-b-2 cursor-pointer group"
+            >
+              <motion.div
+                whileHover={{ rotate: 10 }}
+                transition={{ duration: 0.6 }}
+                className="w-16 h-16 rounded-[1rem] bg-gray-100 overflow-hidden shadow-inner border border-black/5 dark:border-white/5"
+              >
+                <img src={stat.image} alt={stat.label} className="w-full h-full object-cover group-hover:scale-110 transition-all duration-500" />
+              </motion.div>
+              <div className="flex flex-col items-start">
+                <p className="text-4xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C]">
+                  {stat.num}
+                </p>
+                <p className="text-lg font-bold text-[#8E8E93] uppercase tracking-wide">
+                  {stat.label}
+                </p>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
       </div>
     </section>
   );
@@ -292,58 +370,81 @@ function LearningPath() {
 function WhatChildGains() {
   const items = [
     {
-      title: "Academic Excellence",
-      desc: "Develops problem-solving skills and spatial reasoning that directly translate to mathematics and sciences.",
-      icon: <Brain className="w-8 h-8"/>,
+      image: "https://images.unsplash.com/photo-1559757175-5700dde675bc?auto=format&fit=crop&w=200&q=80",
+      text: "Sharpens Critical Thinking",
+      desc: "Develops problem-solving skills that translate to academics.",
     },
     {
-      title: "Laser Focus",
-      desc: "Trains the mind to concentrate deeply for extended periods, completely eliminating modern screen-induced ADHD tendencies.",
-      icon: <Target className="w-8 h-8"/>,
+      image: "https://images.unsplash.com/photo-1504280613257-22f281e053f3?auto=format&fit=crop&w=200&q=80",
+      text: "Improves Focus & Patience",
+      desc: "Trains the mind to concentrate for extended periods.",
     },
     {
-      title: "Resilience & Grit",
-      desc: "Teaches emotional control and resilience through wins and losses, cultivating a stoic competitive mindset.",
-      icon: <Shield className="w-8 h-8"/>,
+      image: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=200&q=80",
+      text: "Boosts Creativity",
+      desc: "Encourages out-of-the-box thinking and pattern recognition.",
     },
     {
-      title: "Strategic Vision",
-      desc: "Learning to make critical decisions under pressure, anticipating outcomes 5 moves ahead.",
-      icon: <Target className="w-8 h-8"/>,
+      image: "https://images.unsplash.com/photo-1614332287897-cdc24cb7ca52?auto=format&fit=crop&w=200&q=80",
+      text: "Builds Confidence",
+      desc: "Teaches resilience through wins and losses.",
+    },
+    {
+      image: "https://images.unsplash.com/photo-1563207153-f403bf289096?auto=format&fit=crop&w=200&q=80",
+      text: "Prepares for Competitions",
+      desc: "Instills a healthy competitive spirit and sportsmanship.",
+    },
+    {
+      image: "https://images.unsplash.com/photo-1501139082119-e14197628102?auto=format&fit=crop&w=200&q=80",
+      text: "Time Management",
+      desc: "Learning to make critical decisions under time pressure.",
     },
   ];
 
   return (
-    <div className="w-full py-24 bg-[var(--color-parchment)] relative">
+    <div className="w-full py-16 md:py-24 bg-white bg-dot-pattern">
       <div className="max-w-7xl mx-auto px-4">
-        <motion.div
-           initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp}
-           className="mb-20 text-center md:text-left flex flex-col md:flex-row justify-between items-end gap-8"
+        <motion.h2
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          variants={fadeInUp}
+          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tight text-center mb-16 bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C]"
         >
-          <div className="max-w-2xl">
-            <h2 className="text-[36px] md:text-[52px] leading-tight font-serif font-medium text-[#111111] mb-6">
-              Beyond the Board: <br/>
-              <span className="italic text-[#D70015]">The Cognitive Edge.</span>
-            </h2>
-            <p className="text-lg text-gray-600 font-sans">
-              We don't just teach children how to move pieces. We reconstruct their neural pathways for elite problem-solving, emotional control, and strategic foresight.
-            </p>
-          </div>
-        </motion.div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-16">
+          What Your Child{" "}
+          <span className="text-[#FF3B30]">Gains With Chess!</span>
+        </motion.h2>
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          variants={staggerContainer}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
           {items.map((item, i) => (
-            <motion.div key={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="group cursor-default flex gap-8">
-              <div className="shrink-0 flex items-center justify-center w-16 h-16 rounded-full border border-onyx-900/10 text-[#D70015] group-hover:bg-[#1C1C1E] group-hover:text-white transition-all duration-500">
-                {item.icon}
+            <motion.div
+              key={i}
+              variants={fadeInUp}
+              whileHover={{ y: -8, scale: 1.02 }}
+              className="bg-gray-50 bg-dot-pattern p-8 rounded-[1.5rem] shadow-[0_8px_24px_rgba(0,0,0,0.06)] border border-black/5 dark:border-white/5 border-b-2 flex flex-col gap-4 group hover:bg-[#1C1C1E] transition-colors duration-300"
+            >
+              <div className="flex items-center gap-4">
+                <motion.div
+                  whileHover={{ rotate: 5, scale: 1.05 }}
+                  className="w-16 h-16 shrink-0 rounded-[1rem] bg-gray-100 overflow-hidden shadow-sm border border-black/5 dark:border-white/5"
+                >
+                  <img src={item.image} alt={item.text} className="w-full h-full object-cover group-hover:scale-110 transition-all duration-500" />
+                </motion.div>
+                <p className="text-xl font-bold text-gray-800 group-hover:text-white group-hover:scale-110 transition-all duration-300 duration-300">
+                  {item.text}
+                </p>
               </div>
-              <div className="flex flex-col">
-                <h3 className="text-2xl font-serif font-medium text-onyx-900 mb-3 group-hover:text-[#D70015] transition-colors">{item.title}</h3>
-                <p className="text-gray-600 text-lg leading-relaxed">{item.desc}</p>
-              </div>
+              <p className="text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-normal text-black pl-[4.5rem] group-hover:text-[#EBEBF5]/80 transition-colors duration-300">
+                {item.desc}
+              </p>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </div>
   );
@@ -416,14 +517,14 @@ function CoachingProcess() {
                 {/* Content Box */}
                 <div className="w-full md:w-1/2 flex justify-center pl-24 md:pl-0">
                   <motion.div
-                    whileHover={{ x: 10 }}
-                    className="w-full max-w-md cursor-default"
+                    whileHover={{ scale: 1.03, y: -5 }}
+                    className="bg-white bg-dot-pattern p-8 rounded-[2rem] border border-black/5 dark:border-white/5 border-b-2 shadow-[0_10px_30px_rgba(0,0,0,0.08)] hover:border-b-[#FFCC00] transition-colors w-full max-w-md relative group"
                   >
-                    <p className="text-sm font-black text-[#FF3B30] uppercase tracking-[0.2em] mb-3">Step 0{step.id}</p>
-                    <h3 className="text-3xl md:text-4xl font-bold mb-4 text-[#1C1C1E] transition-colors duration-300">
+                    <div className="absolute inset-0 bg-gradient-to-br from-white to-gray-50 rounded-[2rem] -z-10"></div>
+                    <h3 className="text-2xl font-bold mb-3 text-[#1C1C1E] group-hover:text-[#FF3B30] group-hover:scale-110 transition-all duration-300">
                       {step.title}
                     </h3>
-                    <p className="text-[18px] md:text-[22px] leading-[28px] md:leading-[32px] font-medium text-gray-600">
+                    <p className="text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-normal text-black">
                       {step.desc}
                     </p>
                   </motion.div>
@@ -617,25 +718,32 @@ function ClassModes() {
             <motion.div
               key={i}
               variants={fadeInUp}
-              whileHover={{ y: -10 }}
-              className="group relative h-[450px] rounded-[2rem] overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.08)] cursor-pointer"
+              whileHover={{ scale: 1.05, y: -10 }}
+              className="bg-gray-50 bg-dot-pattern p-10 rounded-[2rem] shadow-[0_10px_30px_rgba(0,0,0,0.08)] text-center border border-black/5 dark:border-white/5 border-b-2 hover:border-b-[#FFCC00] transition-colors relative overflow-hidden group"
             >
-              <img src={mode.image} alt={mode.title} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#1C1C1E] via-[#1C1C1E]/50 to-transparent"></div>
-              <div className="absolute bottom-0 left-0 right-0 p-8 flex flex-col justify-end h-full">
-                <h3 className="text-3xl font-black text-white mb-3 group-hover:text-[#FFCC00] transition-colors">
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="relative z-10">
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ duration: 0.5 }}
+                  className="w-24 h-24 mx-auto rounded-[1.5rem] overflow-hidden mb-6 shadow-md border border-black/5 dark:border-white/5"
+                >
+                  <img src={mode.image} alt={mode.title} className="w-full h-full object-cover group-hover:scale-110 transition-all duration-500" />
+                </motion.div>
+                <h3 className="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C] mb-4">
                   {mode.title}
                 </h3>
-                <p className="text-[16px] md:text-[18px] text-white/90 mb-6 leading-relaxed">
+                <p className="text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-normal text-black mb-8">
                   {mode.desc}
                 </p>
-                <button
-                  type="button"
-                  onClick={() => document.getElementById('contact-form')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="w-full py-4 rounded-full text-lg font-bold text-[#1C1C1E] bg-[#FFCC00] hover:bg-white transition-colors"
+                <Magnetic><motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="relative overflow-hidden w-full py-4 rounded-full text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-semibold text-white bg-gradient-to-r from-[#FF3B30] to-[#D70015] hover:from-red-700 hover:to-red-900 transition-colors shadow-[0_4px_12px_rgba(0,0,0,0.04)] border border-black/5 dark:border-white/5"
                 >
-                  Select Expert Coach
-                </button>
+              <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shine"></span>
+                  Select Mode
+                </motion.button></Magnetic>
               </div>
             </motion.div>
           ))}
@@ -1021,17 +1129,17 @@ function VideoDemo() {
 function WhyChooseUs() {
   const features = [
     {
-      image: "https://images.unsplash.com/photo-1586165368502-1bad197a6461?auto=format&fit=crop&w=1000&q=80",
+      image: "https://images.unsplash.com/photo-1586165368502-1bad197a6461?auto=format&fit=crop&w=800&q=80",
       title: "Certified Coaches",
       desc: "All our trainers are FIDE rated and certified chess instructors.",
     },
     {
-      image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1000&q=80",
+      image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80",
       title: "Safe Environment",
       desc: "100% secure, kid-friendly online learning platform.",
     },
     {
-      image: "https://images.unsplash.com/photo-1580541832626-2a7131ee809f?auto=format&fit=crop&w=1000&q=80",
+      image: "https://images.unsplash.com/photo-1580541832626-2a7131ee809f?auto=format&fit=crop&w=800&q=80",
       title: "Proven Track Record",
       desc: "Hundreds of our students have won state and national titles.",
     },
@@ -1060,18 +1168,18 @@ function WhyChooseUs() {
             <motion.div
               key={i}
               variants={fadeInUp}
-              className="group relative h-[400px] rounded-[2rem] overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.08)] cursor-default"
+              whileHover={{ y: -10 }}
+              className="bg-gray-50 bg-dot-pattern p-8 rounded-[2rem] border border-black/5 dark:border-white/5 border-b-2 text-center hover:border-b-[#FF3B30] transition-colors group"
             >
-              <img src={f.image} alt={f.title} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#1C1C1E] via-[#1C1C1E]/60 to-transparent"></div>
-              <div className="absolute bottom-0 left-0 right-0 p-8 flex flex-col justify-end text-left">
-                <h3 className="text-2xl md:text-3xl font-black text-white mb-3 group-hover:text-[#FFCC00] transition-colors">
-                  {f.title}
-                </h3>
-                <p className="text-[16px] md:text-[18px] leading-relaxed text-white/90">
-                  {f.desc}
-                </p>
+              <div className="w-24 h-24 mx-auto rounded-[1.5rem] overflow-hidden mb-6 shadow-[0_8px_24px_rgba(0,0,0,0.06)] border border-black/5 dark:border-white/5">
+                <img src={f.image} alt={f.title} className="w-full h-full object-cover group-hover:scale-110 transition-all duration-500" />
               </div>
+              <h3 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C] mb-4">
+                {f.title}
+              </h3>
+              <p className="text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-normal text-black">
+                {f.desc}
+              </p>
             </motion.div>
           ))}
         </motion.div>
@@ -1146,7 +1254,7 @@ function Pricing() {
               key={i}
               variants={fadeInUp}
               whileHover={{ y: -10 }}
-              className={`bg-white rounded-[2rem] p-8 shadow-[0_8px_30px_rgba(0,0,0,0.04)] relative transition-all duration-300 border border-gray-100 hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] ${plan.popular ? "border-2 border-[#FFCC00] shadow-[0_20px_40px_rgba(255,204,0,0.1)] md:scale-105 z-10" : "border-b-gray-300"}`}
+              className={`bg-white bg-dot-pattern rounded-[2rem] p-8 shadow-[0_10px_30px_rgba(0,0,0,0.08)] relative border border-black/5 dark:border-white/5 border-b-2 ${plan.popular ? "border-b-[#FFCC00] md:scale-105 z-10" : "border-b-gray-300"}`}
             >
               {plan.popular && (
                 <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#FFCC00] text-[#1C1C1E] font-bold px-4 py-1 rounded-full text-sm uppercase tracking-wide border border-black/5 dark:border-white/5">
@@ -1191,89 +1299,152 @@ function Pricing() {
 }
 
 function ContactForm() {
-  const [step, setStep] = useState(1);
-
   return (
-    <motion.div id="contact-form" initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="w-full py-24 bg-[#111111] font-sans text-white">
-      <div className="max-w-5xl mx-auto px-4 flex flex-col md:flex-row gap-16">
-        <div className="w-full md:w-5/12">
-          <h2 className="text-[40px] md:text-[56px] leading-[1.1] font-serif font-medium mb-6">
-            Book Your <br/><span className="text-[#D70015] italic">Free Trial.</span>
-          </h2>
-          <p className="text-xl text-white/60 mb-12">
-            Experience our premium chess coaching firsthand. Fill out the application below to schedule your child's free 1-on-1 evaluation and trial class.
-          </p>
-          
-          <div className="space-y-8">
-             <div className="flex items-center gap-5">
-               <div className="w-px h-12 bg-[#D70015]"></div>
-               <div>
-                 <p className="text-sm font-bold uppercase tracking-widest text-[#D70015] mb-1">Direct Line</p>
-                 <p className="text-xl font-medium">+1 (555) 123-4567</p>
-               </div>
-             </div>
-             <div className="flex items-center gap-5">
-               <div className="w-px h-12 bg-white/20"></div>
-               <div>
-                 <p className="text-sm font-bold uppercase tracking-widest text-white/50 mb-1">Email</p>
-                 <p className="text-xl font-medium">admissions@chesswize.com</p>
-               </div>
-             </div>
-          </div>
-        </div>
-
-        <div className="w-full md:w-7/12">
-          <div className="bg-white/5 backdrop-blur-lg border border-white/10 p-10 md:p-12 rounded-3xl">
-            {/* Progress */}
-            <div className="flex items-center gap-4 mb-10">
-               <div className={`h-1 flex-1 rounded-full ${step >= 1 ? 'bg-[#D70015]' : 'bg-white/10'} transition-all duration-500`}></div>
-               <div className={`h-1 flex-1 rounded-full ${step >= 2 ? 'bg-[#D70015]' : 'bg-white/10'} transition-all duration-500`}></div>
+    <motion.div
+      initial={{ opacity: 0, y: 50 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 0.8 }}
+      className="w-full py-16 md:py-24 bg-white bg-dot-pattern font-sans"
+    >
+      <div className="max-w-7xl mx-auto px-4">
+        <motion.h2
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          variants={fadeInUp}
+          className="text-[28px] md:text-[36px] leading-[32px] md:leading-[40px] font-medium tracking-tight text-center mb-16 bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C]"
+        >
+          Get In <span className="text-[#FF3B30]">Touch</span>
+        </motion.h2>
+        <div className="flex flex-col lg:flex-row gap-12">
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.6 }}
+            className="w-full lg:w-1/3 space-y-8"
+          >
+            <div className="bg-gray-50 bg-dot-pattern p-8 rounded-[2rem] border border-black/5 dark:border-white/5 border-b-2 border-b-[#FFCC00]">
+              <h3 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-[#1C1C1E] to-[#4A4A4C] mb-6">
+                Contact Information
+              </h3>
+              <div className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-[#FFCC00] rounded-full flex items-center justify-center shrink-0 border border-black/5 dark:border-white/5">
+                    <Phone className="w-6 h-6 text-[#1C1C1E]" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-[#8E8E93] font-bold uppercase">
+                      Phone
+                    </p>
+                    <p className="text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-normal text-black">
+                      +1 (555) 123-4567
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-[#FFCC00] rounded-full flex items-center justify-center shrink-0">
+                    <Mail className="w-6 h-6 text-[#1C1C1E]" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-[#8E8E93] font-bold uppercase">
+                      Email
+                    </p>
+                    <p className="text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-normal text-black">
+                      hello@chesswize.com
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-[#FFCC00] rounded-full flex items-center justify-center shrink-0">
+                    <MapPin className="w-6 h-6 text-[#1C1C1E]" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-[#8E8E93] font-bold uppercase">
+                      Location
+                    </p>
+                    <p className="text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-normal text-black">
+                      123 Grandmaster Ave, NY
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
+          </motion.div>
 
-            <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
-               {step === 1 && (
-                 <motion.div initial={{opacity:0, x:20}} animate={{opacity:1, x:0}} exit={{opacity:0, x:-20}} className="space-y-6">
-                    <h3 className="text-2xl font-serif mb-6">Student Details</h3>
-                    <div>
-                      <label className="block text-sm font-medium text-white/70 mb-2">Child's Full Name</label>
-                      <input type="text" className="w-full bg-transparent border-b border-white/20 px-0 py-3 focus:border-[#D70015] focus:outline-none transition-colors text-xl font-serif placeholder:text-white/20 placeholder-[var(--font-serif)]" placeholder="e.g. Alexander Petrov" />
-                    </div>
-                    <div className="grid grid-cols-2 gap-8">
-                       <div>
-                         <label className="block text-sm font-medium text-white/70 mb-2">Age</label>
-                         <input type="number" className="w-full bg-transparent border-b border-white/20 px-0 py-3 focus:border-[#D70015] focus:outline-none transition-colors text-xl font-serif placeholder:text-white/20 placeholder-[var(--font-serif)]" placeholder="8" />
-                       </div>
-                       <div>
-                         <label className="block text-sm font-medium text-white/70 mb-2">Current ELO (Approx.)</label>
-                         <input type="text" className="w-full bg-transparent border-b border-white/20 px-0 py-3 focus:border-[#D70015] focus:outline-none transition-colors text-xl font-serif placeholder:text-white/20 placeholder-[var(--font-serif)]" placeholder="Unrated" />
-                       </div>
-                    </div>
-                    <button type="button" onClick={() => setStep(2)} className="mt-8 bg-white text-[#111111] px-8 py-4 rounded-full font-bold uppercase tracking-widest text-sm hover:bg-[#D70015] hover:text-white transition-colors w-full md:w-auto">
-                       Next Step
-                    </button>
-                 </motion.div>
-               )}
-               {step === 2 && (
-                 <motion.div initial={{opacity:0, x:20}} animate={{opacity:1, x:0}} exit={{opacity:0, x:-20}} className="space-y-6">
-                    <h3 className="text-2xl font-serif mb-6">Parent Contact Info</h3>
-                    <div>
-                      <label className="block text-sm font-medium text-white/70 mb-2">Parent/Guardian Email</label>
-                      <input type="email" className="w-full bg-transparent border-b border-white/20 px-0 py-3 focus:border-[#D70015] focus:outline-none transition-colors text-xl font-serif placeholder:text-white/20 placeholder-[var(--font-serif)]" placeholder="parent@elite.com" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-white/70 mb-2">Phone Number</label>
-                      <input type="tel" className="w-full bg-transparent border-b border-white/20 px-0 py-3 focus:border-[#D70015] focus:outline-none transition-colors text-xl font-serif placeholder:text-white/20 placeholder-[var(--font-serif)]" placeholder="+1 (555) 000-0000" />
-                    </div>
-                    <div className="flex gap-4 pt-4">
-                       <button type="button" onClick={() => setStep(1)} className="text-white/50 px-6 py-4 font-bold hover:text-white transition-colors">Back</button>
-                       <button type="button" className="bg-[#D70015] text-white flex-1 py-4 rounded-full font-bold uppercase tracking-widest text-sm hover:bg-white hover:text-[#111111] transition-colors shadow-[0_0_20px_rgba(215,0,21,0.4)]">
-                          Confirm Free Trial
-                       </button>
-                    </div>
-                 </motion.div>
-               )}
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.6 }}
+            className="w-full lg:w-2/3"
+          >
+            <form className="bg-gray-50 bg-dot-pattern p-8 md:p-12 rounded-[2rem] border border-gray-100 shadow-[0_8px_24px_rgba(0,0,0,0.06)]">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                    Parent's Name
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full px-4 py-3 rounded-[1rem] border border-gray-200 focus:border-[#FF3B30] focus:outline-none focus:ring-4 focus:ring-[#FF3B30]/20 transition-colors bg-white bg-dot-pattern"
+                    placeholder="John Doe"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                    Child's Age
+                  </label>
+                  <input
+                    type="number"
+                    className="w-full px-4 py-3 rounded-[1rem] border border-gray-200 focus:border-[#FF3B30] focus:outline-none focus:ring-4 focus:ring-[#FF3B30]/20 transition-colors bg-white bg-dot-pattern"
+                    placeholder="8"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    className="w-full px-4 py-3 rounded-[1rem] border border-gray-200 focus:border-[#FF3B30] focus:outline-none focus:ring-4 focus:ring-[#FF3B30]/20 transition-colors bg-white bg-dot-pattern"
+                    placeholder="john@example.com"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                    Phone Number
+                  </label>
+                  <input
+                    type="tel"
+                    className="w-full px-4 py-3 rounded-[1rem] border border-gray-200 focus:border-[#FF3B30] focus:outline-none focus:ring-4 focus:ring-[#FF3B30]/20 transition-colors bg-white bg-dot-pattern"
+                    placeholder="+1 (555) 000-0000"
+                  />
+                </div>
+              </div>
+              <div className="mb-8">
+                <label className="block text-sm font-bold text-gray-700 mb-2">
+                  Message (Optional)
+                </label>
+                <textarea
+                  rows={4}
+                  className="w-full px-4 py-3 rounded-[1rem] border border-gray-200 focus:border-[#FF3B30] focus:outline-none focus:ring-4 focus:ring-[#FF3B30]/20 transition-colors bg-white bg-dot-pattern resize-none"
+                  placeholder="Tell us about your child's chess experience..."
+                ></textarea>
+              </div>
+              <Magnetic><motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="relative overflow-hidden w-full py-4 rounded-[1rem] text-[16px] md:text-[20px] leading-[24px] md:leading-[28px] font-semibold text-white bg-gradient-to-r from-[#FF3B30] to-[#D70015] hover:from-red-700 hover:to-red-900 transition-colors flex items-center justify-center gap-2"
+              >
+              <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shine"></span>
+                Send Message <Send className="w-5 h-5" />
+              </motion.button></Magnetic>
             </form>
-          </div>
+          </motion.div>
         </div>
       </div>
     </motion.div>
