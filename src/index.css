@@ -1,141 +1,223 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@fontsource-variable/geist";
 
 @custom-variant dark (&:is(.dark *));
 
-/* ===== M3 / HIG Design System ===== */
-
-@theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
-}
+/* ===== ChessWize — Enterprise / GrowthSchool Aesthetic ===== */
 
 :root {
-  /* --- Color Tokens (M3 semantic roles) --- */
-  --color-primary: #0B7DDA;
-  --color-on-primary: #FFFFFF;
-  --color-primary-container: #D4EAFF;
-  --color-on-primary-container: #002244;
-
-  --color-secondary: #E5A100;
-  --color-on-secondary: #FFFFFF;
-  --color-secondary-container: #FFF3D6;
-  --color-on-secondary-container: #3A2800;
-
-  --color-surface: #FFFFFF;
-  --color-surface-dim: #F5F5F7;
-  --color-surface-container: #F0F0F2;
-  --color-surface-container-high: #EAEAEC;
-  --color-on-surface: #1C1C1E;
-  --color-on-surface-variant: #6E6E73;
-
-  --color-outline: #C7C7CC;
-  --color-outline-variant: #E5E5EA;
-
-  --color-error: #D32F2F;
-  --color-on-error: #FFFFFF;
-  --color-success: #2E7D32;
-
-  --color-scrim: rgba(0, 0, 0, 0.32);
-
-  /* --- Elevation (M3 levels 0–5) --- */
-  --elevation-0: none;
-  --elevation-1: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-  --elevation-2: 0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
-  --elevation-3: 0 4px 16px rgba(0, 0, 0, 0.06), 0 2px 4px rgba(0, 0, 0, 0.04);
-  --elevation-4: 0 8px 24px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
-  --elevation-5: 0 12px 32px rgba(0, 0, 0, 0.10), 0 4px 8px rgba(0, 0, 0, 0.04);
-
-  /* --- Shape (M3 shape scale) --- */
-  --shape-xs: 4px;
-  --shape-sm: 8px;
-  --shape-md: 12px;
-  --shape-lg: 16px;
-  --shape-xl: 24px;
-
-  /* --- Spacing (8pt grid) --- */
-  --space-xs: 4px;
-  --space-sm: 8px;
-  --space-md: 16px;
-  --space-lg: 24px;
-  --space-xl: 32px;
-  --space-2xl: 48px;
-  --space-3xl: 64px;
-  --space-4xl: 96px;
-
-  /* --- Motion (M3 easing + duration) --- */
-  --ease-emphasized: cubic-bezier(0.05, 0.7, 0.1, 1.0);
-  --ease-standard: cubic-bezier(0.2, 0.0, 0, 1.0);
-  --ease-decelerate: cubic-bezier(0.0, 0.0, 0, 1.0);
-  --duration-short: 150ms;
-  --duration-medium: 300ms;
-  --duration-long: 500ms;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  --background: oklch(1 0 0); /* Pure white */
+  --foreground: oklch(0.15 0.02 250); /* Slate 900 */
+  
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: oklch(0.15 0.02 250);
+  
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --popover-foreground: oklch(0.15 0.02 250);
+  
+  --primary: oklch(0.45 0.2 250); /* Deep Royal Blue - #1D4ED8 */
+  --primary-foreground: oklch(0.98 0 0);
+  
+  --secondary: oklch(0.96 0.01 250); /* Slate 100 */
+  --secondary-foreground: oklch(0.15 0.02 250);
+  
+  --muted: oklch(0.96 0.01 250);
+  --muted-foreground: oklch(0.45 0.02 250);
+  
+  --accent: oklch(0.96 0.01 250);
+  --accent-foreground: oklch(0.2 0.02 250);
+  
+  --destructive: oklch(0.6 0.2 25);
+  --destructive-foreground: oklch(0.98 0 0);
+  
+  --border: oklch(0.92 0.01 250); /* Slate 200 */
+  --input: oklch(0.92 0.01 250);
+  --ring: oklch(0.45 0.2 250);
+  
+  --radius: 0.5rem; /* Sharper radii for enterprise feel (8px) */
 }
 
-/* --- Base Reset --- */
 html {
   scroll-behavior: smooth;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background-color: #FFFFFF;
+  color: var(--foreground);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
-html, body {
+body {
   overflow-x: hidden;
-  width: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #FFFFFF;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: 'kern' 1, 'liga' 1;
+}
+
+/* --- Enterprise Visual Primitives --- */
+
+/* Extremely subtle, highly refined shadows */
+.gs-shadow {
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05), 0 4px 10px rgba(15, 23, 42, 0.03);
+}
+.gs-shadow-lg {
+  box-shadow: 0 4px 6px rgba(15, 23, 42, 0.03), 0 10px 24px rgba(15, 23, 42, 0.06);
+}
+.gs-shadow-xl {
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.05), 0 20px 48px rgba(15, 23, 42, 0.06);
+}
+
+/* Inset border for cards (looks premium on light backgrounds) */
+.gs-border {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+}
+.gs-border-dark {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Glassmorphism for sticky elements */
+.gs-glass {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+/* Typography Utilities — Material 3 / Apple HIG aligned */
+.tracking-tight-gs {
+  letter-spacing: -0.022em; /* M3 headline tracking */
+}
+.tracking-tighter-gs {
+  letter-spacing: -0.032em; /* M3 display tracking */
+}
+.tracking-widest-gs {
+  letter-spacing: 0.08em; /* M3 label tracking */
+}
+
+/* Optical sizing for large headings */
+h1, h2, h3, .text-4xl, .text-5xl, .text-6xl {
+  font-optical-sizing: auto;
+  word-spacing: -0.02em;
+}
+
+/* Body text rhythm — Apple HIG paragraph spacing */
+p {
+  orphans: 3;
+  widows: 3;
+}
+
+/* Improve select/input typography */
+select, input, textarea {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+/* Gradient Texts */
+.text-gradient-primary {
+  background: linear-gradient(135deg, #1D4ED8 0%, #3B82F6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+.text-gradient-amber {
+  background: linear-gradient(135deg, #D97706 0%, #F59E0B 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Premium Button Press */
+.gs-btn {
+  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+.gs-btn:active {
+  transform: scale(0.98);
+}
+.gs-btn-primary {
+  background: linear-gradient(180deg, #2563EB 0%, #1D4ED8 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(29, 78, 216, 0.2);
+  color: white;
+  border: 1px solid #1E3A8A;
+}
+.gs-btn-primary:hover {
+  background: linear-gradient(180deg, #3B82F6 0%, #2563EB 100%);
+}
+
+/* Pattern Backgrounds */
+.gs-grid-pattern {
+  background-image: 
+    linear-gradient(to right, rgba(15, 23, 42, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15, 23, 42, 0.03) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+.gs-grid-pattern-dark {
+  background-image: 
+    linear-gradient(to right, rgba(15, 23, 42, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15, 23, 42, 0.05) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* Animations */
+.marquee-container {
+  overflow: hidden;
+  white-space: nowrap;
   position: relative;
+  display: flex;
+}
+.marquee-container::before, .marquee-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 150px;
+  height: 100%;
+  z-index: 2;
+}
+.marquee-container::before {
+  left: 0;
+  background: linear-gradient(to right, #FFFFFF, transparent);
+}
+.marquee-container::after {
+  right: 0;
+  background: linear-gradient(to left, #FFFFFF, transparent);
+}
+.marquee-content {
+  display: flex;
+  animation: marquee 35s linear infinite;
+}
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
 }
 
-/* --- Reduced Motion (HIG accessibility) --- */
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
+/* Micro Detailing & Interactions — Apple HIG spring curves */
+.hover-lift {
+  transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.35s ease;
+  will-change: transform;
 }
-
-/* --- Focus visible (HIG accessibility) --- */
-:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
-  border-radius: var(--shape-xs);
+.hover-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.07), 0 4px 8px rgba(15, 23, 42, 0.04);
+  border-color: rgba(37, 99, 235, 0.25);
+}
+.trust-badge-container {
+  background: white;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+  border-radius: 9999px;
+  padding: 4px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
 @theme inline {
-  --font-heading: var(--font-sans);
-  --font-sans: 'Geist Variable', sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -144,11 +226,6 @@ html, body {
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -176,48 +253,8 @@ html, body {
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
-}
-
 @layer base {
   * {
     @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-  html {
-    @apply font-sans;
   }
 }
