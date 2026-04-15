@@ -117,11 +117,11 @@ function TopNav() {
         </nav>
         <div className="flex items-center gap-4 md:gap-5">
           <div className="hidden sm:flex flex-col items-end">
-            <span className="text-[10px] font-extrabold text-emerald-600 uppercase tracking-widest-gs">Priority Boarding</span>
-            <span className="text-xs font-bold text-slate-600">Secure Your Baseline Test</span>
+            <span className="text-[10px] font-extrabold text-emerald-600 uppercase tracking-widest-gs">Limited Seats</span>
+            <span className="text-xs font-bold text-slate-600">Book a Free Demo Class</span>
           </div>
           <Button onClick={scrollToForm} className="gs-btn gs-btn-primary rounded-lg font-bold tracking-tight-gs px-4 md:px-6 h-9 md:h-11 text-xs md:text-sm shadow-md">
-            Book Baseline Eval
+            Book Free Demo
           </Button>
         </div>
       </div>
@@ -168,7 +168,7 @@ function Hero() {
             <motion.div variants={fadeUp} className="bg-white p-5 md:p-6 rounded-2xl border border-slate-200 gs-shadow-lg mt-2 md:mt-4 max-w-xl relative overflow-hidden hover-lift">
               <div className="absolute top-0 left-0 w-1 h-full bg-blue-600" />
               <h3 className="text-sm font-extrabold text-slate-900 uppercase tracking-widest-gs mb-4 flex items-center gap-2">
-                <Target className="size-4 text-blue-600" /> Establish Your Baseline
+                <Target className="size-4 text-blue-600" /> Start Your Free Evaluation
               </h3>
               <div className="flex flex-col sm:flex-row gap-3">
                 <div className="relative flex-1">
@@ -404,7 +404,7 @@ function ParentAssessmentQuiz() {
       <div className="max-w-[1000px] mx-auto px-4 md:px-8 relative z-10">
         <div className="text-center mb-10 md:mb-16">
           <Badge className="bg-blue-500/20 text-blue-600 border border-blue-500/30 rounded-full font-bold mb-4 px-3 py-1 text-[9px] md:text-[10px] uppercase tracking-widest-gs">
-            <BrainCircuit className="size-3 mr-1.5 inline" /> Cognitive Diagnostic Engine
+            <BrainCircuit className="size-3 mr-1.5 inline" /> Quick Assessment
           </Badge>
           <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tighter-gs mb-4 leading-tight text-slate-900 drop-shadow-sm">
             Is your child ready for <span className="text-blue-600">serious growth?</span>
@@ -419,7 +419,7 @@ function ParentAssessmentQuiz() {
             {!calculating && !showResult && (
               <motion.div key="quiz" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="flex flex-col w-full">
                 <div className="flex items-center justify-between mb-6">
-                  <span className="text-[10px] font-bold text-slate-600 uppercase tracking-widest-gs">Diagnostic Node {step + 1} of {questions.length}</span>
+                  <span className="text-[10px] font-bold text-slate-600 uppercase tracking-widest-gs">Question {step + 1} of {questions.length}</span>
                   <div className="flex gap-1.5">
                     {questions.map((_, i) => (
                       <div key={i} className={`h-1.5 w-8 rounded-full ${i <= step ? 'bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)]' : 'bg-white'}`} />
@@ -545,12 +545,12 @@ function TheProblem() {
           <div className="w-full lg:w-1/2 mt-4 lg:mt-0">
             <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 md:p-8 gs-shadow-xl relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-white/50 blur-[40px] rounded-full pointer-events-none" />
-              <h4 className="text-xl font-extrabold tracking-tight-gs text-slate-900 mb-6 text-center">Structural Comparison Matrix</h4>
+              <h4 className="text-xl font-extrabold tracking-tight-gs text-slate-900 mb-6 text-center">How We Compare</h4>
               
               <div className="flex flex-col gap-3">
                 {/* Header Row */}
                 <div className="grid grid-cols-[1fr_100px_100px] md:grid-cols-[1fr_120px_120px] gap-2 mb-2 pb-2 border-b border-slate-200 text-[9px] md:text-[10px] font-extrabold uppercase tracking-widest-gs text-slate-600">
-                  <div>Pedagogical Feature</div>
+                  <div>Feature</div>
                   <div className="text-center text-red-500">Hobby Clubs</div>
                   <div className="text-center text-blue-600">ChessWize Protocol</div>
                 </div>
@@ -768,13 +768,13 @@ function Platform() {
       <div className="max-w-[1400px] mx-auto px-4 md:px-8 relative z-10">
         <div className="text-center mb-12 md:mb-20 max-w-3xl mx-auto">
           <h2 className="text-[10px] font-bold text-blue-600 uppercase tracking-widest-gs mb-2 md:mb-3 flex items-center justify-center gap-2">
-            <BarChart3 className="size-3" /> Proprietary Parent Dashboard
+            <BarChart3 className="size-3" /> Parent Dashboard
           </h2>
           <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tighter-gs mb-4 md:mb-6 leading-tight drop-shadow-md">
             Stop wondering if they're <span className="text-blue-600">actually learning.</span>
           </h3>
           <p className="text-base md:text-lg text-slate-600 font-medium max-w-2xl mx-auto leading-relaxed">
-            We give parents complete visibility. Track their cognitive growth, tactical accuracy, and focus improvements week over week through our proprietary telemetry dashboard. No more guessing.
+            We give parents complete visibility. Track your child's progress, tactical accuracy, and focus improvements week over week through our parent dashboard. No more guessing.
           </p>
         </div>
 
@@ -852,9 +852,9 @@ function Platform() {
                 <Activity className="size-6 text-blue-600" />
               </div>
               <div>
-                <h4 className="text-xl font-extrabold text-slate-900 tracking-tight-gs mb-2">Algorithmic Weakness Detection</h4>
+                <h4 className="text-xl font-extrabold text-slate-900 tracking-tight-gs mb-2">Pinpoint Weakness Detection</h4>
                 <p className="text-slate-600 text-sm md:text-base leading-relaxed font-medium">
-                  Coaches systematically ingest the games your child plays online into our analytics engine. We mathematically identify recurring blunders and generate custom tactical sets to patch the exact leak.
+                  Our coaches analyse every game your child plays online. We identify recurring mistakes and create custom puzzle sets to fix the exact gaps — so they improve faster, not just play more.
                 </p>
               </div>
             </div>
@@ -866,15 +866,15 @@ function Platform() {
                 <LineChartIcon className="size-6 text-emerald-600" />
               </div>
               <div>
-                <h4 className="text-xl font-extrabold text-slate-900 tracking-tight-gs mb-2">Total Parental Transparency</h4>
+                <h4 className="text-xl font-extrabold text-slate-900 tracking-tight-gs mb-2">Complete Transparency for Parents</h4>
                 <p className="text-slate-600 text-sm md:text-base leading-relaxed font-medium">
-                  Never guess what you are paying for. Receive bi-weekly WhatsApp telemetry reports showing exactly what theoretical concepts were mastered, attendance records, and live Elo progression graphs.
+                  Know exactly what you're paying for. Receive regular WhatsApp progress reports covering concepts mastered, attendance, and live Elo rating graphs.
                 </p>
               </div>
             </div>
 
             <Button onClick={scrollToForm} variant="outline" className="w-fit mt-4 bg-slate-50 border-slate-200 text-slate-900 hover:bg-white font-bold hover-lift shadow-lg">
-              Experience the Engine <ArrowUpRight className="ml-2 size-4" />
+              Experience the Dashboard <ArrowUpRight className="ml-2 size-4" />
             </Button>
           </div>
         </div>
@@ -960,7 +960,7 @@ function InteractivePuzzle() {
       <div className="max-w-[1200px] mx-auto px-4 md:px-8 relative z-10">
         <div className="text-center mb-10 md:mb-16">
           <Badge className="bg-blue-100 text-blue-800 border-0 rounded-full font-bold mb-4 px-3 py-1 text-[9px] md:text-[10px] uppercase tracking-widest-gs">
-            <Zap className="size-3 mr-1 inline" /> Engine Simulation
+            <Zap className="size-3 mr-1 inline" /> Try a Puzzle
           </Badge>
           <h3 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tighter-gs mb-4">
             Test Their Tactical Vision
@@ -1175,7 +1175,7 @@ function LearningModes() {
     <section id="learning-modes" className="py-16 md:py-24 bg-slate-50 border-b border-slate-200">
       <div className="max-w-[1400px] mx-auto px-4 md:px-8">
         <div className="mb-12 md:mb-16 max-w-3xl">
-          <h2 className="text-[10px] font-bold text-blue-600 uppercase tracking-widest-gs mb-3">Delivery Systems</h2>
+          <h2 className="text-[10px] font-bold text-blue-600 uppercase tracking-widest-gs mb-3">Class Formats</h2>
           <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tighter-gs mb-4 md:mb-6 leading-tight">
             Architected for maximum focus.
           </h3>
@@ -1692,7 +1692,7 @@ function HowItWorks() {
             The Process
           </Badge>
           <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tighter-gs mb-4 md:mb-6 text-slate-900 leading-tight">
-            How our <span className="text-emerald-600">Cognitive Dojo</span> works.
+            How our <span className="text-emerald-600">training process</span> works.
           </h3>
           <p className="text-base md:text-lg text-slate-600 font-medium max-w-2xl mx-auto leading-relaxed">
             We've removed all friction. Your child can access our elite academic-grade training from anywhere.
@@ -1762,7 +1762,7 @@ function FAQ() {
     <section id="faq" className="py-16 md:py-24 bg-slate-50 text-slate-900 gs-grid-pattern border-t border-slate-200">
       <div className="max-w-[800px] mx-auto px-4 md:px-8">
         <div className="text-center mb-10 md:mb-16">
-          <h2 className="text-[10px] font-bold text-blue-600 uppercase tracking-widest-gs mb-3">Objection Handling</h2>
+          <h2 className="text-[10px] font-bold text-blue-600 uppercase tracking-widest-gs mb-3">Frequently Asked Questions</h2>
           <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tighter-gs mb-4 text-slate-900 leading-tight">
             Frequently Asked <span className="text-blue-600">Questions</span>
           </h3>
@@ -1995,39 +1995,23 @@ function Footer() {
               <img src="/logo-side-black.svg" alt="ChessWize" className="h-8 md:h-10 object-contain" />
             </div>
             <p className="font-medium text-sm leading-relaxed text-slate-600 max-w-sm mb-8">
-              Elite cognitive protocol disguised as a chess academy. Developing rigorous tactical vision, algorithmic decision-making, and absolute focus.
+              India's premier online chess academy for children. FIDE-certified coaches, structured curriculum, and measurable results — trusted by 1,500+ parents nationwide.
             </p>
-            
-            {/* System Status - Mission Control Aesthetic */}
-            <div className="bg-slate-50/50 border border-slate-200 rounded-xl p-4 max-w-sm">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest-gs">System Status</span>
-                <span className="flex items-center gap-1.5 text-[10px] font-bold text-emerald-600 uppercase tracking-widest-gs">
-                  <div className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  All Protocols Active
-                </span>
-              </div>
-              <div className="flex items-center justify-between text-[11px] font-medium text-slate-600 font-mono">
-                <span>SERVER: ASIA-SOUTH-1 [SECURE]</span>
-                <span>{new Date().toISOString().split('T')[1].split('.')[0]} UTC</span>
-              </div>
-            </div>
           </div>
 
           {/* Departments (Col span 2) */}
           <div className="md:col-span-4 lg:col-span-2 lg:col-start-6">
-            <h4 className="text-[11px] font-extrabold text-slate-700 uppercase tracking-widest-gs mb-6">Departments</h4>
+            <h4 className="text-[11px] font-extrabold text-slate-700 uppercase tracking-widest-gs mb-6">Quick Links</h4>
             <ul className="space-y-4 text-sm font-medium text-slate-500">
               <li><a href="https://chesswize.com/about-us" className="hover:text-blue-600 transition-colors">About Us</a></li>
-              <li><a href="https://chesswize.com/courses" className="hover:text-blue-600 transition-colors">Courses & Protocols</a></li>
-              <li><a href="https://chesswize.com/experience" className="hover:text-blue-600 transition-colors">The Experience</a></li>
-              <li><a href="https://chesswize.com/blog" className="hover:text-blue-600 transition-colors">Intelligence Blog</a></li>
+              <li><a href="https://chesswize.com/courses" className="hover:text-blue-600 transition-colors">Courses</a></li>
+              <li><a href="https://chesswize.com/blog" className="hover:text-blue-600 transition-colors">Blog</a></li>
             </ul>
           </div>
 
           {/* Connect (Col span 3) */}
           <div className="md:col-span-4 lg:col-span-3">
-            <h4 className="text-[11px] font-extrabold text-slate-700 uppercase tracking-widest-gs mb-6">Headquarters</h4>
+            <h4 className="text-[11px] font-extrabold text-slate-700 uppercase tracking-widest-gs mb-6">Contact Us</h4>
             <ul className="space-y-5 text-sm font-medium text-slate-500">
               <li className="flex items-start gap-3 group">
                 <Phone className="size-4 text-slate-600 group-hover:text-blue-600 transition-colors shrink-0 mt-0.5" />
@@ -2046,13 +2030,13 @@ function Footer() {
 
           {/* Legal & Social (Col span 2) */}
           <div className="md:col-span-4 lg:col-span-2">
-            <h4 className="text-[11px] font-extrabold text-slate-700 uppercase tracking-widest-gs mb-6">Documentation</h4>
+            <h4 className="text-[11px] font-extrabold text-slate-700 uppercase tracking-widest-gs mb-6">Legal</h4>
             <ul className="space-y-4 text-sm font-medium text-slate-500 mb-10">
               <li><a href="https://chesswize.com/terms-of-service" className="hover:text-blue-600 transition-colors">Terms of Service</a></li>
               <li><a href="https://chesswize.com/privacy-policy" className="hover:text-blue-600 transition-colors">Privacy Policy</a></li>
             </ul>
 
-            <h4 className="text-[11px] font-extrabold text-slate-700 uppercase tracking-widest-gs mb-6">Network</h4>
+            <h4 className="text-[11px] font-extrabold text-slate-700 uppercase tracking-widest-gs mb-6">Follow Us</h4>
             <div className="flex gap-4">
               <a href="https://www.linkedin.com/company/chesswize/" target="_blank" rel="noreferrer" className="size-10 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-blue-600 hover:text-slate-900 hover:border-blue-500 transition-all gs-shadow-sm hover-lift">
                 <Linkedin className="size-4" />
@@ -2138,7 +2122,7 @@ function EloProjectionCalculator() {
       <div className="max-w-[1200px] mx-auto px-4 md:px-8 relative z-10">
         <div className="text-center mb-12 md:mb-16">
           <Badge className="bg-blue-500/20 text-blue-600 border border-blue-500/30 rounded-full font-bold mb-4 px-3 py-1 text-[9px] md:text-[10px] uppercase tracking-widest-gs">
-            <Calculator className="size-3 mr-1.5 inline" /> Growth Trajectory Model
+            <Calculator className="size-3 mr-1.5 inline" /> Elo Growth Projector
           </Badge>
           <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tighter-gs mb-4 leading-tight text-slate-900">
             Project Your Child's <span className="text-blue-600">Elo Potential.</span>
@@ -2192,7 +2176,7 @@ function EloProjectionCalculator() {
             </div>
             
             <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl mt-4">
-              <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest-gs block mb-1">Algorithmic Insight</span>
+              <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest-gs block mb-1">Why It Matters</span>
               <p className="text-xs text-slate-600 font-medium leading-relaxed">
                 Casual play yields diminishing returns due to uncorrected structural blunders. Our protocol patches these leaks systematically.
               </p>
@@ -2269,7 +2253,7 @@ function SyllabusExplorer() {
   
   const syllabus = [
     {
-      title: "Weeks 1-4: Cognitive Foundation",
+      title: "Weeks 1-4: Building the Foundation",
       weeks: [
         { w: "Week 1", topic: "The Geometry of the Board", desc: "Algebraic notation mastery, piece coordinate mapping, and identifying undefended targets instantly." },
         { w: "Week 2", topic: "Checks, Captures, Threats", desc: "The foundational calculation algorithm. Every move evaluated strictly through this 3-step hierarchical filter." },
@@ -2278,7 +2262,7 @@ function SyllabusExplorer() {
       ]
     },
     {
-      title: "Weeks 5-8: Tactical Exploitation",
+      title: "Weeks 5-8: Sharpening Tactics",
       weeks: [
         { w: "Week 5", topic: "Discovered Attacks", desc: "Calculating forcing moves that unmask hidden attacks. Deepening calculation depth to 2.5 moves." },
         { w: "Week 6", topic: "Pawn Structure Integrity", desc: "Understanding passed pawns, isolated pawns, and pawn islands. How structural damage decides endgames." },
@@ -2287,7 +2271,7 @@ function SyllabusExplorer() {
       ]
     },
     {
-      title: "Weeks 9-12: Tournament Readiness",
+      title: "Weeks 9-12: Competition Ready",
       weeks: [
         { w: "Week 9", topic: "Positional Assessment", desc: "Evaluating imbalances. Knights vs Bishops in closed vs open positions." },
         { w: "Week 10", topic: "Time Management Psychology", desc: "Clock utilization under pressure. Preventing panic blunders in time trouble." },
@@ -2302,7 +2286,7 @@ function SyllabusExplorer() {
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-100 rounded-full blur-[100px] pointer-events-none" />
       <div className="max-w-[1200px] mx-auto px-4 md:px-8 relative z-10">
         <div className="mb-12 md:mb-16 text-center max-w-3xl mx-auto">
-          <h2 className="text-[10px] font-bold text-blue-600 uppercase tracking-widest-gs mb-3">Academic Rigor</h2>
+          <h2 className="text-[10px] font-bold text-blue-600 uppercase tracking-widest-gs mb-3">12-Week Syllabus</h2>
           <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tighter-gs text-slate-900 mb-4 leading-tight">
             The 12-Week Syllabus.
           </h3>
