@@ -1429,19 +1429,20 @@ function Curriculum() {
    ════════════════════════════════════════════════ */
 function VideoShowcase() {
   const videos = [
-    { src: "https://chesswize.com/wp-content/uploads/2026/03/WhatsApp-Video-2026-03-07-at-22.51.22.mp4", name: "Saanvika's Parents", desc: "Won five tournaments since joining" },
-    { src: "https://chesswize.com/wp-content/uploads/2026/03/WhatsApp-Video-2026-03-07-at-22.51.22-1.mp4", name: "Mikaeel's Parents", desc: "Huge improvement in confidence" }
+    { src: "https://chesswize.com/wp-content/uploads/2026/03/WhatsApp-Video-2026-03-07-at-22.51.22.mp4", name: "Saanvika's Parents", desc: "Won five tournaments since joining", poster: "/2026-04-15-10-36-00-proud-parent-tablet.webp" },
+    { src: "https://chesswize.com/wp-content/uploads/2026/03/WhatsApp-Video-2026-03-07-at-22.51.22-1.mp4", name: "Mikaeel's Parents", desc: "Huge improvement in confidence", poster: "/2026-04-15-10-35-00-parent-child-video-call.webp" }
   ];
 
   return (
-    <section id="testimonials" className="py-16 md:py-24 bg-slate-50 border-b border-slate-200 gs-grid-pattern">
-      <div className="max-w-[1400px] mx-auto px-4 md:px-8">
+    <section id="testimonials" className="py-16 md:py-24 bg-slate-50 border-b border-slate-200 gs-grid-pattern relative overflow-hidden">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-amber-500/5 rounded-full blur-[100px] pointer-events-none" />
+      <div className="max-w-[1400px] mx-auto px-4 md:px-8 relative z-10">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 md:mb-16 gap-6 md:gap-8">
           <div className="max-w-2xl mx-auto text-center md:text-left">
             <h2 className="text-[10px] font-bold text-amber-600 uppercase tracking-widest-gs mb-2 md:mb-3 flex items-center justify-center md:justify-start gap-2">
               <PlayCircle className="size-3" /> Verifiable Results
             </h2>
-            <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tighter-gs mb-3 md:mb-4 leading-tight">
+            <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tighter-gs mb-3 md:mb-4 leading-tight drop-shadow-sm">
               Real parents. <span className="text-amber-600">Real data.</span>
             </h3>
             <p className="text-base md:text-lg text-slate-600 font-medium">
@@ -1452,25 +1453,28 @@ function VideoShowcase() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 max-w-4xl mx-auto gap-6 md:gap-10">
           {videos.map((v, i) => (
-            <div key={i} className="flex flex-col gap-3 md:gap-4 hover-lift">
-              <div className="relative aspect-[9/16] rounded-2xl bg-slate-800 border border-slate-200 gs-shadow-lg overflow-hidden group">
+            <div key={i} className="flex flex-col gap-3 md:gap-4 group">
+              <div className="relative aspect-[9/16] rounded-2xl bg-slate-900 border border-slate-700 shadow-2xl overflow-hidden group hover:border-amber-400/50 transition-colors">
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent z-10 pointer-events-none" />
                 <MediaPlayer
                   title={v.name}
                   src={v.src}
                   playsInline
                   aspectRatio="9/16"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover z-20 relative"
                 >
-                  <MediaProvider />
+                  <MediaProvider>
+                    <Poster src={v.poster} alt={v.name} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500" />
+                  </MediaProvider>
                   <DefaultVideoLayout icons={defaultLayoutIcons} />
                 </MediaPlayer>
               </div>
-              <div className="bg-white/80 gs-shadow-xl p-4 rounded-xl border border-slate-200">
+              <div className="depth-panel p-4 md:p-5 rounded-xl hover-lift cursor-default mt-2">
                 <div className="flex gap-0.5 mb-2">
-                  {[1,2,3,4,5].map(s=><Star key={s} className="size-3 fill-amber-400 text-amber-600" />)}
+                  {[1,2,3,4,5].map(s=><Star key={s} className="size-3 fill-amber-400 text-amber-500 drop-shadow-sm" />)}
                 </div>
-                <p className="font-extrabold text-slate-900 tracking-tight-gs text-sm md:text-base leading-snug">{v.name}</p>
-                <p className="text-xs font-bold text-slate-600 mt-1">{v.desc}</p>
+                <p className="font-extrabold text-slate-900 tracking-tight-gs text-sm md:text-base leading-snug drop-shadow-sm">{v.name}</p>
+                <p className="text-xs font-bold text-slate-500 mt-1">{v.desc}</p>
               </div>
             </div>
           ))}
@@ -2117,69 +2121,76 @@ function ExitIntentPopup() {
 
 function Footer() {
   return (
-    <footer className="bg-slate-50 text-slate-600 pt-20 md:pt-32 pb-12 border-t border-slate-200/50 relative overflow-hidden">
+    <footer className="bg-gradient-to-b from-slate-900 to-slate-950 text-slate-400 pt-20 md:pt-32 pb-12 border-t border-slate-800 relative overflow-hidden">
       {/* Background Textures */}
-      <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-blue-600/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_rgba(15,23,42,0.8),_transparent)] pointer-events-none" />
       
       <div className="max-w-[1400px] mx-auto px-4 md:px-8 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-8 mb-16 md:mb-24">
           
           {/* Brand & Mission (Col span 4) */}
           <div className="md:col-span-12 lg:col-span-4">
-            <div className="mb-6 md:mb-8">
-              <img loading="lazy" src="/logo-side-black.svg" alt="ChessWize" className="h-8 md:h-10 object-contain" />
+            <div className="mb-6 md:mb-8 bg-white/5 inline-block p-3 rounded-2xl border border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]">
+              <img loading="lazy" src="/logo-side-white.svg" alt="ChessWize" className="h-8 md:h-10 object-contain drop-shadow-md" />
             </div>
-            <p className="font-medium text-sm leading-relaxed text-slate-600 max-w-sm mb-8">
+            <p className="font-medium text-sm leading-relaxed text-slate-400 max-w-sm mb-8 drop-shadow-sm">
               India's premier online chess academy for children. FIDE-certified coaches, structured curriculum, and measurable results — trusted by 1,500+ parents nationwide.
             </p>
           </div>
 
-          {/* Departments (Col span 2) */}
+          {/* Quick Links (Col span 2) */}
           <div className="md:col-span-4 lg:col-span-2 lg:col-start-6">
-            <h4 className="text-[11px] font-extrabold text-slate-700 uppercase tracking-widest-gs mb-6">Quick Links</h4>
-            <ul className="space-y-4 text-sm font-medium text-slate-500">
-              <li><a href="https://chesswize.com/about-us" className="hover:text-blue-600 transition-colors">About Us</a></li>
-              <li><a href="https://chesswize.com/courses" className="hover:text-blue-600 transition-colors">Courses</a></li>
-              <li><a href="https://chesswize.com/blog" className="hover:text-blue-600 transition-colors">Blog</a></li>
+            <h4 className="text-[11px] font-extrabold text-slate-200 uppercase tracking-widest-gs mb-6 drop-shadow-sm">Quick Links</h4>
+            <ul className="space-y-4 text-sm font-medium text-slate-400">
+              <li><a href="https://chesswize.com/about-us" className="hover:text-blue-400 hover:translate-x-1 inline-block transition-all">About Us</a></li>
+              <li><a href="https://chesswize.com/courses" className="hover:text-blue-400 hover:translate-x-1 inline-block transition-all">Courses</a></li>
+              <li><a href="https://chesswize.com/blog" className="hover:text-blue-400 hover:translate-x-1 inline-block transition-all">Blog</a></li>
             </ul>
           </div>
 
-          {/* Connect (Col span 3) */}
+          {/* Contact (Col span 3) */}
           <div className="md:col-span-4 lg:col-span-3">
-            <h4 className="text-[11px] font-extrabold text-slate-700 uppercase tracking-widest-gs mb-6">Contact Us</h4>
-            <ul className="space-y-5 text-sm font-medium text-slate-500">
+            <h4 className="text-[11px] font-extrabold text-slate-200 uppercase tracking-widest-gs mb-6 drop-shadow-sm">Contact Us</h4>
+            <ul className="space-y-5 text-sm font-medium text-slate-400">
               <li className="flex items-start gap-3 group">
-                <Phone className="size-4 text-slate-600 group-hover:text-blue-600 transition-colors shrink-0 mt-0.5" />
-                <a href="tel:+918400979997" className="hover:text-blue-600 transition-colors">+91-8400979997</a>
+                <div className="p-2 rounded-lg bg-slate-800 border border-slate-700 group-hover:border-blue-500/50 group-hover:bg-blue-500/10 transition-colors shadow-inner">
+                  <Phone className="size-4 text-slate-300 group-hover:text-blue-400 transition-colors" />
+                </div>
+                <a href="tel:+918400979997" className="hover:text-blue-400 transition-colors mt-1.5 drop-shadow-sm">+91-8400979997</a>
               </li>
               <li className="flex items-start gap-3 group">
-                <Mail className="size-4 text-slate-600 group-hover:text-blue-600 transition-colors shrink-0 mt-0.5" />
-                <a href="mailto:chesswize79@gmail.com" className="hover:text-blue-600 transition-colors">chesswize79@gmail.com</a>
+                <div className="p-2 rounded-lg bg-slate-800 border border-slate-700 group-hover:border-blue-500/50 group-hover:bg-blue-500/10 transition-colors shadow-inner">
+                  <Mail className="size-4 text-slate-300 group-hover:text-blue-400 transition-colors" />
+                </div>
+                <a href="mailto:chesswize79@gmail.com" className="hover:text-blue-400 transition-colors mt-1.5 drop-shadow-sm">chesswize79@gmail.com</a>
               </li>
               <li className="flex items-start gap-3 group">
-                <MapPin className="size-4 text-slate-600 group-hover:text-blue-600 transition-colors shrink-0 mt-0.5" />
-                <span className="leading-relaxed">Araaji No 988, H.no 05 Rajiv Vihar Naubasta, Kanpur 208021</span>
+                <div className="p-2 rounded-lg bg-slate-800 border border-slate-700 shadow-inner">
+                  <MapPin className="size-4 text-slate-300" />
+                </div>
+                <span className="leading-relaxed mt-1 drop-shadow-sm">Araaji No 988, H.no 05 Rajiv Vihar Naubasta, Kanpur 208021</span>
               </li>
             </ul>
           </div>
 
           {/* Legal & Social (Col span 2) */}
           <div className="md:col-span-4 lg:col-span-2">
-            <h4 className="text-[11px] font-extrabold text-slate-700 uppercase tracking-widest-gs mb-6">Legal</h4>
-            <ul className="space-y-4 text-sm font-medium text-slate-500 mb-10">
-              <li><a href="https://chesswize.com/terms-of-service" className="hover:text-blue-600 transition-colors">Terms of Service</a></li>
-              <li><a href="https://chesswize.com/privacy-policy" className="hover:text-blue-600 transition-colors">Privacy Policy</a></li>
+            <h4 className="text-[11px] font-extrabold text-slate-200 uppercase tracking-widest-gs mb-6 drop-shadow-sm">Legal</h4>
+            <ul className="space-y-4 text-sm font-medium text-slate-400 mb-10">
+              <li><a href="https://chesswize.com/terms-of-service" className="hover:text-blue-400 hover:translate-x-1 inline-block transition-all">Terms of Service</a></li>
+              <li><a href="https://chesswize.com/privacy-policy" className="hover:text-blue-400 hover:translate-x-1 inline-block transition-all">Privacy Policy</a></li>
             </ul>
 
-            <h4 className="text-[11px] font-extrabold text-slate-700 uppercase tracking-widest-gs mb-6">Follow Us</h4>
+            <h4 className="text-[11px] font-extrabold text-slate-200 uppercase tracking-widest-gs mb-6 drop-shadow-sm">Follow Us</h4>
             <div className="flex gap-4">
-              <a href="https://www.linkedin.com/company/chesswize/" target="_blank" rel="noreferrer" className="size-10 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-blue-600 hover:text-slate-900 hover:border-blue-500 transition-all gs-shadow-sm hover-lift">
+              <a href="https://www.linkedin.com/company/chesswize/" target="_blank" rel="noreferrer" className="size-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 hover:bg-blue-600 hover:text-white hover:border-blue-500 transition-all shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0_0_15px_rgba(37,99,235,0.4)] hover-lift">
                 <Linkedin className="size-4" />
               </a>
-              <a href="https://www.facebook.com/chesswize" target="_blank" rel="noreferrer" className="size-10 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-blue-600 hover:text-slate-900 hover:border-blue-500 transition-all gs-shadow-sm hover-lift">
+              <a href="https://www.facebook.com/chesswize" target="_blank" rel="noreferrer" className="size-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 hover:bg-blue-600 hover:text-white hover:border-blue-500 transition-all shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0_0_15px_rgba(37,99,235,0.4)] hover-lift">
                 <Facebook className="size-4" />
               </a>
-              <a href="https://www.instagram.com/chesswize/" target="_blank" rel="noreferrer" className="size-10 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-pink-600 hover:text-slate-900 hover:border-pink-500 transition-all gs-shadow-sm hover-lift">
+              <a href="https://www.instagram.com/chesswize/" target="_blank" rel="noreferrer" className="size-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 hover:bg-pink-600 hover:text-white hover:border-pink-500 transition-all shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0_0_15px_rgba(219,39,119,0.4)] hover-lift">
                 <Instagram className="size-4" />
               </a>
             </div>
@@ -2188,13 +2199,13 @@ function Footer() {
         </div>
         
         {/* Bottom Bar */}
-        <Separator className="bg-white/60 mb-8" />
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-[10px] font-bold uppercase tracking-widest-gs text-slate-600">
+        <Separator className="bg-slate-800 mb-8 shadow-inner" />
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4 relative z-10">
+          <p className="text-[10px] font-bold uppercase tracking-widest-gs text-slate-500 drop-shadow-sm">
             © 2025 by Chesswize. All rights reserved.
           </p>
           <div className="flex items-center gap-2">
-            <a href="https://engazedigital.com" target="_blank" rel="noopener noreferrer" className="text-[10px] font-extrabold tracking-widest-gs text-slate-600 hover:text-slate-700 transition-colors">
+            <a href="https://engazedigital.com" target="_blank" rel="noopener noreferrer" className="text-[10px] font-extrabold tracking-widest-gs text-slate-500 hover:text-slate-300 transition-colors drop-shadow-sm">
               Engaze
             </a>
           </div>
