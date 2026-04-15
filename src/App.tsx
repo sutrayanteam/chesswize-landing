@@ -156,8 +156,8 @@ function Hero() {
               </div>
             </motion.div>
 
-            <motion.h1 variants={fadeUp} className="text-4xl sm:text-5xl md:text-6xl lg:text-[4.5rem] font-extrabold tracking-tighter-gs text-slate-900 leading-[1.08] drop-shadow-sm">
-              Turn idle screen time into <br className="hidden md:block"/>
+            <motion.h1 variants={fadeUp} className="text-3xl sm:text-4xl md:text-[2.75rem] lg:text-[3.25rem] font-extrabold tracking-tighter-gs text-slate-900 leading-[1.12] drop-shadow-sm">
+              Turn idle screen time into{' '}
               <span className="text-gradient-primary">strategic intelligence.</span>
             </motion.h1>
 
@@ -165,14 +165,14 @@ function Hero() {
               Stop wasting hours on unstructured play. Our rigorous, level-based chess curriculum transforms impulsive kids into focused, patient, and analytical thinkers—guided by elite FIDE-certified masters.
             </motion.p>
 
-            <motion.div variants={fadeUp} className="bg-white p-5 md:p-6 rounded-2xl border border-slate-200 gs-shadow-lg mt-2 md:mt-4 max-w-xl relative overflow-hidden hover-lift">
+            <motion.div variants={fadeUp} className="bg-white p-5 md:p-6 rounded-2xl depth-panel mt-2 md:mt-4 max-w-xl relative overflow-hidden hover-lift">
               <div className="absolute top-0 left-0 w-1 h-full bg-blue-600" />
               <h3 className="text-sm font-extrabold text-slate-900 uppercase tracking-widest-gs mb-4 flex items-center gap-2">
                 <Target className="size-4 text-blue-600" /> Start Your Free Evaluation
               </h3>
               <div className="flex flex-col sm:flex-row gap-3">
                 <div className="relative flex-1">
-                  <select className="w-full px-4 py-3.5 text-sm md:text-base border border-slate-200 rounded-xl bg-slate-50 text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all appearance-none cursor-pointer hover:border-blue-300 shadow-sm">
+                  <select className="w-full px-4 py-3.5 text-sm md:text-base border border-slate-200 rounded-xl bg-slate-50 text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all appearance-none cursor-pointer hover:border-blue-300 shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]">
                     <option value="">Select Child's Age</option>
                     <option value="4-6">4 - 6 Years</option>
                     <option value="7-9">7 - 9 Years</option>
@@ -181,16 +181,16 @@ function Hero() {
                   </select>
                   <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 size-4 md:size-5 text-slate-500 pointer-events-none" />
                 </div>
-                <Button onClick={scrollToForm} size="lg" className="w-full sm:w-auto h-12 md:h-14 px-6 md:px-8 gs-btn gs-btn-primary rounded-xl text-sm md:text-base font-bold shadow-lg hover:shadow-xl transition-all">
+                <Button onClick={scrollToForm} size="lg" className="w-full sm:w-auto h-12 md:h-14 px-6 md:px-8 gs-btn gs-btn-primary rounded-xl text-sm md:text-base font-bold transition-all">
                   Request Eval <ArrowRight className="ml-2 size-4" />
                 </Button>
               </div>
               <div className="flex items-center gap-4 mt-4 pt-4 border-t border-slate-100">
                 <span className="flex items-center gap-1.5 text-[10px] md:text-xs font-bold text-slate-500">
-                  <CheckCircle className="size-3.5 text-emerald-500" /> Zero Financial Risk
+                  <CheckCircle className="size-3.5 text-emerald-500 drop-shadow-sm" /> Zero Financial Risk
                 </span>
                 <span className="flex items-center gap-1.5 text-[10px] md:text-xs font-bold text-slate-500">
-                  <CheckCircle className="size-3.5 text-emerald-500" /> 100% Free Baseline Report
+                  <CheckCircle className="size-3.5 text-emerald-500 drop-shadow-sm" /> 100% Free Baseline Report
                 </span>
               </div>
             </motion.div>
@@ -198,11 +198,11 @@ function Hero() {
 
           {/* Right Media Side - VSL / Masterclass Snippet */}
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }} className="w-full xl:w-[45%] mt-6 lg:mt-0">
-            <div className="bg-white p-2.5 md:p-3 rounded-2xl md:rounded-3xl gs-shadow-xl gs-border relative hover-lift">
+            <div className="glass-panel p-2.5 md:p-3 rounded-2xl md:rounded-3xl gs-shadow-xl gs-border relative hover-lift">
               <div className="absolute -top-4 -right-4 md:-top-6 md:-right-6 w-24 md:w-32 h-24 md:h-32 bg-blue-400/20 blur-2xl md:blur-3xl rounded-full" />
-              <div className="relative rounded-xl md:rounded-2xl overflow-hidden bg-slate-50 border border-slate-200 group">
+              <div className="relative rounded-xl md:rounded-2xl overflow-hidden bg-slate-50 border border-slate-200 group shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)]">
                 <div className="absolute top-3 left-3 md:top-4 md:left-4 z-20 flex flex-col gap-2">
-                  <Badge className="bg-red-600 text-slate-50 border-0 font-bold px-2 py-1 md:px-3 md:py-1 rounded shadow-lg uppercase tracking-widest-gs text-[9px] md:text-[10px] animate-pulse">Inside Live Training</Badge>
+                  <Badge className="bg-red-500/90 backdrop-blur-md text-white border-0 font-bold px-2 py-1 md:px-3 md:py-1 rounded shadow-lg uppercase tracking-widest-gs text-[9px] md:text-[10px] animate-pulse ring-1 ring-white/20">Inside Live Training</Badge>
                 </div>
                 
                 <video
@@ -212,16 +212,16 @@ function Hero() {
                   muted
                   playsInline
                   className="w-full aspect-[4/3] object-cover opacity-80 group-hover:opacity-100 transition-opacity"
-                />                <div className="absolute inset-0 bg-gradient-to-t from-slate-200 via-slate-100/40 to-transparent opacity-90 pointer-events-none" />
+                />                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-slate-900/20 to-transparent opacity-90 pointer-events-none" />
                 
                 <div className="absolute bottom-0 left-0 w-full p-4 md:p-6 z-20 pointer-events-none">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="text-slate-800 font-extrabold text-lg md:text-xl tracking-tight-gs">Positional Masterclass</h3>
-                      <p className="text-slate-600 text-xs md:text-sm font-medium">Real tournament simulation training</p>
+                      <h3 className="text-white font-extrabold text-lg md:text-xl tracking-tight-gs drop-shadow-md">Positional Masterclass</h3>
+                      <p className="text-slate-200 text-xs md:text-sm font-medium drop-shadow-sm">Real tournament simulation training</p>
                     </div>
-                    <div className="size-10 md:size-14 rounded-full bg-blue-600/90 backdrop-blur-md flex items-center justify-center border border-blue-400 gs-shadow-lg group-hover:scale-110 transition-transform">
-                      <PlayCircle className="size-5 md:size-6 text-slate-800" />
+                    <div className="size-10 md:size-14 rounded-full bg-blue-600/90 backdrop-blur-md flex items-center justify-center border border-white/20 gs-shadow-lg group-hover:scale-110 transition-transform ring-4 ring-blue-500/30">
+                      <PlayCircle className="size-5 md:size-6 text-white" />
                     </div>
                   </div>
                 </div>
@@ -229,18 +229,18 @@ function Hero() {
               
               {/* Trust Indicators below video */}
               <div className="mt-3 md:mt-4 grid grid-cols-3 gap-2 md:gap-3">
-                <div className="bg-slate-50 rounded-lg md:rounded-xl p-2 md:p-3 border border-slate-100 flex flex-col items-center justify-center text-center hover:bg-white hover:border-slate-200 hover:shadow-sm transition-all cursor-default">
-                  <img src="/calendar-appointment.webp" className="size-5 md:size-7 object-contain mb-1 md:mb-2" alt="Calendar" />
+                <div className="pill-badge rounded-lg md:rounded-xl p-2 md:p-3 flex flex-col items-center justify-center text-center hover:bg-white hover:border-slate-200 hover:shadow-sm transition-all cursor-default">
+                  <img src="/calendar-appointment.webp" className="size-5 md:size-7 object-contain mb-1 md:mb-2 drop-shadow-sm" alt="Calendar" />
                   <span className="text-[8px] md:text-[9px] font-bold text-slate-500 uppercase tracking-widest-gs">Diagnostic</span>
                   <span className="text-xs md:text-sm font-extrabold text-slate-900 tracking-tight-gs">Evaluation</span>
                 </div>
-                <div className="bg-slate-50 rounded-lg md:rounded-xl p-2 md:p-3 border border-slate-100 flex flex-col items-center justify-center text-center hover:bg-white hover:border-slate-200 hover:shadow-sm transition-all cursor-default">
-                  <img src="/gold-thropy.webp" className="size-5 md:size-7 object-contain mb-1 md:mb-2" alt="Trophy" />
+                <div className="pill-badge rounded-lg md:rounded-xl p-2 md:p-3 flex flex-col items-center justify-center text-center hover:bg-white hover:border-slate-200 hover:shadow-sm transition-all cursor-default">
+                  <img src="/gold-thropy.webp" className="size-5 md:size-7 object-contain mb-1 md:mb-2 drop-shadow-sm" alt="Trophy" />
                   <span className="text-[8px] md:text-[9px] font-bold text-slate-500 uppercase tracking-widest-gs">Expert</span>
                   <span className="text-xs md:text-sm font-extrabold text-slate-900 tracking-tight-gs">FIDE Masters</span>
                 </div>
-                <div className="bg-slate-50 rounded-lg md:rounded-xl p-2 md:p-3 border border-slate-100 flex flex-col items-center justify-center text-center hover:bg-white hover:border-slate-200 hover:shadow-sm transition-all cursor-default">
-                  <Activity className="size-5 md:size-7 text-blue-600 mb-1 md:mb-2" />
+                <div className="pill-badge rounded-lg md:rounded-xl p-2 md:p-3 flex flex-col items-center justify-center text-center hover:bg-white hover:border-slate-200 hover:shadow-sm transition-all cursor-default">
+                  <Activity className="size-5 md:size-7 text-blue-600 mb-1 md:mb-2 drop-shadow-sm" />
                   <span className="text-[8px] md:text-[9px] font-bold text-slate-500 uppercase tracking-widest-gs">Analytics</span>
                   <span className="text-xs md:text-sm font-extrabold text-slate-900 tracking-tight-gs">Data-Driven</span>
                 </div>
@@ -638,8 +638,10 @@ function Transformation() {
           </div>
 
           {/* After */}
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 lg:p-10 shadow-xl relative overflow-hidden hover-lift">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-100 via-transparent to-transparent pointer-events-none" />
+          <div className="bg-white/60 backdrop-blur-xl border border-white/40 rounded-3xl p-6 md:p-8 lg:p-10 shadow-[0_8px_60px_-12px_rgba(37,99,235,0.18)] relative overflow-hidden hover-lift ring-1 ring-blue-100/60">
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-100/80 via-blue-50/30 to-transparent pointer-events-none" />
+            <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-400/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-16 -left-16 w-40 h-40 bg-indigo-400/10 rounded-full blur-3xl pointer-events-none" />
             
             <div className="flex items-center gap-3 mb-6 md:mb-8 relative z-10">
               <div className="size-8 md:size-10 rounded-lg bg-blue-600 text-slate-50 flex items-center justify-center font-bold border border-blue-500 shadow-md">
@@ -714,11 +716,12 @@ function DailyRegimen() {
             { day: "Day 4", title: "Resilience Training", desc: "Playing out tough endgames against our engine without giving up.", icon: Layers },
             { day: "Weekend", title: "Practical Application", desc: "Executing their focus under the pressure of timed, weekend tournaments.", icon: Swords }
           ].map((step, i) => (
-            <div key={i} className={`relative flex flex-col p-5 md:p-6 rounded-2xl border ${step.active ? 'bg-blue-600 border-blue-500 text-slate-50 gs-shadow-xl transform -translate-y-2' : 'bg-white border-slate-200 text-slate-900 gs-shadow-sm'} transition-all`}>
-                      <span className={`text-[10px] font-extrabold uppercase tracking-widest-gs mb-3 ${step.active ? 'text-blue-100' : 'text-slate-500'}`}>{step.day}</span>
-              <step.icon className={`size-8 mb-4 ${step.active ? 'text-slate-50' : 'text-blue-600'}`} />
-              <h4 className="text-lg font-extrabold tracking-tight-gs mb-2 leading-snug">{step.title}</h4>
-              <p className={`text-xs font-medium leading-relaxed ${step.active ? 'text-blue-100' : 'text-slate-500'}`}>{step.desc}</p>
+            <div key={i} className={`relative flex flex-col p-5 md:p-6 rounded-2xl border ${step.active ? 'depth-panel transform -translate-y-2 ring-1 ring-blue-500/20' : 'bg-gradient-to-b from-white to-slate-50/50 border-slate-200/60 text-slate-900 shadow-[0_2px_10px_rgba(15,23,42,0.03),inset_0_1px_0_rgba(255,255,255,1)]'} transition-all duration-300`}>
+              <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent rounded-2xl pointer-events-none" />
+              <span className={`text-[10px] font-extrabold uppercase tracking-widest-gs mb-3 relative z-10 ${step.active ? 'text-blue-500 drop-shadow-sm' : 'text-slate-400'}`}>{step.day}</span>
+              <step.icon className={`size-8 mb-4 relative z-10 ${step.active ? 'text-blue-600 drop-shadow-md' : 'text-slate-400'}`} />
+              <h4 className={`text-lg font-extrabold tracking-tight-gs mb-2 leading-snug relative z-10 ${step.active ? 'text-slate-800' : 'text-slate-700'}`}>{step.title}</h4>
+              <p className={`text-xs font-medium leading-relaxed relative z-10 ${step.active ? 'text-slate-600' : 'text-slate-500'}`}>{step.desc}</p>
             </div>
           ))}
         </div>
@@ -781,48 +784,51 @@ function Platform() {
         <div className="flex flex-col lg:flex-row gap-10 items-center">
           {/* Dashboard UI Mockup */}
           <div className="w-full lg:w-1/2 relative">
-            <div className="bg-slate-50/80 backdrop-blur-2xl border border-slate-200 rounded-3xl p-4 md:p-6 shadow-xl relative z-10 overflow-hidden group hover:border-blue-400 transition-colors duration-500">
+            <div className="glass-panel rounded-3xl p-4 md:p-6 shadow-2xl relative z-10 overflow-hidden group hover:border-blue-300 transition-colors duration-500">
+              <div className="absolute inset-0 bg-gradient-to-br from-white/60 to-white/10 pointer-events-none" />
+              <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+              
               {/* Fake Topbar */}
-              <div className="flex items-center justify-between border-b border-slate-200 pb-4 mb-6">
+              <div className="flex items-center justify-between border-b border-slate-200/60 pb-4 mb-6 relative z-10">
                 <div className="flex items-center gap-3">
-                  <div className="size-10 rounded-xl bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center border border-slate-200 shadow-inner">
-                    <span className="font-extrabold text-slate-50 text-lg">S</span>
+                  <div className="size-10 rounded-xl bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_2px_8px_rgba(37,99,235,0.3)] border border-blue-400/20">
+                    <span className="font-extrabold text-white text-lg drop-shadow-md">S</span>
                   </div>
                   <div>
                     <div className="text-sm font-extrabold text-slate-900">Saanvika's Telemetry</div>
                     <div className="text-[10px] text-blue-600 uppercase tracking-widest-gs font-bold">Tournament Masterclass</div>
                   </div>
                 </div>
-                <div className="bg-emerald-500/10 text-emerald-600 px-3 py-1.5 rounded-lg text-[10px] font-extrabold uppercase tracking-widest-gs border border-emerald-500/20 flex items-center gap-1.5 shadow-sm">
+                <div className="bg-gradient-to-b from-emerald-50 to-emerald-100/50 text-emerald-700 px-3 py-1.5 rounded-lg text-[10px] font-extrabold uppercase tracking-widest-gs border border-emerald-200 shadow-sm flex items-center gap-1.5">
                   <TrendingUp className="size-3.5" /> +142 Elo (30 Days)
                 </div>
               </div>
               
-              <div className="grid grid-cols-2 gap-4 mb-4">
+              <div className="grid grid-cols-2 gap-4 mb-4 relative z-10">
                 {/* Radar Chart Component */}
-                <div className="bg-white/50 border border-slate-200 rounded-2xl p-4 flex flex-col items-center justify-center aspect-square relative">
+                <div className="depth-panel rounded-2xl p-4 flex flex-col items-center justify-center aspect-square relative">
                   <div className="absolute top-3 left-3 text-[9px] font-bold text-slate-500 uppercase tracking-widest-gs">Skill Matrix</div>
-                  <div className="w-3/4 h-3/4 mt-4">
+                  <div className="w-3/4 h-3/4 mt-4 drop-shadow-sm">
                     <RadarChart />
                   </div>
                 </div>
 
                 <div className="flex flex-col gap-4">
                   {/* Fake Graph */}
-                  <div className="bg-white/50 border border-slate-200 rounded-2xl p-4 flex-1 flex flex-col justify-between">
+                  <div className="depth-panel rounded-2xl p-4 flex-1 flex flex-col justify-between">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest-gs">Tactical Accuracy</span>
-                      <span className="text-xs font-extrabold text-emerald-600">94%</span>
+                      <span className="text-xs font-extrabold text-emerald-600 drop-shadow-sm">94%</span>
                     </div>
                     <div className="w-full h-16 flex items-end justify-between gap-1.5">
                       {[40, 50, 45, 60, 75, 70, 85, 94].map((height, idx) => (
-                        <div key={idx} className="w-full bg-white rounded-t-sm relative group/bar">
+                        <div key={idx} className="w-full bg-slate-100 rounded-t-sm relative group/bar shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)] overflow-hidden">
                           <motion.div 
                             initial={{ height: 0 }}
                             whileInView={{ height: `${height}%` }}
                             viewport={{ once: true }}
                             transition={{ duration: 1, delay: idx * 0.1 }}
-                            className="absolute bottom-0 w-full bg-gradient-to-t from-blue-600 to-blue-400 rounded-t-sm"
+                            className="absolute bottom-0 w-full bg-gradient-to-t from-blue-600 to-blue-400 rounded-t-sm shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)]"
                           />
                         </div>
                       ))}
@@ -830,11 +836,11 @@ function Platform() {
                   </div>
 
                   {/* Weakness Tag */}
-                  <div className="bg-white/50 border border-slate-200 rounded-2xl p-4 flex flex-col justify-center">
+                  <div className="depth-panel rounded-2xl p-4 flex flex-col justify-center">
                     <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest-gs block mb-2">Focus Area Identified</span>
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-slate-700">Rook Endgames</span>
-                      <Badge className="bg-red-100 text-red-600 border-0 rounded text-[9px] px-1.5 py-0 font-extrabold uppercase tracking-widest-gs">Action Req</Badge>
+                      <span className="text-xs font-bold text-slate-800">Rook Endgames</span>
+                      <Badge className="bg-gradient-to-b from-red-50 to-red-100/50 text-red-700 border-red-200 rounded text-[9px] px-1.5 py-0 font-extrabold uppercase tracking-widest-gs shadow-sm">Action Req</Badge>
                     </div>
                   </div>
                 </div>
@@ -842,7 +848,7 @@ function Platform() {
             </div>
             
             {/* Decorative background blocks behind dashboard */}
-            <div className="absolute top-8 -right-8 w-full h-full bg-gradient-to-br from-blue-600/20 to-violet-600/20 rounded-3xl border border-slate-300 gs-shadow-lg z-0 blur-sm" />
+            <div className="absolute top-8 -right-8 w-full h-full bg-gradient-to-br from-blue-600/20 to-violet-600/20 rounded-3xl border border-slate-300 gs-shadow-lg z-0 blur-md" />
           </div>
 
           {/* Right Text Content */}
@@ -884,217 +890,346 @@ function Platform() {
 }
 
 /* ════════════════════════════════════════════════
-   MICRO-ENGAGEMENT: INTERACTIVE PUZZLE (Upgraded)
+   MICRO-ENGAGEMENT: INTERACTIVE PUZZLE (Realistic)
    ════════════════════════════════════════════════ */
 function InteractivePuzzle() {
   const [level, setLevel] = useState<"beginner" | "intermediate" | "advanced">("beginner");
   const [solved, setSolved] = useState(false);
   const [depth, setDepth] = useState(1);
+  const [wrongSquare, setWrongSquare] = useState<{row:number;col:number}|null>(null);
+  const [attempts, setAttempts] = useState(0);
+  const [hintSquare, setHintSquare] = useState<{row:number;col:number}|null>(null);
+  const [moveTime, setMoveTime] = useState(0);
+  const [whiteTime, setWhiteTime] = useState(300);
+  const [blackTime] = useState(247);
 
   useEffect(() => {
-    setSolved(false);
-    setDepth(1);
+    setSolved(false); setDepth(1); setWrongSquare(null); setAttempts(0); setHintSquare(null); setMoveTime(0); setWhiteTime(300);
   }, [level]);
+
+  useEffect(() => {
+    if (!solved) {
+      const t = setInterval(() => setMoveTime(p => p + 1), 1000);
+      return () => clearInterval(t);
+    }
+  }, [solved, level]);
+
+  useEffect(() => {
+    if (!solved) {
+      const t = setInterval(() => setWhiteTime(p => Math.max(0, p - 1)), 1000);
+      return () => clearInterval(t);
+    }
+  }, [solved, level]);
 
   useEffect(() => {
     if (solved) {
       let d = 1;
-      const interval = setInterval(() => {
-        d++;
-        setDepth(d);
-        if (d >= 24) clearInterval(interval);
-      }, 50);
+      const interval = setInterval(() => { d++; setDepth(d); if (d >= 32) clearInterval(interval); }, 40);
       return () => clearInterval(interval);
     }
   }, [solved]);
 
+  const formatTime = (s: number) => `${Math.floor(s/60)}:${(s%60).toString().padStart(2,'0')}`;
+
   const puzzles = {
     beginner: {
-      title: "Level 1: Mate in 1",
-      desc: "White to play and mate in 1. Find the forced sequence.",
+      title: "Mate in 1",
+      subtitle: "White to move",
+      desc: "Find the only square that delivers checkmate. The king has no escape.",
       pieces: [
-        { row: 7, col: 4, type: "♔", color: "text-slate-50" },
-        { row: 0, col: 6, type: "♚", color: "text-slate-900" },
-        { row: 2, col: 5, type: "♕", color: "text-slate-50" },
+        { row: 7, col: 4, type: "♔", color: "w" },
+        { row: 0, col: 6, type: "♚", color: "b" },
+        { row: 2, col: 5, type: "♕", color: "w" },
+        { row: 1, col: 7, type: "♟", color: "b" },
+        { row: 1, col: 5, type: "♟", color: "b" },
       ],
-      winningSquare: { row: 0, col: 5 }, // f8
-      evalStart: 60,
-      evalEnd: 100,
-      evalText: "+M1"
+      winningSquare: { row: 0, col: 5 },
+      lastMove: { from: { row: 3, col: 2 }, to: { row: 2, col: 5 } },
+      captured: { white: ["♟","♟","♝"], black: ["♞","♟"] },
+      moveHistory: ["1. e4 e5", "2. Qh5 Nc6", "3. Bc4 Nf6??", "4. Qxf7#"],
+      solutionMove: "Qf8#",
+      evalStart: 60, evalEnd: 100, evalText: "+M1",
+      difficulty: "Easy", rating: 800,
     },
     intermediate: {
-      title: "Level 2: Tactical Geometry",
-      desc: "White to play. Spot the geometric weakness to execute a Knight fork.",
+      title: "Knight Fork",
+      subtitle: "White to move",
+      desc: "Spot the geometric weakness. One knight move attacks two pieces simultaneously.",
       pieces: [
-        { row: 7, col: 6, type: "♔", color: "text-slate-50" },
-        { row: 1, col: 6, type: "♚", color: "text-slate-900" },
-        { row: 4, col: 4, type: "♘", color: "text-slate-50" },
-        { row: 1, col: 3, type: "♛", color: "text-slate-900" }
+        { row: 7, col: 6, type: "♔", color: "w" },
+        { row: 1, col: 6, type: "♚", color: "b" },
+        { row: 4, col: 4, type: "♘", color: "w" },
+        { row: 1, col: 3, type: "♛", color: "b" },
+        { row: 2, col: 7, type: "♟", color: "b" },
+        { row: 6, col: 5, type: "♙", color: "w" },
+        { row: 6, col: 6, type: "♙", color: "w" },
       ],
-      winningSquare: { row: 2, col: 5 }, // f6
-      evalStart: 52,
-      evalEnd: 85,
-      evalText: "+6.4"
+      winningSquare: { row: 2, col: 5 },
+      lastMove: { from: { row: 0, col: 3 }, to: { row: 1, col: 3 } },
+      captured: { white: ["♟","♝","♜"], black: ["♞","♟","♟"] },
+      moveHistory: ["18. Nd5 Qd7??", "19. Nf6+"],
+      solutionMove: "Nf6+",
+      evalStart: 52, evalEnd: 85, evalText: "+6.4",
+      difficulty: "Medium", rating: 1200,
     },
     advanced: {
-      title: "Level 3: Positional Deflection",
-      desc: "White to play. Calculate the sacrifice required to deflect the defender.",
+      title: "Deflection Sacrifice",
+      subtitle: "White to move",
+      desc: "Calculate the sacrifice that deflects the defender, opening the back rank for mate.",
       pieces: [
-        { row: 7, col: 6, type: "♔", color: "text-slate-50" },
-        { row: 0, col: 6, type: "♚", color: "text-slate-900" },
-        { row: 0, col: 5, type: "♜", color: "text-slate-900" },
-        { row: 2, col: 7, type: "♖", color: "text-slate-50" },
-        { row: 2, col: 6, type: "♕", color: "text-slate-50" }
+        { row: 7, col: 6, type: "♔", color: "w" },
+        { row: 0, col: 6, type: "♚", color: "b" },
+        { row: 0, col: 5, type: "♜", color: "b" },
+        { row: 2, col: 7, type: "♖", color: "w" },
+        { row: 2, col: 6, type: "♕", color: "w" },
+        { row: 1, col: 5, type: "♟", color: "b" },
+        { row: 1, col: 7, type: "♟", color: "b" },
+        { row: 6, col: 6, type: "♙", color: "w" },
+        { row: 6, col: 7, type: "♙", color: "w" },
       ],
-      winningSquare: { row: 0, col: 7 }, // h8
-      evalStart: 48,
-      evalEnd: 100,
-      evalText: "+M4"
+      winningSquare: { row: 0, col: 7 },
+      lastMove: { from: { row: 0, col: 0 }, to: { row: 0, col: 5 } },
+      captured: { white: ["♜","♝","♟","♟"], black: ["♞","♝","♟","♟","♟"] },
+      moveHistory: ["24. Qg6 Rf8??", "25. Rh8+!"],
+      solutionMove: "Rh8+!",
+      evalStart: 48, evalEnd: 100, evalText: "+M4",
+      difficulty: "Hard", rating: 1600,
     }
   };
 
   const currentPuzzle = puzzles[level];
 
   return (
-    <section className="py-16 md:py-24 bg-white border-b border-slate-200 gs-grid-pattern relative overflow-hidden">
+    <section className="py-16 md:py-24 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700 relative overflow-hidden">
+      {/* Ambient background effects */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/20 via-transparent to-transparent pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-blue-500/5 rounded-full blur-[120px] pointer-events-none" />
+
       <div className="max-w-[1200px] mx-auto px-4 md:px-8 relative z-10">
         <div className="text-center mb-10 md:mb-16">
-          <Badge className="bg-blue-100 text-blue-800 border-0 rounded-full font-bold mb-4 px-3 py-1 text-[9px] md:text-[10px] uppercase tracking-widest-gs">
-            <Zap className="size-3 mr-1 inline" /> Try a Puzzle
+          <Badge className="bg-blue-500/20 text-blue-300 border border-blue-500/30 rounded-full font-bold mb-4 px-3 py-1 text-[9px] md:text-[10px] uppercase tracking-widest-gs backdrop-blur-sm">
+            <Zap className="size-3 mr-1 inline" /> Interactive Puzzle
           </Badge>
-          <h3 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tighter-gs mb-4">
+          <h3 className="text-3xl md:text-4xl font-extrabold text-slate-50 tracking-tighter-gs mb-4">
             Test Their Tactical Vision
           </h3>
-          <p className="text-base md:text-lg text-slate-600 font-medium max-w-2xl mx-auto">
+          <p className="text-base md:text-lg text-slate-400 font-medium max-w-2xl mx-auto">
             Before we speak, let's see how they calculate. Click the correct square to execute the winning move.
           </p>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-10 lg:gap-16 items-center justify-center bg-slate-50 p-6 md:p-10 rounded-3xl border border-slate-200 gs-shadow-xl overflow-hidden relative hover-lift">
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-stretch justify-center">
 
-          {/* Left: The Board + Eval Bar */}
-          <div className="flex items-stretch gap-2 md:gap-4 relative z-10 w-full max-w-[360px] md:max-w-[460px]">
-            {/* Evaluation Bar */}
-            <div className="w-6 md:w-8 bg-slate-200 rounded-lg border border-slate-300 overflow-hidden relative flex flex-col justify-end shadow-inner">
-               <motion.div
-                 animate={{ height: `${solved ? currentPuzzle.evalEnd : currentPuzzle.evalStart}%` }}
-                 transition={{ type: "spring", stiffness: 50 }}
-                 className="w-full bg-slate-50 transition-all"
-               />
-               {solved && (
-                 <div className="absolute top-2 left-1/2 -translate-x-1/2 text-[9px] font-extrabold text-slate-800 bg-slate-200/80 px-1 rounded backdrop-blur-sm">
-                   {currentPuzzle.evalText}
-                 </div>
-               )}
+          {/* LEFT COLUMN: Board Area */}
+          <div className="flex flex-col w-full lg:w-auto lg:max-w-[520px]">
+            {/* Player bar - Black */}
+            <div className="flex items-center justify-between bg-slate-800/80 backdrop-blur-sm border border-slate-700/50 rounded-t-2xl px-4 py-2.5">
+              <div className="flex items-center gap-3">
+                <div className="size-8 rounded-full bg-slate-700 flex items-center justify-center text-sm font-bold text-slate-300 ring-2 ring-slate-600">B</div>
+                <div>
+                  <p className="text-sm font-bold text-slate-200">Opponent</p>
+                  <p className="text-[10px] text-slate-500">Rating: {currentPuzzle.rating + 50}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="flex gap-0.5">
+                  {currentPuzzle.captured.black.map((p, i) => <span key={i} className="text-xs text-slate-500">{p}</span>)}
+                </div>
+                <div className="bg-slate-700 px-3 py-1 rounded-lg font-mono text-sm font-bold text-slate-300 tabular-nums border border-slate-600">
+                  {formatTime(blackTime)}
+                </div>
+              </div>
             </div>
-            {/* Board */}
-            <div className="flex-1 relative aspect-square bg-slate-200 border-[4px] md:border-[6px] border-slate-300 rounded-xl overflow-hidden grid grid-cols-8 grid-rows-8 shadow-2xl">
-              {Array.from({ length: 64 }).map((_, i) => {
-                const row = Math.floor(i / 8);
-                const col = i % 8;
-                const isLight = (row + col) % 2 === 0;
-                const isWinningSquare = row === currentPuzzle.winningSquare.row && col === currentPuzzle.winningSquare.col;
-                const piece = currentPuzzle.pieces.find(p => p.row === row && p.col === col);
-                
-                return (
-                  <div 
-                    key={i} 
-                    onClick={() => {
-                      if (!solved && isWinningSquare) {
-                        setSolved(true);
-                        toast.success("Brilliant Move!", {
-                          description: "You found the forced sequence. Initiating deep engine evaluation..."
-                        });
-                        confetti({
-                          particleCount: 100,
-                          spread: 70,
-                          origin: { y: 0.6 },
-                          colors: ['#3b82f6', '#10b981', '#f59e0b']
-                        });
-                      } else if (!solved && !isWinningSquare) {
-                        toast.error("Inaccurate Move", {
-                          description: "That square blunders the advantage. Try again."
-                        });
-                      }
-                    }}
-                    className={`w-full h-full flex items-center justify-center ${!solved ? 'cursor-pointer' : ''} ${isLight ? 'bg-amber-100' : 'bg-emerald-600/80'} ${(!solved && isWinningSquare) ? 'hover:bg-emerald-400/80' : ''} ${(!solved && !isWinningSquare) ? 'hover:bg-red-500/50' : ''} transition-colors relative`}
-                  >
-                    {/* Coordinate overlays */}
-                    {col === 0 && <span className={`absolute top-0.5 left-1 text-[8px] font-bold ${isLight ? 'text-emerald-900' : 'text-amber-100'}`}>{8 - row}</span>}
-                    {row === 7 && <span className={`absolute bottom-0.5 right-1 text-[8px] font-bold ${isLight ? 'text-emerald-900' : 'text-amber-100'}`}>{String.fromCharCode(97 + col)}</span>}
 
-                    {piece && (
-                      <span className={`text-2xl md:text-5xl drop-shadow-lg ${piece.color} ${piece.color === 'text-slate-50' ? 'drop-shadow-[0_2px_1px_rgba(0,0,0,0.5)]' : 'drop-shadow-[0_2px_1px_rgba(255,255,255,0.3)]'}`}>
-                        {piece.type}
-                      </span>
-                    )}
-                    {solved && isWinningSquare && (
-                      <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute inset-0 bg-blue-500/80 flex items-center justify-center z-10 pointer-events-none backdrop-blur-[1px]">
-                        <Target className="size-8 md:size-12 text-slate-800 drop-shadow-md" />
-                      </motion.div>
-                    )}
-                  </div>
-                );
-              })}
+            {/* Board + Eval Bar */}
+            <div className="flex items-stretch gap-0 relative">
+              {/* Evaluation Bar */}
+              <div className="w-5 md:w-7 bg-slate-700 overflow-hidden relative flex flex-col justify-end border-x border-slate-600">
+                <motion.div
+                  animate={{ height: `${solved ? currentPuzzle.evalEnd : currentPuzzle.evalStart}%` }}
+                  transition={{ type: "spring", stiffness: 50, damping: 20 }}
+                  className="w-full bg-slate-100 transition-all relative"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-200 to-white" />
+                </motion.div>
+                <div className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 z-10">
+                  <span className="text-[8px] md:text-[9px] font-extrabold text-slate-300 bg-slate-800/90 px-1 py-0.5 rounded backdrop-blur-sm whitespace-nowrap">
+                    {solved ? currentPuzzle.evalText : `+${(currentPuzzle.evalStart / 20).toFixed(1)}`}
+                  </span>
+                </div>
+              </div>
+
+              {/* The Board */}
+              <div className="flex-1 relative aspect-square grid grid-cols-8 grid-rows-8 shadow-[0_0_60px_-10px_rgba(0,0,0,0.6)]">
+                {Array.from({ length: 64 }).map((_, i) => {
+                  const row = Math.floor(i / 8);
+                  const col = i % 8;
+                  const isLight = (row + col) % 2 === 0;
+                  const isWinningSquare = row === currentPuzzle.winningSquare.row && col === currentPuzzle.winningSquare.col;
+                  const piece = currentPuzzle.pieces.find(p => p.row === row && p.col === col);
+                  const isLastMoveFrom = currentPuzzle.lastMove.from.row === row && currentPuzzle.lastMove.from.col === col;
+                  const isLastMoveTo = currentPuzzle.lastMove.to.row === row && currentPuzzle.lastMove.to.col === col;
+                  const isWrong = wrongSquare?.row === row && wrongSquare?.col === col;
+                  const isHint = hintSquare?.row === row && hintSquare?.col === col;
+
+                  const lightColor = "bg-[#f0d9b5]";
+                  const darkColor = "bg-[#b58863]";
+                  const lastMoveLight = "bg-[#cdd16a]";
+                  const lastMoveDark = "bg-[#aaa23a]";
+
+                  let squareColor = isLight ? lightColor : darkColor;
+                  if (isLastMoveFrom || isLastMoveTo) squareColor = isLight ? lastMoveLight : lastMoveDark;
+
+                  return (
+                    <div
+                      key={i}
+                      onClick={() => {
+                        if (solved) return;
+                        if (isWinningSquare) {
+                          setSolved(true);
+                          toast.success("Brilliant Move!", { description: `${currentPuzzle.solutionMove} — Forced winning sequence found in ${moveTime}s.` });
+                          confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 }, colors: ['#3b82f6', '#10b981', '#f59e0b', '#ffffff'] });
+                        } else {
+                          setAttempts(a => a + 1);
+                          setWrongSquare({ row, col });
+                          setTimeout(() => setWrongSquare(null), 600);
+                          toast.error("Inaccurate", { description: attempts >= 1 ? "Try using the hint button." : "That blunders the advantage. Recalculate." });
+                        }
+                      }}
+                      className={`w-full h-full flex items-center justify-center relative ${!solved ? 'cursor-pointer' : ''} ${squareColor} transition-colors duration-150`}
+                    >
+                      {col === 0 && <span className={`absolute top-0.5 left-0.5 text-[7px] md:text-[8px] font-bold select-none ${isLight ? 'text-[#b58863]' : 'text-[#f0d9b5]'}`}>{8 - row}</span>}
+                      {row === 7 && <span className={`absolute bottom-0.5 right-1 text-[7px] md:text-[8px] font-bold select-none ${isLight ? 'text-[#b58863]' : 'text-[#f0d9b5]'}`}>{String.fromCharCode(97 + col)}</span>}
+
+                      {piece && (
+                        <span className={`text-2xl md:text-[2.8rem] leading-none select-none ${piece.color === 'w' ? 'text-white drop-shadow-[0_2px_3px_rgba(0,0,0,0.6)]' : 'text-slate-900 drop-shadow-[0_1px_2px_rgba(255,255,255,0.2)]'}`} style={{ textShadow: piece.color === 'w' ? '0 1px 4px rgba(0,0,0,0.5)' : '0 1px 2px rgba(0,0,0,0.3)' }}>
+                          {piece.type}
+                        </span>
+                      )}
+
+                      {/* Wrong move flash */}
+                      {isWrong && (
+                        <motion.div initial={{ opacity: 0.8 }} animate={{ opacity: 0 }} transition={{ duration: 0.6 }} className="absolute inset-0 bg-red-500/50 pointer-events-none" />
+                      )}
+
+                      {/* Hint glow */}
+                      {isHint && !solved && (
+                        <motion.div animate={{ opacity: [0.3, 0.7, 0.3] }} transition={{ repeat: Infinity, duration: 1.5 }} className="absolute inset-0 bg-blue-400/30 pointer-events-none rounded-sm" />
+                      )}
+
+                      {/* Solved overlay */}
+                      {solved && isWinningSquare && (
+                        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute inset-0 bg-blue-500/70 flex items-center justify-center z-10 pointer-events-none backdrop-blur-[2px]">
+                          <Target className="size-6 md:size-10 text-white drop-shadow-lg" />
+                        </motion.div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Player bar - White */}
+            <div className="flex items-center justify-between bg-slate-800/80 backdrop-blur-sm border border-slate-700/50 rounded-b-2xl px-4 py-2.5">
+              <div className="flex items-center gap-3">
+                <div className="size-8 rounded-full bg-white flex items-center justify-center text-sm font-bold text-slate-800 ring-2 ring-slate-300 shadow-sm">W</div>
+                <div>
+                  <p className="text-sm font-bold text-slate-50">Your Child</p>
+                  <p className="text-[10px] text-slate-500">Rating: {currentPuzzle.rating}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="flex gap-0.5">
+                  {currentPuzzle.captured.white.map((p, i) => <span key={i} className="text-xs text-slate-400">{p}</span>)}
+                </div>
+                <div className={`px-3 py-1 rounded-lg font-mono text-sm font-bold tabular-nums border ${!solved ? 'bg-white text-slate-900 border-white/80 shadow-[0_0_12px_rgba(255,255,255,0.15)]' : 'bg-slate-700 text-slate-300 border-slate-600'}`}>
+                  {formatTime(whiteTime)}
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Right: Controls */}
-          <div className="w-full max-w-[400px] lg:max-w-[450px] flex flex-col justify-center relative z-10 min-h-[300px] text-slate-900">
-            <div className="flex flex-wrap gap-2 mb-8 bg-white p-1.5 rounded-xl border border-slate-200 shadow-sm">
-              <Button 
-                variant="ghost" 
-                onClick={() => setLevel("beginner")} 
-                className={`text-xs h-8 px-4 font-bold rounded-lg transition-all ${level === "beginner" ? "bg-slate-100 text-slate-800 shadow-sm border border-slate-200" : "text-slate-500 hover:text-slate-900 hover:bg-slate-100"}`}
-              >
-                Level 1
-              </Button>
-              <Button 
-                variant="ghost"
-                onClick={() => setLevel("intermediate")} 
-                className={`text-xs h-8 px-4 font-bold rounded-lg transition-all ${level === "intermediate" ? "bg-slate-100 text-slate-800 shadow-sm border border-slate-200" : "text-slate-500 hover:text-slate-900 hover:bg-slate-100"}`}
-              >
-                Level 2
-              </Button>
-              <Button 
-                variant="ghost"
-                onClick={() => setLevel("advanced")} 
-                className={`text-xs h-8 px-4 font-bold rounded-lg transition-all ${level === "advanced" ? "bg-slate-100 text-slate-800 shadow-sm border border-slate-200" : "text-slate-500 hover:text-slate-900 hover:bg-slate-100"}`}
-              >
-                Level 3
-              </Button>
+          {/* RIGHT COLUMN: Analysis Panel */}
+          <div className="w-full lg:w-[380px] flex flex-col bg-slate-800/60 backdrop-blur-sm border border-slate-700/50 rounded-2xl overflow-hidden">
+            {/* Difficulty Tabs */}
+            <div className="flex gap-1 p-2 bg-slate-900/50 border-b border-slate-700/50">
+              {(["beginner","intermediate","advanced"] as const).map((l, i) => (
+                <button key={l} onClick={() => setLevel(l)}
+                  className={`flex-1 text-[10px] md:text-xs h-8 font-bold rounded-lg transition-all uppercase tracking-wider ${level === l ? "bg-blue-600 text-white shadow-lg shadow-blue-900/30" : "text-slate-400 hover:text-slate-200 hover:bg-slate-700/50"}`}>
+                  {["Easy","Medium","Hard"][i]}
+                </button>
+              ))}
             </div>
-            
-            <h4 className="text-2xl md:text-3xl font-extrabold tracking-tighter-gs mb-3 text-slate-900">{currentPuzzle.title}</h4>
-            <p className="text-slate-600 font-medium md:text-lg mb-8 leading-relaxed">
-              {currentPuzzle.desc}
-            </p>
 
+            {/* Puzzle Info */}
+            <div className="p-4 md:p-5 border-b border-slate-700/30">
+              <div className="flex items-center gap-2 mb-2">
+                <div className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${currentPuzzle.difficulty === 'Easy' ? 'bg-emerald-500/20 text-emerald-400' : currentPuzzle.difficulty === 'Medium' ? 'bg-amber-500/20 text-amber-400' : 'bg-red-500/20 text-red-400'}`}>
+                  {currentPuzzle.difficulty}
+                </div>
+                <span className="text-[10px] text-slate-500">Rating: {currentPuzzle.rating}</span>
+                {attempts > 0 && !solved && <span className="text-[10px] text-red-400 ml-auto">{attempts} wrong</span>}
+              </div>
+              <h4 className="text-lg md:text-xl font-extrabold tracking-tight text-slate-50 mb-1">{currentPuzzle.title}</h4>
+              <p className="text-xs md:text-sm text-slate-400 leading-relaxed">{currentPuzzle.subtitle} — {currentPuzzle.desc}</p>
+            </div>
+
+            {/* Move History */}
+            <div className="p-4 md:p-5 border-b border-slate-700/30 flex-1">
+              <div className="flex items-center gap-2 mb-3">
+                <Layers className="size-3.5 text-slate-500" />
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Move History</span>
+              </div>
+              <div className="space-y-1.5 font-mono text-xs">
+                {currentPuzzle.moveHistory.map((move, i) => (
+                  <div key={i} className={`flex items-center gap-2 px-2 py-1 rounded ${i === currentPuzzle.moveHistory.length - 1 && !solved ? 'bg-blue-500/10 border border-blue-500/20' : ''}`}>
+                    <span className="text-slate-400">{move}</span>
+                    {i === currentPuzzle.moveHistory.length - 1 && !solved && <span className="text-blue-400 text-[9px] ml-auto animate-pulse">Your turn</span>}
+                  </div>
+                ))}
+                {solved && (
+                  <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-2 px-2 py-1 rounded bg-emerald-500/10 border border-emerald-500/20">
+                    <span className="text-emerald-400 font-bold">{currentPuzzle.solutionMove}</span>
+                    <span className="text-emerald-500 text-[9px] ml-auto">Brilliant!</span>
+                  </motion.div>
+                )}
+              </div>
+            </div>
+
+            {/* Engine Analysis (shown on solve) */}
             {solved && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-blue-50 border border-blue-200 rounded-2xl p-5 mb-8">
-                 <div className="flex items-center gap-3 mb-3">
-                   <div className="size-8 rounded-full bg-blue-600 flex items-center justify-center shadow-sm">
-                     <BrainCircuit className="size-4 text-slate-50" />
-                   </div>
-                   <span className="font-extrabold text-blue-700 tracking-widest-gs text-xs uppercase">Engine Analysis Complete</span>
-                 </div>
-                 <div className="grid grid-cols-2 gap-4 text-sm font-bold">
-                    <div>
-                      <span className="block text-[10px] text-slate-500 uppercase tracking-widest-gs">Depth</span>
-                      <span className="text-slate-900 tabular-nums">D{depth}</span>
-                    </div>
-                    <div>
-                      <span className="block text-[10px] text-slate-500 uppercase tracking-widest-gs">Evaluation</span>
-                      <span className="text-emerald-600">{currentPuzzle.evalText}</span>
-                    </div>
-                 </div>
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="p-4 md:p-5 border-b border-slate-700/30 bg-slate-900/40">
+                <div className="flex items-center gap-2 mb-3">
+                  <BrainCircuit className="size-3.5 text-blue-400" />
+                  <span className="text-[10px] font-bold text-blue-400 uppercase tracking-widest">Engine Analysis</span>
+                </div>
+                <div className="grid grid-cols-3 gap-3 text-center">
+                  <div>
+                    <span className="block text-[9px] text-slate-500 uppercase tracking-wider mb-1">Depth</span>
+                    <span className="text-sm font-bold text-slate-200 tabular-nums font-mono">D{depth}</span>
+                  </div>
+                  <div>
+                    <span className="block text-[9px] text-slate-500 uppercase tracking-wider mb-1">Eval</span>
+                    <span className="text-sm font-bold text-emerald-400 font-mono">{currentPuzzle.evalText}</span>
+                  </div>
+                  <div>
+                    <span className="block text-[9px] text-slate-500 uppercase tracking-wider mb-1">Time</span>
+                    <span className="text-sm font-bold text-slate-200 tabular-nums font-mono">{moveTime}s</span>
+                  </div>
+                </div>
               </motion.div>
             )}
-            
-            <div className="mt-auto">
-               <Button onClick={scrollToForm} className="w-full h-14 gs-btn bg-blue-600 hover:bg-blue-700 text-slate-50 rounded-xl font-extrabold text-base shadow-lg shadow-blue-900/20 border-0">
-                 Claim Evaluation Based On This Result <ArrowRight className="ml-2 size-5" />
-               </Button>
+
+            {/* Action Buttons */}
+            <div className="p-4 md:p-5 space-y-3 mt-auto">
+              {!solved && attempts >= 2 && !hintSquare && (
+                <Button onClick={() => setHintSquare(currentPuzzle.winningSquare)} variant="ghost" className="w-full h-10 text-xs font-bold text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 border border-blue-500/20 rounded-xl">
+                  <Zap className="size-3.5 mr-2" /> Show Hint
+                </Button>
+              )}
+              <Button onClick={scrollToForm} className="w-full h-12 gs-btn bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-extrabold text-sm shadow-lg shadow-blue-900/30 border-0">
+                {solved ? "Claim Evaluation Based On This Result" : "Book Free Evaluation"} <ArrowRight className="ml-2 size-4" />
+              </Button>
             </div>
           </div>
         </div>
@@ -2088,13 +2223,14 @@ function MobileStickyCTA() {
           initial={{ y: 100 }} 
           animate={{ y: 0 }} 
           exit={{ y: 100 }}
-          className="fixed bottom-0 left-0 right-0 z-[100] bg-white/90 backdrop-blur-xl border-t border-slate-200 p-4 shadow-[0_-10px_20px_rgba(0,0,0,0.05)] flex items-center justify-between lg:hidden"
+          className="fixed bottom-0 left-0 right-0 z-[100] glass-panel border-t border-white/40 p-4 shadow-[0_-10px_40px_rgba(0,0,0,0.15)] flex items-center justify-between lg:hidden"
         >
-          <div className="flex flex-col">
-            <span className="text-[10px] font-extrabold text-blue-600 uppercase tracking-widest-gs">Baseline Assessment</span>
-            <span className="text-xs font-bold text-slate-900">Secure Your Slot</span>
+          <div className="absolute inset-0 bg-gradient-to-t from-white/90 to-white/50 pointer-events-none" />
+          <div className="flex flex-col relative z-10">
+            <span className="text-[10px] font-extrabold text-blue-600 uppercase tracking-widest-gs drop-shadow-sm">Baseline Assessment</span>
+            <span className="text-xs font-bold text-slate-900 drop-shadow-sm">Secure Your Slot</span>
           </div>
-          <Button onClick={scrollToForm} size="default" className="gs-btn gs-btn-primary rounded-xl font-bold tracking-tight-gs px-6 h-12 text-sm shadow-lg">
+          <Button onClick={scrollToForm} size="default" className="gs-btn gs-btn-primary relative z-10 rounded-xl font-bold tracking-tight-gs px-6 h-12 text-sm shadow-[0_8px_16px_rgba(37,99,235,0.2)]">
             Book Now
           </Button>
         </motion.div>
@@ -2132,13 +2268,15 @@ function EloProjectionCalculator() {
           </p>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-10 items-center bg-white border border-slate-200 rounded-3xl p-6 md:p-10 shadow-xl">
+        <div className="flex flex-col lg:flex-row gap-10 items-center glass-panel rounded-3xl p-6 md:p-10 shadow-2xl relative group hover:border-blue-300 transition-all duration-500">
+          <div className="absolute inset-0 bg-gradient-to-br from-white/60 to-white/10 pointer-events-none rounded-3xl" />
+          
           {/* Controls */}
-          <div className="w-full lg:w-1/3 flex flex-col gap-8">
-            <div>
+          <div className="w-full lg:w-1/3 flex flex-col gap-8 relative z-10">
+            <div className="depth-panel p-5 rounded-2xl">
               <div className="flex justify-between mb-2">
-                <label className="text-[10px] font-bold text-slate-600 uppercase tracking-widest-gs">Current Baseline (Elo)</label>
-                <span className="text-sm font-extrabold text-blue-600 tabular-nums">{baseline}</span>
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest-gs drop-shadow-sm">Current Baseline (Elo)</label>
+                <span className="text-sm font-extrabold text-blue-600 tabular-nums drop-shadow-sm">{baseline}</span>
               </div>
               <input 
                 type="range" 
@@ -2147,18 +2285,18 @@ function EloProjectionCalculator() {
                 step="100" 
                 value={baseline} 
                 onChange={(e) => setBaseline(Number(e.target.value))} 
-                className="w-full accent-blue-500 bg-white h-2 rounded-lg appearance-none cursor-pointer"
+                className="w-full accent-blue-500 bg-slate-200 h-2 rounded-lg appearance-none cursor-pointer shadow-inner"
               />
-              <div className="flex justify-between mt-2 text-[9px] text-slate-600 font-bold">
+              <div className="flex justify-between mt-2 text-[9px] text-slate-500 font-bold">
                 <span>Beginner (400)</span>
                 <span>Advanced (1400)</span>
               </div>
             </div>
 
-            <div>
+            <div className="depth-panel p-5 rounded-2xl">
               <div className="flex justify-between mb-2">
-                <label className="text-[10px] font-bold text-slate-600 uppercase tracking-widest-gs">Weekly Commitment</label>
-                <span className="text-sm font-extrabold text-blue-600 tabular-nums">{hours} Hours</span>
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest-gs drop-shadow-sm">Weekly Commitment</label>
+                <span className="text-sm font-extrabold text-blue-600 tabular-nums drop-shadow-sm">{hours} Hours</span>
               </div>
               <input 
                 type="range" 
@@ -2167,36 +2305,36 @@ function EloProjectionCalculator() {
                 step="1" 
                 value={hours} 
                 onChange={(e) => setHours(Number(e.target.value))} 
-                className="w-full accent-blue-500 bg-white h-2 rounded-lg appearance-none cursor-pointer"
+                className="w-full accent-blue-500 bg-slate-200 h-2 rounded-lg appearance-none cursor-pointer shadow-inner"
               />
-              <div className="flex justify-between mt-2 text-[9px] text-slate-600 font-bold">
+              <div className="flex justify-between mt-2 text-[9px] text-slate-500 font-bold">
                 <span>Casual (2h)</span>
                 <span>Intensive (10h)</span>
               </div>
             </div>
             
-            <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl mt-4">
-              <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest-gs block mb-1">Why It Matters</span>
-              <p className="text-xs text-slate-600 font-medium leading-relaxed">
+            <div className="p-4 bg-blue-50/80 border border-blue-100 rounded-xl shadow-inner backdrop-blur-sm">
+              <span className="text-[9px] font-bold text-blue-600 uppercase tracking-widest-gs block mb-1 drop-shadow-sm">Why It Matters</span>
+              <p className="text-xs text-blue-900 font-medium leading-relaxed">
                 Casual play yields diminishing returns due to uncorrected structural blunders. Our protocol patches these leaks systematically.
               </p>
             </div>
           </div>
 
           {/* Graph Output */}
-          <div className="w-full lg:w-2/3 bg-slate-50 border border-slate-200 rounded-2xl p-6 relative overflow-hidden">
+          <div className="w-full lg:w-2/3 depth-panel rounded-2xl p-6 relative overflow-hidden shadow-[inset_0_2px_10px_rgba(0,0,0,0.02)]">
             <div className="absolute top-4 left-4 flex flex-wrap gap-2 md:gap-4 z-10 pr-4">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-1 bg-slate-300 rounded-full" />
-                <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest-gs">Unstructured Play</span>
+                <div className="w-3 h-1 bg-slate-300 rounded-full shadow-sm" />
+                <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest-gs drop-shadow-sm">Unstructured Play</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-1 bg-emerald-500 rounded-full" />
-                <span className="text-[9px] font-bold text-emerald-500 uppercase tracking-widest-gs">ChessWize Protocol</span>
+                <div className="w-3 h-1 bg-blue-500 rounded-full shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
+                <span className="text-[9px] font-bold text-blue-600 uppercase tracking-widest-gs drop-shadow-sm">ChessWize Protocol</span>
               </div>
             </div>
             
-            <div className="mt-12 h-48 md:h-64 flex items-end gap-2 md:gap-4 relative border-l border-b border-slate-200 pb-2 pl-2 ml-6 md:ml-8">
+            <div className="mt-12 h-48 md:h-64 flex items-end gap-2 md:gap-4 relative border-l border-b border-slate-300 pb-2 pl-2 ml-6 md:ml-8">
                {/* Simplified Bar Chart Simulation */}
                {[1, 2, 3, 4, 5, 6].map((month, idx) => {
                  const unstrVal = baseline + (hours * 15 * (month/6));

@@ -132,22 +132,60 @@ select, input, textarea {
   color: transparent;
 }
 
-/* Premium Button Press */
+/* Premium Button Press with more realism */
 .gs-btn {
-  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255,255,255,0.1);
+  will-change: transform, box-shadow;
 }
 .gs-btn:active {
-  transform: scale(0.98);
+  transform: scale(0.96) translateY(2px);
+  box-shadow: 0 0 0 rgba(0,0,0,0), inset 0 3px 6px rgba(0,0,0,0.15);
 }
 .gs-btn-primary {
-  background: linear-gradient(180deg, #2563EB 0%, #1D4ED8 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(29, 78, 216, 0.2);
+  background: linear-gradient(180deg, #3B82F6 0%, #1D4ED8 100%);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3), 
+              inset 0 -2px 0px rgba(30, 58, 138, 0.5),
+              0 4px 10px rgba(29, 78, 216, 0.3),
+              0 2px 4px rgba(29, 78, 216, 0.2);
   color: white;
   border: 1px solid #1E3A8A;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.4);
 }
 .gs-btn-primary:hover {
-  background: linear-gradient(180deg, #3B82F6 0%, #2563EB 100%);
+  background: linear-gradient(180deg, #60A5FA 0%, #2563EB 100%);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.4), 
+              inset 0 -2px 0px rgba(30, 58, 138, 0.6),
+              0 6px 15px rgba(29, 78, 216, 0.4),
+              0 3px 6px rgba(29, 78, 216, 0.3);
+}
+
+/* Glass & Depth Primitives */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 
+    inset 0 1px 1px rgba(255, 255, 255, 0.9),
+    0 8px 32px rgba(15, 23, 42, 0.08);
+}
+
+.depth-panel {
+  background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 
+    inset 0 1px 0 rgba(255,255,255,1),
+    0 1px 3px rgba(15, 23, 42, 0.05), 
+    0 10px 24px rgba(15, 23, 42, 0.03);
+}
+
+.pill-badge {
+  background: linear-gradient(180deg, #FFFFFF 0%, #F1F5F9 100%);
+  border: 1px solid #E2E8F0;
+  box-shadow: 
+    inset 0 1px 0 rgba(255,255,255,1),
+    0 2px 4px rgba(15, 23, 42, 0.04);
 }
 
 /* Pattern Backgrounds */
@@ -207,9 +245,11 @@ select, input, textarea {
   border-color: rgba(37, 99, 235, 0.25);
 }
 .trust-badge-container {
-  background: white;
-  border: 1px solid rgba(15, 23, 42, 0.06);
-  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+  background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 
+    inset 0 1px 0 rgba(255,255,255,1),
+    0 2px 10px rgba(15, 23, 42, 0.04);
   border-radius: 9999px;
   padding: 4px 12px;
   display: inline-flex;
