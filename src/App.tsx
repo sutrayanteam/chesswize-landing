@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, lazy, Suspense } from "react";
 import {
   CheckCircle,
   Trophy,
@@ -230,12 +230,12 @@ function Hero() {
               {/* Trust Indicators below video */}
               <div className="mt-3 md:mt-4 grid grid-cols-3 gap-2 md:gap-3">
                 <div className="bg-slate-50 rounded-lg md:rounded-xl p-2 md:p-3 border border-slate-100 flex flex-col items-center justify-center text-center hover:bg-white hover:border-slate-200 hover:shadow-sm transition-all cursor-default">
-                  <img src="/calendar-appointment.png" className="size-5 md:size-7 object-contain mb-1 md:mb-2" alt="Calendar" />
+                  <img src="/calendar-appointment.webp" className="size-5 md:size-7 object-contain mb-1 md:mb-2" alt="Calendar" />
                   <span className="text-[8px] md:text-[9px] font-bold text-slate-500 uppercase tracking-widest-gs">Diagnostic</span>
                   <span className="text-xs md:text-sm font-extrabold text-slate-900 tracking-tight-gs">Evaluation</span>
                 </div>
                 <div className="bg-slate-50 rounded-lg md:rounded-xl p-2 md:p-3 border border-slate-100 flex flex-col items-center justify-center text-center hover:bg-white hover:border-slate-200 hover:shadow-sm transition-all cursor-default">
-                  <img src="/gold-thropy.png" className="size-5 md:size-7 object-contain mb-1 md:mb-2" alt="Trophy" />
+                  <img src="/gold-thropy.webp" className="size-5 md:size-7 object-contain mb-1 md:mb-2" alt="Trophy" />
                   <span className="text-[8px] md:text-[9px] font-bold text-slate-500 uppercase tracking-widest-gs">Expert</span>
                   <span className="text-xs md:text-sm font-extrabold text-slate-900 tracking-tight-gs">FIDE Masters</span>
                 </div>
@@ -532,11 +532,11 @@ function TheProblem() {
             
             <div className="mt-8 grid grid-cols-2 gap-4">
               <div className="rounded-2xl overflow-hidden shadow-lg border border-slate-200 aspect-square relative group">
-                <img src="/2026-04-15-10-30-00-distracted-child-screen.png" alt="A distracted child scrolling on an iPad" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 grayscale sepia-[0.3]" />
+                <img loading="lazy" src="/2026-04-15-10-30-00-distracted-child-screen.webp" alt="A distracted child scrolling on an iPad" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 grayscale sepia-[0.3]" />
                 <div className="absolute top-2 left-2 bg-red-600 text-slate-50 text-[10px] font-extrabold uppercase tracking-widest-gs px-2 py-1 rounded shadow">The Status Quo</div>
               </div>
               <div className="rounded-2xl overflow-hidden shadow-lg border border-slate-200 aspect-square relative group">
-                 <img src="/2026-04-15-10-00-00-focused-child-chess.png" alt="A child deeply focused on a chess board, overcoming screen-time addiction" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                 <img loading="lazy" src="/2026-04-15-10-00-00-focused-child-chess.webp" alt="A child deeply focused on a chess board, overcoming screen-time addiction" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                  <div className="absolute top-2 left-2 bg-blue-600 text-slate-50 text-[10px] font-extrabold uppercase tracking-widest-gs px-2 py-1 rounded shadow">The Solution</div>
               </div>
             </div>
@@ -675,7 +675,7 @@ function Transformation() {
         </div>
         
         <div className="mt-12 max-w-4xl mx-auto rounded-3xl overflow-hidden shadow-2xl border border-slate-200 relative aspect-video group">
-           <img src="/2026-04-15-10-01-00-resilience-chess-close.png" alt="A child deeply focusing on a chess piece, demonstrating a cognitive paradigm shift" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+           <img loading="lazy" src="/2026-04-15-10-01-00-resilience-chess-close.webp" alt="A child deeply focusing on a chess piece, demonstrating a cognitive paradigm shift" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
            <div className="absolute inset-0 bg-gradient-to-t from-slate-100/60 to-transparent pointer-events-none" />
            <div className="absolute bottom-6 left-6 right-6">
              <p className="text-slate-800 text-lg md:text-xl font-extrabold drop-shadow-md">"From screen-addicted to strategically obsessed."</p>
@@ -692,7 +692,7 @@ function Transformation() {
 function DailyRegimen() {
   return (
     <section className="py-16 md:py-24 bg-white border-b border-slate-200 relative overflow-hidden">
-      <div className="absolute inset-0 bg-[url('/2026-04-15-10-31-00-chess-study-desk-overhead.png')] bg-cover bg-center opacity-[0.06] mix-blend-multiply pointer-events-none" />
+      <div className="absolute inset-0 bg-[url('/2026-04-15-10-31-00-chess-study-desk-overhead.webp')] bg-cover bg-center opacity-[0.06] mix-blend-multiply pointer-events-none" />
       <div className="max-w-[1200px] mx-auto px-4 md:px-8 relative z-10">
         <div className="text-center mb-12 md:mb-16">
           <Badge className="bg-amber-100 text-amber-800 border-0 rounded-full font-bold mb-4 px-3 py-1 text-[9px] md:text-[10px] uppercase tracking-widest-gs">
@@ -1108,14 +1108,14 @@ function InteractivePuzzle() {
    ════════════════════════════════════════════════ */
 function WhoIsThisFor() {
   const personas = [
-    { title: "The Absolute Beginner", badge: "Ages 4-8", icon: Target, img: "/2026-04-15-10-16-00-absolute-beginner.png", desc: "For children who don't know the rules but want to build a strong foundation in logical thinking, pattern recognition, and deep concentration.", pain: "Lacks focus and structure in learning." },
-    { title: "The Casual Player", badge: "Ages 7-12", icon: Layers, img: "/2026-04-15-10-17-00-casual-player.png", desc: "Plays casually but hasn't seen real progress. Needs structure to turn a passing hobby into a disciplined, measurable cognitive routine.", pain: "Plays aimlessly without seeing real improvement." },
-    { title: "The Tournament Hopeful", badge: "Ages 9-16", icon: Trophy, img: "/2026-04-15-10-18-00-tournament-hopeful.png", desc: "Already playing competitively but struggles under pressure. Needs psychological resilience and advanced calculation training to win.", pain: "Loses focus and blunders under time pressure." },
+    { title: "The Absolute Beginner", badge: "Ages 4-8", icon: Target, img: "/2026-04-15-10-16-00-absolute-beginner.webp", desc: "For children who don't know the rules but want to build a strong foundation in logical thinking, pattern recognition, and deep concentration.", pain: "Lacks focus and structure in learning." },
+    { title: "The Casual Player", badge: "Ages 7-12", icon: Layers, img: "/2026-04-15-10-17-00-casual-player.webp", desc: "Plays casually but hasn't seen real progress. Needs structure to turn a passing hobby into a disciplined, measurable cognitive routine.", pain: "Plays aimlessly without seeing real improvement." },
+    { title: "The Tournament Hopeful", badge: "Ages 9-16", icon: Trophy, img: "/2026-04-15-10-18-00-tournament-hopeful.webp", desc: "Already playing competitively but struggles under pressure. Needs psychological resilience and advanced calculation training to win.", pain: "Loses focus and blunders under time pressure." },
   ];
 
   return (
     <section className="py-16 md:py-24 bg-white border-b border-slate-200 relative overflow-hidden">
-      <div className="absolute inset-0 bg-[url('/2026-04-15-10-11-00-chess-focus-background.png')] opacity-[0.03] object-cover mix-blend-overlay pointer-events-none" />
+      <div className="absolute inset-0 bg-[url('/2026-04-15-10-11-00-chess-focus-background.webp')] opacity-[0.03] object-cover mix-blend-overlay pointer-events-none" />
       <div className="max-w-[1400px] mx-auto px-4 md:px-8 relative z-10">
         <div className="mb-12 md:mb-16 max-w-3xl">
           <h2 className="text-[10px] font-bold text-blue-600 uppercase tracking-widest-gs mb-3">Audience Fit</h2>
@@ -1133,7 +1133,7 @@ function WhoIsThisFor() {
             return (
               <div key={i} className="bg-slate-50 rounded-3xl gs-border gs-shadow-md hover:border-blue-300 hover:shadow-xl transition-all flex flex-col h-full hover-lift cursor-default group overflow-hidden">
                 <div className="h-48 md:h-56 w-full relative overflow-hidden">
-                  <img src={p.img} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                  <img loading="lazy" src={p.img} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-100/60 to-transparent" />
                   <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
                     <div className="size-10 rounded-xl bg-white/20 backdrop-blur-md border border-slate-300 flex items-center justify-center">
@@ -1166,9 +1166,9 @@ function WhoIsThisFor() {
    ════════════════════════════════════════════════ */
 function LearningModes() {
   const modes = [
-    { title: "Individual (1-on-1)", badge: "Highest Intensity", icon: User, img: "/2026-04-15-10-05-00-1-on-1-coaching.png", desc: "Surgical attention and customized training at the student's exact pace. Best for rapid rating gain and tailored opening repertoires." },
-    { title: "Two-on-One", badge: "Collaborative", icon: Users, img: "/2026-04-15-10-06-00-two-on-one-coaching.png", desc: "Designed for friends or siblings to learn together. Fosters healthy competition while maintaining high pedagogical density." },
-    { title: "Cohort Training", badge: "Max 4-6 Students", icon: UserPlus, img: "/2026-04-15-10-15-00-cohort-coaching.png", desc: "Elite small batches to ensure quality learning, peer-to-peer tactical sparring, and structured academic progression." },
+    { title: "Individual (1-on-1)", badge: "Highest Intensity", icon: User, img: "/2026-04-15-10-05-00-1-on-1-coaching.webp", desc: "Surgical attention and customized training at the student's exact pace. Best for rapid rating gain and tailored opening repertoires." },
+    { title: "Two-on-One", badge: "Collaborative", icon: Users, img: "/2026-04-15-10-06-00-two-on-one-coaching.webp", desc: "Designed for friends or siblings to learn together. Fosters healthy competition while maintaining high pedagogical density." },
+    { title: "Cohort Training", badge: "Max 4-6 Students", icon: UserPlus, img: "/2026-04-15-10-15-00-cohort-coaching.webp", desc: "Elite small batches to ensure quality learning, peer-to-peer tactical sparring, and structured academic progression." },
   ];
 
   return (
@@ -1190,7 +1190,7 @@ function LearningModes() {
             return (
               <div key={i} className="bg-white rounded-3xl border border-slate-200 shadow-md hover:border-blue-400 hover:shadow-xl transition-all flex flex-col h-full hover-lift overflow-hidden group">
                 <div className="h-48 w-full relative overflow-hidden">
-                  <img src={p.img} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                  <img loading="lazy" src={p.img} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-100/60 to-transparent" />
                   <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
                     <div className="size-10 rounded-xl bg-white/20 backdrop-blur-md border border-slate-300 flex items-center justify-center">
@@ -1222,9 +1222,9 @@ function LearningModes() {
    ════════════════════════════════════════════════ */
 function Curriculum() {
   const modules = [
-    { week: "Phase 1", title: "Foundation Protocol", duration: "Beginners", details: "Strict structural training for complete beginners. Focuses heavily on board vision, piece safety, and instilling the patience required to calculate before acting.", tools: ["Checks, Captures, Threats", "Board Vision", "Patience Building"], img: "/2026-04-15-10-02-00-foundation-protocol.png" },
-    { week: "Phase 2", title: "Tactical Geometry", duration: "Intermediate", details: "Intensive calculation training. Students learn to spot multi-move combinations, execute forks/pins/skewers, and develop basic opening principles to survive the first 15 moves.", tools: ["Multi-move Calculation", "Opening Principles"], img: "/2026-04-15-10-03-00-tactical-geometry.png" },
-    { week: "Phase 3", title: "Tournament Masterclass", duration: "Advanced", details: "Elite prep for rated players. Covers deep theoretical endgames, pawn structure manipulation, and psychological resilience under severe time pressure.", tools: ["Positional Play", "Theoretical Endgames", "Clock Management"], img: "/2026-04-15-10-04-00-tournament-masterclass.png" }
+    { week: "Phase 1", title: "Foundation Protocol", duration: "Beginners", details: "Strict structural training for complete beginners. Focuses heavily on board vision, piece safety, and instilling the patience required to calculate before acting.", tools: ["Checks, Captures, Threats", "Board Vision", "Patience Building"], img: "/2026-04-15-10-02-00-foundation-protocol.webp" },
+    { week: "Phase 2", title: "Tactical Geometry", duration: "Intermediate", details: "Intensive calculation training. Students learn to spot multi-move combinations, execute forks/pins/skewers, and develop basic opening principles to survive the first 15 moves.", tools: ["Multi-move Calculation", "Opening Principles"], img: "/2026-04-15-10-03-00-tactical-geometry.webp" },
+    { week: "Phase 3", title: "Tournament Masterclass", duration: "Advanced", details: "Elite prep for rated players. Covers deep theoretical endgames, pawn structure manipulation, and psychological resilience under severe time pressure.", tools: ["Positional Play", "Theoretical Endgames", "Clock Management"], img: "/2026-04-15-10-04-00-tournament-masterclass.webp" }
   ];
 
   return (
@@ -1251,7 +1251,7 @@ function Curriculum() {
               
               <div className="w-full lg:w-[45%] shrink-0 relative z-10">
                 <div className="aspect-[4/3] rounded-2xl overflow-hidden border border-slate-200 gs-shadow">
-                  <img src={mod.img} alt={mod.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                  <img loading="lazy" src={mod.img} alt={mod.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                 </div>
               </div>
 
@@ -1391,9 +1391,9 @@ function Mentors() {
               <div className="absolute top-0 right-0 w-40 md:w-64 h-40 md:h-64 bg-amber-100/50 rounded-full blur-[40px] md:blur-[60px] pointer-events-none" />
               <div className="flex flex-col sm:flex-row gap-6 md:gap-8 items-start relative z-10">
                 <div className="relative shrink-0">
-                  <img src="/young-man-deep-in-thought-while-playing-game-of-ch-2026-01-09-00-57-38-utc.jpg" alt="Coach" className="w-28 h-28 sm:w-36 sm:h-36 rounded-2xl object-cover border-2 border-slate-200 gs-shadow-lg relative z-10" />
+                  <img loading="lazy" src="/young-man-deep-in-thought-while-playing-game-of-ch-2026-01-09-00-57-38-utc.webp" alt="Coach" className="w-28 h-28 sm:w-36 sm:h-36 rounded-2xl object-cover border-2 border-slate-200 gs-shadow-lg relative z-10" />
                   <div className="absolute -bottom-4 -right-4 bg-white border border-slate-200 rounded-xl p-2 gs-shadow-lg z-20">
-                     <img src="/star-badge.png" className="size-8 object-contain" alt="FIDE" />
+                     <img src="/star-badge.webp" className="size-8 object-contain" alt="FIDE" />
                   </div>
                 </div>
                 <div className="flex-1 mt-2 sm:mt-0">
@@ -1427,7 +1427,7 @@ function FounderStory() {
         <div className="bg-white/80 gs-shadow-xl backdrop-blur-xl rounded-3xl p-8 md:p-12 border border-slate-200 shadow-2xl flex flex-col md:flex-row gap-8 md:gap-12 items-center hover-lift">
           <div className="w-full md:w-1/3 shrink-0 relative">
             <div className="absolute inset-0 bg-blue-500/20 blur-2xl rounded-full" />
-           <img src="/2026-04-15-10-34-00-founder-tarun-portrait.png" alt="Tarun Sir, Founder and Head Coach" className="w-full aspect-square object-cover rounded-2xl border border-slate-200 relative z-10 shadow-lg grayscale hover:grayscale-0 transition-all duration-700" />
+           <img loading="lazy" src="/2026-04-15-10-34-00-founder-tarun-portrait.webp" alt="Tarun Sir, Founder and Head Coach" className="w-full aspect-square object-cover rounded-2xl border border-slate-200 relative z-10 shadow-lg grayscale hover:grayscale-0 transition-all duration-700" />
           </div>          <div className="w-full md:w-2/3 flex flex-col">
             <h2 className="text-[10px] font-bold text-blue-600 uppercase tracking-widest-gs mb-3">Origin Directive</h2>
             <h3 className="text-2xl md:text-3xl font-extrabold tracking-tighter-gs text-slate-900 mb-4 leading-tight">
@@ -1477,7 +1477,7 @@ function CertificateSection() {
             <div className="bg-white p-6 md:p-8 rounded-3xl border border-slate-200 shadow-xl relative z-10 rotate-1 sm:rotate-2 hover:rotate-0 transition-transform duration-500 cursor-pointer">
               <div className="border-[4px] border-amber-500/30 rounded-2xl p-8 md:p-10 bg-slate-50 text-center relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-transparent pointer-events-none" />
-                <img src="/gold-thropy.png" className="size-20 mx-auto mb-6 relative z-10 drop-shadow-2xl" alt="Trophy" />
+                <img src="/gold-thropy.webp" className="size-20 mx-auto mb-6 relative z-10 drop-shadow-2xl" alt="Trophy" />
                 <h4 className="text-3xl font-extrabold tracking-tighter-gs text-slate-900 uppercase relative z-10">Certificate of Excellence</h4>
                 <p className="text-slate-600 font-medium text-sm mt-4 relative z-10 max-w-sm mx-auto">Awarded for mastering advanced strategic planning and tactical calculation.</p>
                 <div className="mt-10 border-t border-slate-200 pt-8 flex justify-between items-center px-4 relative z-10">
@@ -1485,7 +1485,7 @@ function CertificateSection() {
                     <p className="text-[10px] uppercase tracking-widest-gs font-bold text-slate-500 mb-1">Head Coach</p>
                     <p className="font-extrabold text-slate-900 text-lg">Tarun Sir</p>
                   </div>
-                  <img src="/star-badge.png" className="size-16 opacity-90 drop-shadow-lg relative z-10" alt="Seal" />
+                  <img src="/star-badge.webp" className="size-16 opacity-90 drop-shadow-lg relative z-10" alt="Seal" />
                 </div>
               </div>
             </div>
@@ -1539,7 +1539,7 @@ function ValueStack() {
 
         {/* Call to Action Card */}
         <div className="w-full lg:w-[45%] relative">
-          <div className="absolute inset-0 rounded-3xl bg-[url('/2026-04-15-10-10-00-chess-dashboard.png')] bg-cover bg-center gs-shadow-2xl border border-slate-200 hover-lift overflow-hidden">
+          <div className="absolute inset-0 rounded-3xl bg-[url('/2026-04-15-10-10-00-chess-dashboard.webp')] bg-cover bg-center gs-shadow-2xl border border-slate-200 hover-lift overflow-hidden">
              <div className="absolute inset-0 bg-slate-50/80 backdrop-blur-sm pointer-events-none" />
              <div className="absolute inset-0 flex flex-col p-6 sm:p-8 md:p-10 text-slate-900 relative z-10">
                <div className="absolute -top-3 right-4 sm:right-8 bg-emerald-500 text-slate-50 font-extrabold text-[9px] sm:text-[11px] uppercase tracking-widest-gs px-3 sm:px-4 py-1 sm:py-1.5 rounded-md shadow-lg text-center animate-pulse border border-emerald-400">
@@ -1618,7 +1618,7 @@ function StarPerformers() {
 
                 <div className="relative mb-6">
                   <div className="aspect-[4/3] rounded-2xl overflow-hidden border border-slate-200 shadow-lg">
-                    <img src={p.img} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                    <img loading="lazy" src={p.img} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                   </div>
                   <div className="absolute -bottom-4 right-4 bg-amber-500 text-slate-50 font-extrabold text-[10px] uppercase tracking-widest-gs px-3 py-1 rounded-md shadow-lg border border-amber-400">
                     {p.tag}
@@ -1664,7 +1664,7 @@ function WallOfLove() {
                   </div>
                   <p className="text-slate-800 font-medium text-base md:text-lg leading-relaxed mb-6 md:mb-8 flex-1 italic">"{r.text}"</p>
                   <div className="flex items-center gap-4 md:gap-5 border-t border-slate-100 pt-5 md:pt-6 mt-auto">
-                    <img src={r.img} alt={r.author} className="size-12 md:size-14 rounded-full border-2 border-slate-100 gs-shadow shrink-0 object-cover" />
+                    <img loading="lazy" src={r.img} alt={r.author} className="size-12 md:size-14 rounded-full border-2 border-slate-100 gs-shadow shrink-0 object-cover" />
                     <div>
                       <p className="font-extrabold text-slate-900 text-sm md:text-base tracking-tight-gs">{r.author}</p>
                       <p className="text-xs md:text-sm font-bold text-slate-500 uppercase tracking-widest-gs mt-0.5">{r.desc}</p>
@@ -1992,7 +1992,7 @@ function Footer() {
           {/* Brand & Mission (Col span 4) */}
           <div className="md:col-span-12 lg:col-span-4">
             <div className="mb-6 md:mb-8">
-              <img src="/logo-side-black.svg" alt="ChessWize" className="h-8 md:h-10 object-contain" />
+              <img loading="lazy" src="/logo-side-black.svg" alt="ChessWize" className="h-8 md:h-10 object-contain" />
             </div>
             <p className="font-medium text-sm leading-relaxed text-slate-600 max-w-sm mb-8">
               India's premier online chess academy for children. FIDE-certified coaches, structured curriculum, and measurable results — trusted by 1,500+ parents nationwide.
@@ -2309,7 +2309,7 @@ function SyllabusExplorer() {
             ))}
             
             <div className="mt-8 rounded-2xl overflow-hidden shadow-lg border border-slate-200 aspect-[4/3] relative hidden lg:block">
-              <img src="/2026-04-15-10-40-00-12-week-syllabus-planner.png" alt="A high-end academic planner showing a 12-week cognitive chess curriculum" className="w-full h-full object-cover" />
+              <img loading="lazy" src="/2026-04-15-10-40-00-12-week-syllabus-planner.webp" alt="A high-end academic planner showing a 12-week cognitive chess curriculum" className="w-full h-full object-cover" />
             </div>
 
             <div className="mt-6 p-5 bg-amber-50 border border-amber-100 rounded-xl hidden lg:block">

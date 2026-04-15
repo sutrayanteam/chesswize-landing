@@ -7,3 +7,13 @@ coverage/
 .env*
 !.env.example
 .vercel
+.env*.local
+.playwright-mcp/
+src/App.tsx.bak
+modify_theme*.js
+modify_theme*.cjs
+01-header-nav.png
+02-hero-section.png
+full-page-desktop.png
+chesswize-full-page.jpeg
+chesswize-mobile.jpeg
