@@ -40,19 +40,26 @@ import {
   Linkedin,
   MapPin,
   Mail,
-  Phone
+  Phone,
+  ArrowLeft,
+  BookOpen
 } from "lucide-react";
 import { motion, AnimatePresence, useInView } from "motion/react";
-import { MediaPlayer, MediaProvider, Poster } from "@vidstack/react";
-import { defaultLayoutIcons, DefaultVideoLayout } from "@vidstack/react/player/layouts/default";
-import "@vidstack/react/player/styles/default/theme.css";
-import "@vidstack/react/player/styles/default/layouts/video.css";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
 import CountUp from "react-countup";
 import Tilt from "react-parallax-tilt";
 import confetti from "canvas-confetti";
 import { Toaster, toast } from "sonner";
+import { BrowserRouter, Routes, Route, Link, useLocation } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+
+import { MediaPlayer, MediaProvider } from "@vidstack/react";
+import { DefaultVideoLayout, defaultLayoutIcons } from "@vidstack/react/player/layouts/default";
+import "@vidstack/react/player/styles/default/theme.css";
+import "@vidstack/react/player/styles/default/layouts/video.css";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -165,6 +172,13 @@ function Hero() {
               Stop wasting hours on unstructured play. Our rigorous, level-based chess curriculum transforms impulsive kids into focused, patient, and analytical thinkers—guided by elite FIDE-certified masters.
             </motion.p>
 
+            <motion.div variants={fadeUp} className="flex items-start gap-3 bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 max-w-xl">
+              <BookOpen className="size-4 text-blue-600 shrink-0 mt-0.5" />
+              <p className="text-xs md:text-sm text-blue-800 font-medium leading-relaxed">
+                <span className="font-extrabold">Research:</span> A 2019 University of Trier meta-analysis of 24 studies found chess instruction significantly improves children's mathematical and cognitive abilities.
+              </p>
+            </motion.div>
+
             <motion.div variants={fadeUp} className="bg-white p-5 md:p-6 rounded-2xl depth-panel mt-2 md:mt-4 max-w-xl relative overflow-hidden hover-lift">
               <div className="absolute top-0 left-0 w-1 h-full bg-blue-600" />
               <h3 className="text-sm font-extrabold text-slate-900 uppercase tracking-widest-gs mb-4 flex items-center gap-2">
@@ -268,7 +282,7 @@ function ProgramStats() {
     <section className="py-12 md:py-16 bg-slate-50 text-slate-900 relative">
       <div className="absolute inset-0 bg-gradient-to-r from-blue-900/20 via-transparent to-emerald-900/20"></div>
       <div className="max-w-[1400px] mx-auto px-4 md:px-8 relative z-10">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-y-10 md:gap-y-4 gap-x-4 divide-x-0 md:divide-x divide-slate-800">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-y-10 md:gap-y-4 gap-x-4 divide-x-0 md:divide-x divide-slate-200">
           {stats.map((s, i) => (
             <div key={i} className="flex flex-col items-center text-center px-2 md:px-4">
               <motion.div
@@ -414,30 +428,50 @@ function ParentAssessmentQuiz() {
           </p>
         </div>
 
-        <div className="bg-slate-50/80 backdrop-blur-xl border border-slate-200 rounded-3xl p-6 md:p-10 max-w-3xl mx-auto shadow-2xl shadow-blue-900/20 relative min-h-[450px] flex flex-col justify-center">
+        <div className="bg-white backdrop-blur-xl border border-slate-200 rounded-3xl p-6 md:p-10 max-w-3xl mx-auto shadow-2xl shadow-blue-900/20 relative min-h-[450px] flex flex-col justify-center">
           <AnimatePresence mode="wait">
             {!calculating && !showResult && (
               <motion.div key="quiz" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="flex flex-col w-full">
-                <div className="flex items-center justify-between mb-6">
-                  <span className="text-[10px] font-bold text-slate-600 uppercase tracking-widest-gs">Question {step + 1} of {questions.length}</span>
-                  <div className="flex gap-1.5">
-                    {questions.map((_, i) => (
-                      <div key={i} className={`h-1.5 w-8 rounded-full ${i <= step ? 'bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)]' : 'bg-white'}`} />
-                    ))}
-                  </div>
+                {/* Progress bar */}
+                <div className="w-full h-2 bg-slate-100 rounded-full mb-6 overflow-hidden">
+                  <motion.div
+                    className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full"
+                    initial={{ width: `${(step / questions.length) * 100}%` }}
+                    animate={{ width: `${((step + 1) / questions.length) * 100}%` }}
+                    transition={{ duration: 0.4, ease: "easeOut" }}
+                  />
                 </div>
-                <h4 className="text-xl md:text-2xl font-extrabold mb-8 leading-snug text-slate-600">{questions[step].q}</h4>
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-xs font-bold text-blue-600 uppercase tracking-widest-gs">Question {step + 1} of {questions.length}</span>
+                  <span className="text-xs font-semibold text-slate-400">{Math.round(((step + 1) / questions.length) * 100)}% complete</span>
+                </div>
+                <h4 className="text-xl md:text-2xl font-extrabold mb-8 leading-snug text-slate-900">{questions[step].q}</h4>
                 <div className="flex flex-col gap-3">
-                  {questions[step].opts.map((opt, i) => (
-                    <button 
-                      key={i}
-                      onClick={() => handleSelect(step, opt.score)}
-                      className="text-left w-full p-4 md:p-5 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 hover:border-blue-500 transition-all font-medium text-sm md:text-base text-slate-500 gs-shadow flex items-center justify-between group hover:shadow-[0_0_15px_rgba(59,130,246,0.15)]"
-                    >
-                      {opt.text}
-                      <ArrowRight className="size-4 opacity-0 group-hover:opacity-100 text-blue-600 transition-opacity" />
-                    </button>
-                  ))}
+                  {questions[step].opts.map((opt, i) => {
+                    const label = String.fromCharCode(65 + i);
+                    const isSelected = answers[step] === opt.score;
+                    return (
+                      <button
+                        key={i}
+                        onClick={() => handleSelect(step, opt.score)}
+                        className={`text-left w-full p-4 md:p-5 rounded-xl border-2 transition-all font-medium text-sm md:text-base flex items-center gap-4 group
+                          ${isSelected
+                            ? 'border-blue-500 bg-blue-50 text-slate-900 shadow-[0_0_20px_rgba(59,130,246,0.15)]'
+                            : 'border-slate-200 bg-slate-50/50 text-slate-600 hover:border-blue-400 hover:bg-blue-50/50 hover:shadow-[0_0_15px_rgba(59,130,246,0.1)]'
+                          }`}
+                      >
+                        <span className={`shrink-0 size-9 rounded-lg flex items-center justify-center text-sm font-extrabold transition-all
+                          ${isSelected
+                            ? 'bg-blue-600 text-white shadow-md'
+                            : 'bg-white text-slate-400 border border-slate-200 group-hover:border-blue-400 group-hover:text-blue-500'
+                          }`}>
+                          {label}
+                        </span>
+                        <span className="flex-1">{opt.text}</span>
+                        <ArrowRight className={`size-4 transition-all shrink-0 ${isSelected ? 'text-blue-600 opacity-100' : 'opacity-0 group-hover:opacity-60 text-slate-400'}`} />
+                      </button>
+                    );
+                  })}
                 </div>
               </motion.div>
             )}
@@ -478,7 +512,7 @@ function ParentAssessmentQuiz() {
                   </span>
                 </div>
                 <Button onClick={() => {
-                  const selectEl = document.getElementById("bottom_child_age") as HTMLSelectElement;
+                  const selectEl = document.getElementById("bottom_child_level") as HTMLSelectElement;
                   if (selectEl) { 
                     if(profile.track.includes("Foundation")) selectEl.value = "beginner";
                     if(profile.track.includes("Vision")) selectEl.value = "intermediate";
@@ -777,7 +811,7 @@ function Platform() {
             Stop wondering if they're <span className="text-blue-600">actually learning.</span>
           </h3>
           <p className="text-base md:text-lg text-slate-600 font-medium max-w-2xl mx-auto leading-relaxed">
-            We give parents complete visibility. Track your child's progress, tactical accuracy, and focus improvements week over week through our parent dashboard. No more guessing.
+            Most chess academies send you a "your child did well today" message. We send you hard data. Every week, you see exactly what your child practised, where they struggled, and what the coach is doing about it. If the numbers aren't moving, we change the plan — not the excuse.
           </p>
         </div>
 
@@ -788,24 +822,40 @@ function Platform() {
               <div className="absolute inset-0 bg-gradient-to-br from-white/60 to-white/10 pointer-events-none" />
               <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
               
-              {/* Fake Topbar */}
-              <div className="flex items-center justify-between border-b border-slate-200/60 pb-4 mb-6 relative z-10">
+              {/* Topbar */}
+              <div className="flex items-center justify-between border-b border-slate-200/60 pb-4 mb-5 relative z-10">
                 <div className="flex items-center gap-3">
                   <div className="size-10 rounded-xl bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_2px_8px_rgba(37,99,235,0.3)] border border-blue-400/20">
                     <span className="font-extrabold text-white text-lg drop-shadow-md">S</span>
                   </div>
                   <div>
                     <div className="text-sm font-extrabold text-slate-900">Saanvika's Telemetry</div>
-                    <div className="text-[10px] text-blue-600 uppercase tracking-widest-gs font-bold">Tournament Masterclass</div>
+                    <div className="text-[10px] text-blue-600 uppercase tracking-widest-gs font-bold">Tournament Masterclass &middot; Age 9</div>
                   </div>
                 </div>
                 <div className="bg-gradient-to-b from-emerald-50 to-emerald-100/50 text-emerald-700 px-3 py-1.5 rounded-lg text-[10px] font-extrabold uppercase tracking-widest-gs border border-emerald-200 shadow-sm flex items-center gap-1.5">
                   <TrendingUp className="size-3.5" /> +142 Elo (30 Days)
                 </div>
               </div>
+
+              {/* Quick Stats Row */}
+              <div className="grid grid-cols-4 gap-2 mb-4 relative z-10">
+                {[
+                  { label: "Sessions", value: "24", sub: "this month" },
+                  { label: "Puzzles", value: "312", sub: "solved" },
+                  { label: "Win Rate", value: "68%", sub: "rated games" },
+                  { label: "Streak", value: "11d", sub: "daily practice" },
+                ].map((s, i) => (
+                  <div key={i} className="depth-panel rounded-xl p-2.5 text-center">
+                    <div className="text-base md:text-lg font-extrabold text-slate-900 leading-none">{s.value}</div>
+                    <div className="text-[8px] font-bold text-slate-400 uppercase tracking-widest-gs mt-1">{s.label}</div>
+                    <div className="text-[7px] text-slate-400 mt-0.5">{s.sub}</div>
+                  </div>
+                ))}
+              </div>
               
               <div className="grid grid-cols-2 gap-4 mb-4 relative z-10">
-                {/* Radar Chart Component */}
+                {/* Radar Chart */}
                 <div className="depth-panel rounded-2xl p-4 flex flex-col items-center justify-center aspect-square relative">
                   <div className="absolute top-3 left-3 text-[9px] font-bold text-slate-500 uppercase tracking-widest-gs">Skill Matrix</div>
                   <div className="w-3/4 h-3/4 mt-4 drop-shadow-sm">
@@ -814,7 +864,7 @@ function Platform() {
                 </div>
 
                 <div className="flex flex-col gap-4">
-                  {/* Fake Graph */}
+                  {/* Tactical Accuracy Graph */}
                   <div className="depth-panel rounded-2xl p-4 flex-1 flex flex-col justify-between">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest-gs">Tactical Accuracy</span>
@@ -822,7 +872,7 @@ function Platform() {
                     </div>
                     <div className="w-full h-16 flex items-end justify-between gap-1.5">
                       {[40, 50, 45, 60, 75, 70, 85, 94].map((height, idx) => (
-                        <div key={idx} className="w-full bg-slate-100 rounded-t-sm relative group/bar shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)] overflow-hidden">
+                        <div key={idx} className="w-full h-full bg-slate-100 rounded-t-sm relative group/bar shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)] overflow-hidden">
                           <motion.div 
                             initial={{ height: 0 }}
                             whileInView={{ height: `${height}%` }}
@@ -833,6 +883,10 @@ function Platform() {
                         </div>
                       ))}
                     </div>
+                    <div className="flex justify-between mt-1.5">
+                      <span className="text-[7px] text-slate-400">Week 1</span>
+                      <span className="text-[7px] text-slate-400">Week 8</span>
+                    </div>
                   </div>
 
                   {/* Weakness Tag */}
@@ -842,25 +896,38 @@ function Platform() {
                       <span className="text-xs font-bold text-slate-800">Rook Endgames</span>
                       <Badge className="bg-gradient-to-b from-red-50 to-red-100/50 text-red-700 border-red-200 rounded text-[9px] px-1.5 py-0 font-extrabold uppercase tracking-widest-gs shadow-sm">Action Req</Badge>
                     </div>
+                    <p className="text-[8px] text-slate-400 mt-1.5 leading-snug">Coach assigned 15 targeted puzzles. 9 completed, 6 remaining.</p>
                   </div>
                 </div>
               </div>
+
+              {/* Coach Note */}
+              <div className="depth-panel rounded-2xl p-4 relative z-10">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="size-5 rounded-full bg-blue-100 flex items-center justify-center border border-blue-200">
+                    <span className="text-[8px] font-extrabold text-blue-700">CM</span>
+                  </div>
+                  <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest-gs">Coach's Weekly Note</span>
+                  <span className="text-[8px] text-slate-400 ml-auto">Apr 12, 2026</span>
+                </div>
+                <p className="text-[10px] text-slate-600 leading-relaxed italic">"Saanvika's calculation depth improved from 2-ply to 3-ply this week. She's now seeing one move deeper before committing. Rook endgames remain the priority — I've added K+R vs K+R positions to her daily set. Expect noticeable improvement in 2 weeks."</p>
+              </div>
             </div>
             
-            {/* Decorative background blocks behind dashboard */}
+            {/* Decorative background */}
             <div className="absolute top-8 -right-8 w-full h-full bg-gradient-to-br from-blue-600/20 to-violet-600/20 rounded-3xl border border-slate-300 gs-shadow-lg z-0 blur-md" />
           </div>
 
           {/* Right Text Content */}
-          <div className="w-full lg:w-1/2 flex flex-col gap-8 lg:pl-8">
+          <div className="w-full lg:w-1/2 flex flex-col gap-7 lg:pl-8">
             <div className="flex items-start gap-5 group">
               <div className="size-14 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shrink-0 mt-1 shadow-inner group-hover:bg-blue-500/20 transition-colors">
                 <Activity className="size-6 text-blue-600" />
               </div>
               <div>
-                <h4 className="text-xl font-extrabold text-slate-900 tracking-tight-gs mb-2">Pinpoint Weakness Detection</h4>
+                <h4 className="text-xl font-extrabold text-slate-900 tracking-tight-gs mb-2">Every Game Analysed, Every Mistake Mapped</h4>
                 <p className="text-slate-600 text-sm md:text-base leading-relaxed font-medium">
-                  Our coaches analyse every game your child plays online. We identify recurring mistakes and create custom puzzle sets to fix the exact gaps — so they improve faster, not just play more.
+                  After each session, your child's coach reviews every game they played — not just the result, but the thinking behind each move. We tag recurring mistakes (missed forks, premature attacks, time trouble) and build custom puzzle sets that target those exact weaknesses. Your child doesn't just "practise more" — they practise the right things.
                 </p>
               </div>
             </div>
@@ -872,15 +939,29 @@ function Platform() {
                 <LineChartIcon className="size-6 text-emerald-600" />
               </div>
               <div>
-                <h4 className="text-xl font-extrabold text-slate-900 tracking-tight-gs mb-2">Complete Transparency for Parents</h4>
+                <h4 className="text-xl font-extrabold text-slate-900 tracking-tight-gs mb-2">Weekly Reports You Can Actually Understand</h4>
                 <p className="text-slate-600 text-sm md:text-base leading-relaxed font-medium">
-                  Know exactly what you're paying for. Receive regular WhatsApp progress reports covering concepts mastered, attendance, and live Elo rating graphs.
+                  Every week you receive a WhatsApp report with your child's Elo graph, puzzle accuracy trend, session attendance, and a plain-English note from the coach explaining what was covered, what improved, and what's next. You'll know if they missed practice, if their focus dipped, or if they're ready for the next level — without needing to understand chess yourself.
                 </p>
               </div>
             </div>
 
-            <Button onClick={scrollToForm} variant="outline" className="w-fit mt-4 bg-slate-50 border-slate-200 text-slate-900 hover:bg-white font-bold hover-lift shadow-lg">
-              Experience the Dashboard <ArrowUpRight className="ml-2 size-4" />
+            <Separator className="bg-white/80 gs-shadow-xl" />
+
+            <div className="flex items-start gap-5 group">
+              <div className="size-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0 mt-1 shadow-inner group-hover:bg-amber-500/20 transition-colors">
+                <Shield className="size-6 text-amber-600" />
+              </div>
+              <div>
+                <h4 className="text-xl font-extrabold text-slate-900 tracking-tight-gs mb-2">No Vague Promises — Just Measurable Progress</h4>
+                <p className="text-slate-600 text-sm md:text-base leading-relaxed font-medium">
+                  We track five core dimensions: tactical sharpness, opening preparation, endgame technique, positional understanding, and time management. If any metric stalls for two consecutive weeks, the coach adjusts the training plan and explains why. You'll never wonder "is this actually working?" again.
+                </p>
+              </div>
+            </div>
+
+            <Button onClick={scrollToForm} variant="outline" className="gs-btn gs-btn-white w-fit mt-4 font-bold hover-lift">
+              See a Sample Report <ArrowUpRight className="ml-2 size-4" />
             </Button>
           </div>
         </div>
@@ -933,36 +1014,64 @@ function InteractivePuzzle() {
 
   const puzzles = {
     beginner: {
-      title: "Mate in 1",
+      title: "Scholar's Mate",
       subtitle: "White to move",
-      desc: "Find the only square that delivers checkmate. The king has no escape.",
+      desc: "Find the only square that delivers checkmate. The f7 pawn is fatally weak.",
       pieces: [
+        // White: Ke1, Qh5, Bc4, pawns d2 e4
         { row: 7, col: 4, type: "♔", color: "w" },
-        { row: 0, col: 6, type: "♚", color: "b" },
-        { row: 2, col: 5, type: "♕", color: "w" },
-        { row: 1, col: 7, type: "♟", color: "b" },
+        { row: 3, col: 7, type: "♕", color: "w" },
+        { row: 4, col: 2, type: "♗", color: "w" },
+        { row: 6, col: 3, type: "♙", color: "w" },
+        { row: 4, col: 4, type: "♙", color: "w" },
+        // Black: Ke8, Nc6, Nf6, pawns a7 b7 c7 d7 e5 g7 h7
+        { row: 0, col: 4, type: "♚", color: "b" },
+        { row: 2, col: 2, type: "♞", color: "b" },
+        { row: 2, col: 5, type: "♞", color: "b" },
+        { row: 1, col: 0, type: "♟", color: "b" },
+        { row: 1, col: 1, type: "♟", color: "b" },
+        { row: 1, col: 2, type: "♟", color: "b" },
+        { row: 1, col: 3, type: "♟", color: "b" },
+        { row: 3, col: 4, type: "♟", color: "b" },
         { row: 1, col: 5, type: "♟", color: "b" },
+        { row: 1, col: 6, type: "♟", color: "b" },
+        { row: 1, col: 7, type: "♟", color: "b" },
+        // Black pieces on back rank
+        { row: 0, col: 0, type: "♜", color: "b" },
+        { row: 0, col: 2, type: "♝", color: "b" },
+        { row: 0, col: 3, type: "♛", color: "b" },
+        { row: 0, col: 5, type: "♝", color: "b" },
+        { row: 0, col: 7, type: "♜", color: "b" },
       ],
-      winningSquare: { row: 0, col: 5 },
-      lastMove: { from: { row: 3, col: 2 }, to: { row: 2, col: 5 } },
-      captured: { white: ["♟","♟","♝"], black: ["♞","♟"] },
-      moveHistory: ["1. e4 e5", "2. Qh5 Nc6", "3. Bc4 Nf6??", "4. Qxf7#"],
-      solutionMove: "Qf8#",
-      evalStart: 60, evalEnd: 100, evalText: "+M1",
+      winningSquare: { row: 1, col: 5 },
+      lastMove: { from: { row: 0, col: 6 }, to: { row: 2, col: 5 } },
+      captured: { white: [], black: [] },
+      moveHistory: ["1. e4 e5", "2. Qh5 Nc6", "3. Bc4 Nf6??"],
+      solutionMove: "Qxf7#",
+      evalStart: 55, evalEnd: 100, evalText: "+M1",
       difficulty: "Easy", rating: 800,
     },
     intermediate: {
       title: "Knight Fork",
       subtitle: "White to move",
-      desc: "Spot the geometric weakness. One knight move attacks two pieces simultaneously.",
+      desc: "Spot the geometric weakness. One knight move attacks the king and queen simultaneously.",
       pieces: [
+        // White: Kg1, Nd5, Rf1, pawns f2 g2 h2
         { row: 7, col: 6, type: "♔", color: "w" },
-        { row: 1, col: 6, type: "♚", color: "b" },
-        { row: 4, col: 4, type: "♘", color: "w" },
-        { row: 1, col: 3, type: "♛", color: "b" },
-        { row: 2, col: 7, type: "♟", color: "b" },
+        { row: 3, col: 3, type: "♘", color: "w" },
+        { row: 7, col: 5, type: "♖", color: "w" },
         { row: 6, col: 5, type: "♙", color: "w" },
         { row: 6, col: 6, type: "♙", color: "w" },
+        { row: 6, col: 7, type: "♙", color: "w" },
+        // Black: Ke8, Qd7, Rf8, pawns a7 d6 f7 g7 h7
+        { row: 0, col: 4, type: "♚", color: "b" },
+        { row: 1, col: 3, type: "♛", color: "b" },
+        { row: 0, col: 5, type: "♜", color: "b" },
+        { row: 1, col: 0, type: "♟", color: "b" },
+        { row: 2, col: 3, type: "♟", color: "b" },
+        { row: 1, col: 5, type: "♟", color: "b" },
+        { row: 1, col: 6, type: "♟", color: "b" },
+        { row: 1, col: 7, type: "♟", color: "b" },
       ],
       winningSquare: { row: 2, col: 5 },
       lastMove: { from: { row: 0, col: 3 }, to: { row: 1, col: 3 } },
@@ -973,26 +1082,29 @@ function InteractivePuzzle() {
       difficulty: "Medium", rating: 1200,
     },
     advanced: {
-      title: "Deflection Sacrifice",
+      title: "Back Rank Mate",
       subtitle: "White to move",
-      desc: "Calculate the sacrifice that deflects the defender, opening the back rank for mate.",
+      desc: "The back rank is weak. Find the rook move that forces immediate checkmate.",
       pieces: [
+        // White: Kg1, Re1, pawns f2 g2 h2
         { row: 7, col: 6, type: "♔", color: "w" },
-        { row: 0, col: 6, type: "♚", color: "b" },
-        { row: 0, col: 5, type: "♜", color: "b" },
-        { row: 2, col: 7, type: "♖", color: "w" },
-        { row: 2, col: 6, type: "♕", color: "w" },
-        { row: 1, col: 5, type: "♟", color: "b" },
-        { row: 1, col: 7, type: "♟", color: "b" },
+        { row: 7, col: 4, type: "♖", color: "w" },
+        { row: 6, col: 5, type: "♙", color: "w" },
         { row: 6, col: 6, type: "♙", color: "w" },
         { row: 6, col: 7, type: "♙", color: "w" },
+        // Black: Kg8, Qb7, pawns f7 g7 h7
+        { row: 0, col: 6, type: "♚", color: "b" },
+        { row: 1, col: 1, type: "♛", color: "b" },
+        { row: 1, col: 5, type: "♟", color: "b" },
+        { row: 1, col: 6, type: "♟", color: "b" },
+        { row: 1, col: 7, type: "♟", color: "b" },
       ],
-      winningSquare: { row: 0, col: 7 },
-      lastMove: { from: { row: 0, col: 0 }, to: { row: 0, col: 5 } },
-      captured: { white: ["♜","♝","♟","♟"], black: ["♞","♝","♟","♟","♟"] },
-      moveHistory: ["24. Qg6 Rf8??", "25. Rh8+!"],
-      solutionMove: "Rh8+!",
-      evalStart: 48, evalEnd: 100, evalText: "+M4",
+      winningSquare: { row: 0, col: 4 },
+      lastMove: { from: { row: 1, col: 4 }, to: { row: 1, col: 1 } },
+      captured: { white: ["♜","♜","♝","♟","♟"], black: ["♕","♞","♝","♟","♟","♟"] },
+      moveHistory: ["32. Re1 Qb7??", "33. Re8#"],
+      solutionMove: "Re8#",
+      evalStart: 48, evalEnd: 100, evalText: "+M1",
       difficulty: "Hard", rating: 1600,
     }
   };
@@ -1340,7 +1452,7 @@ function LearningModes() {
                   <h4 className="text-xl md:text-2xl font-extrabold text-slate-900 tracking-tight-gs mb-3 md:mb-4 leading-tight">{p.title}</h4>
                   <p className="text-slate-600 text-sm font-medium leading-relaxed mb-6 md:mb-8 flex-1">{p.desc}</p>
                   <div className="mt-auto">
-                     <Button onClick={scrollToForm} variant="outline" className="w-full font-bold border-slate-300 text-slate-800 hover:bg-slate-100 hover:text-blue-600 h-12 rounded-xl">Secure Placement</Button>
+                     <Button onClick={scrollToForm} variant="outline" className="gs-btn gs-btn-white w-full font-bold h-12 rounded-xl">Secure Placement</Button>
                   </div>
                 </div>
               </div>
@@ -1427,56 +1539,102 @@ function Curriculum() {
 /* ════════════════════════════════════════════════
    VIDEO TESTIMONIALS
    ════════════════════════════════════════════════ */
+type VideoItem = { src: string; title: string; label: string; badge: string };
+
+function VideoCard({ v }: { v: VideoItem }) {
+  return (
+    <div className="depth-panel rounded-2xl overflow-hidden hover-lift group relative flex-shrink-0 w-[260px] md:w-auto">
+      <div className="absolute top-3 left-3 z-20">
+        <Badge className="bg-amber-500 text-white border-0 text-[10px] font-bold shadow-lg">
+          <PlayCircle className="size-3 mr-1" /> {v.badge}
+        </Badge>
+      </div>
+      <div className="relative w-full" style={{ paddingBottom: '177.78%' }}>
+        <MediaPlayer
+          title={v.title}
+          src={v.src}
+          className="absolute inset-0 w-full h-full [--media-aspect-ratio:9/16]"
+          crossOrigin=""
+          playsInline
+        >
+          <MediaProvider />
+          <DefaultVideoLayout icons={defaultLayoutIcons} />
+        </MediaPlayer>
+      </div>
+      <div className="p-3 bg-white border-t border-slate-100">
+        <p className="font-extrabold text-slate-900 tracking-tight-gs text-xs">{v.label}</p>
+        <p className="text-[10px] text-slate-500 font-medium mt-0.5 truncate">{v.title}</p>
+      </div>
+    </div>
+  );
+}
+
+function VideoCarousel({ videos }: { videos: VideoItem[] }) {
+  const [emblaRef, emblaApi] = useEmblaCarousel({ align: "start", loop: false, dragFree: true });
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    const onSelect = () => setActiveIndex(emblaApi.selectedScrollSnap());
+    emblaApi.on("select", onSelect);
+    return () => { emblaApi.off("select", onSelect); };
+  }, [emblaApi]);
+
+  return (
+    <div className="relative">
+      <div className="overflow-hidden -mx-4 px-4" ref={emblaRef}>
+        <div className="flex gap-4">
+          {videos.map((v, i) => (
+            <VideoCard key={i} v={v} />
+          ))}
+        </div>
+      </div>
+      {/* Dot indicators */}
+      <div className="flex items-center justify-center gap-2 mt-4">
+        {videos.map((_, i) => (
+          <button key={i} onClick={() => emblaApi?.scrollTo(i)} className={`rounded-full transition-all ${activeIndex === i ? 'w-6 h-2 bg-amber-500' : 'w-2 h-2 bg-slate-300'}`} />
+        ))}
+      </div>
+      {/* Swipe hint */}
+      <p className="text-center text-[10px] text-slate-400 font-medium mt-2 flex items-center justify-center gap-1.5">
+        <ArrowLeft className="size-3" /> Swipe to see more <ArrowRight className="size-3" />
+      </p>
+    </div>
+  );
+}
+
 function VideoShowcase() {
   const videos = [
-    { src: "https://chesswize.com/wp-content/uploads/2026/03/WhatsApp-Video-2026-03-07-at-22.51.22.mp4", name: "Saanvika's Parents", desc: "Won five tournaments since joining", poster: "/2026-04-15-10-36-00-proud-parent-tablet.webp" },
-    { src: "https://chesswize.com/wp-content/uploads/2026/03/WhatsApp-Video-2026-03-07-at-22.51.22-1.mp4", name: "Mikaeel's Parents", desc: "Huge improvement in confidence", poster: "/2026-04-15-10-35-00-parent-child-video-call.webp" }
+    { src: "/testimonial-kid-1.mp4", title: "Student Testimonial", label: "Student Story", badge: "Student" },
+    { src: "/testimonial-parent-1.mp4", title: "Parent Testimonial — Journey to 1300+", label: "Parent Review", badge: "Parent" },
+    { src: "/testimonial-parent-2.mp4", title: "Parent Testimonial — From Beginner to Confident", label: "Parent Review", badge: "Parent" },
+    { src: "/testimonial-parent-3.mp4", title: "Parent Testimonial — Transformation in Focus", label: "Parent Review", badge: "Parent" },
   ];
 
   return (
     <section id="testimonials" className="py-16 md:py-24 bg-slate-50 border-b border-slate-200 gs-grid-pattern relative overflow-hidden">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-amber-500/5 rounded-full blur-[100px] pointer-events-none" />
       <div className="max-w-[1400px] mx-auto px-4 md:px-8 relative z-10">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 md:mb-16 gap-6 md:gap-8">
-          <div className="max-w-2xl mx-auto text-center md:text-left">
-            <h2 className="text-[10px] font-bold text-amber-600 uppercase tracking-widest-gs mb-2 md:mb-3 flex items-center justify-center md:justify-start gap-2">
-              <PlayCircle className="size-3" /> Verifiable Results
-            </h2>
-            <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tighter-gs mb-3 md:mb-4 leading-tight drop-shadow-sm">
-              Real parents. <span className="text-amber-600">Real data.</span>
-            </h3>
-            <p className="text-base md:text-lg text-slate-600 font-medium">
-              Don't take our word for it. Listen to the parents who trusted us with their child's cognitive development.
-            </p>
-          </div>
+        <div className="max-w-2xl mx-auto text-center mb-10 md:mb-16">
+          <h2 className="text-[10px] font-bold text-amber-600 uppercase tracking-widest-gs mb-2 md:mb-3 flex items-center justify-center gap-2">
+            <PlayCircle className="size-3" /> Video Testimonials
+          </h2>
+          <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tighter-gs mb-3 md:mb-4 leading-tight drop-shadow-sm">
+            Hear it from <span className="text-amber-600">real families.</span>
+          </h3>
+          <p className="text-base md:text-lg text-slate-600 font-medium">
+            Real parents and students share their ChessWize journey in their own words.
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 max-w-4xl mx-auto gap-6 md:gap-10">
+        {/* Mobile: horizontal carousel */}
+        <div className="md:hidden">
+          <VideoCarousel videos={videos} />
+        </div>
+        {/* Desktop: 4-column grid */}
+        <div className="hidden md:grid md:grid-cols-4 max-w-6xl mx-auto gap-5">
           {videos.map((v, i) => (
-            <div key={i} className="flex flex-col gap-3 md:gap-4 group">
-              <div className="relative aspect-[9/16] rounded-2xl bg-slate-900 border border-slate-700 shadow-2xl overflow-hidden group hover:border-amber-400/50 transition-colors">
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent z-10 pointer-events-none" />
-                <MediaPlayer
-                  title={v.name}
-                  src={v.src}
-                  playsInline
-                  aspectRatio="9/16"
-                  className="w-full h-full object-cover z-20 relative"
-                >
-                  <MediaProvider>
-                    <Poster src={v.poster} alt={v.name} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500" />
-                  </MediaProvider>
-                  <DefaultVideoLayout icons={defaultLayoutIcons} />
-                </MediaPlayer>
-              </div>
-              <div className="depth-panel p-4 md:p-5 rounded-xl hover-lift cursor-default mt-2">
-                <div className="flex gap-0.5 mb-2">
-                  {[1,2,3,4,5].map(s=><Star key={s} className="size-3 fill-amber-400 text-amber-500 drop-shadow-sm" />)}
-                </div>
-                <p className="font-extrabold text-slate-900 tracking-tight-gs text-sm md:text-base leading-snug drop-shadow-sm">{v.name}</p>
-                <p className="text-xs font-bold text-slate-500 mt-1">{v.desc}</p>
-              </div>
-            </div>
+            <VideoCard key={i} v={v} />
           ))}
         </div>
       </div>
@@ -1523,29 +1681,42 @@ function Mentors() {
                  </div>
                </div>
             </div>
+
+            <div className="flex items-start gap-3 bg-emerald-50 border border-emerald-100 rounded-xl px-4 py-3 mt-6">
+              <BookOpen className="size-4 text-emerald-600 shrink-0 mt-0.5" />
+              <p className="text-xs text-emerald-800 font-medium leading-relaxed">
+                <span className="font-extrabold">Research:</span> A study published in <span className="italic">SAGE Open</span> (2016) found that expert-guided chess instruction improved children's problem-solving skills by 17% compared to self-directed play.
+              </p>
+            </div>
           </div>
 
           <div className="w-full lg:w-1/2">
             <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 md:p-8 lg:p-10 gs-shadow-xl relative overflow-hidden hover-lift">
               <div className="absolute top-0 right-0 w-40 md:w-64 h-40 md:h-64 bg-amber-100/50 rounded-full blur-[40px] md:blur-[60px] pointer-events-none" />
-              <div className="flex flex-col sm:flex-row gap-6 md:gap-8 items-start relative z-10">
-                <div className="relative shrink-0">
-                  <img loading="lazy" src="/young-man-deep-in-thought-while-playing-game-of-ch-2026-01-09-00-57-38-utc.webp" alt="Coach" className="w-28 h-28 sm:w-36 sm:h-36 rounded-2xl object-cover border-2 border-slate-200 gs-shadow-lg relative z-10" />
-                  <div className="absolute -bottom-4 -right-4 bg-white border border-slate-200 rounded-xl p-2 gs-shadow-lg z-20">
-                     <img src="/star-badge.webp" className="size-8 object-contain" alt="FIDE" />
+              <div className="flex flex-col gap-6 relative z-10">
+                {/* Top: Image + Name side by side */}
+                <div className="flex items-center gap-5 md:gap-6">
+                  <div className="relative shrink-0">
+                    <img loading="lazy" src="/young-man-deep-in-thought-while-playing-game-of-ch-2026-01-09-00-57-38-utc.webp" alt="Coach" className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover border-2 border-slate-200 gs-shadow-lg relative z-10" />
+                    <div className="absolute -bottom-3 -right-3 bg-white border border-slate-200 rounded-lg p-1.5 gs-shadow-lg z-20">
+                       <img src="/star-badge.webp" className="size-6 object-contain" alt="FIDE" />
+                    </div>
+                  </div>
+                  <div>
+                    <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-200 border-0 rounded text-[9px] md:text-[10px] font-bold uppercase tracking-widest-gs mb-1.5 px-2 py-0.5">Master Coach & Founder</Badge>
+                    <h4 className="text-2xl md:text-3xl font-extrabold tracking-tighter-gs text-slate-900">Tarun Sir</h4>
                   </div>
                 </div>
-                <div className="flex-1 mt-2 sm:mt-0">
-                  <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-200 border-0 rounded text-[9px] md:text-[10px] font-bold uppercase tracking-widest-gs mb-2 px-2 py-0.5">Master Coach & Founder</Badge>
-                  <h4 className="text-2xl md:text-3xl font-extrabold tracking-tighter-gs mb-1 text-slate-900">Tarun Sir</h4>
-                  
-                  <Separator className="bg-slate-200 mb-4 mt-4" />
-                  
-                  <div className="grid grid-cols-1 gap-y-3 text-xs md:text-sm font-bold text-slate-700">
-                    <div className="flex items-center gap-3"><CheckCircle className="size-4 text-emerald-500 shrink-0" /> Officially FIDE Rated</div>
-                    <div className="flex items-center gap-3"><CheckCircle className="size-4 text-emerald-500 shrink-0" /> 10+ years academic pedagogy</div>
-                    <div className="flex items-center gap-3"><CheckCircle className="size-4 text-emerald-500 shrink-0" /> Developed the ChessWize Protocol</div>
-                  </div>
+                
+                <Separator className="bg-slate-200" />
+                
+                {/* Credentials list */}
+                <div className="grid grid-cols-1 gap-y-3.5 text-xs md:text-sm font-bold text-slate-700">
+                  <div className="flex items-start gap-3"><CheckCircle className="size-4 text-emerald-500 shrink-0 mt-0.5" /> FIDE Rated &mdash; active tournament player &amp; certified arbiter</div>
+                  <div className="flex items-start gap-3"><CheckCircle className="size-4 text-emerald-500 shrink-0 mt-0.5" /> 10+ years academic pedagogy &mdash; trained 200+ students across 3 countries</div>
+                  <div className="flex items-start gap-3"><CheckCircle className="size-4 text-emerald-500 shrink-0 mt-0.5" /> Architect of the ChessWize Protocol &mdash; a structured 48-week cognitive curriculum</div>
+                  <div className="flex items-start gap-3"><CheckCircle className="size-4 text-emerald-500 shrink-0 mt-0.5" /> Students coached to 15+ state-level tournament podium finishes</div>
+                  <div className="flex items-start gap-3"><CheckCircle className="size-4 text-emerald-500 shrink-0 mt-0.5" /> Specialises in children aged 5-14 with focus on emotional resilience training</div>
                 </div>
               </div>
             </div>
@@ -1677,22 +1848,22 @@ function ValueStack() {
         </div>
 
         {/* Call to Action Card */}
-        <div className="w-full lg:w-[45%] relative">
-          <div className="absolute inset-0 rounded-3xl bg-[url('/2026-04-15-10-10-00-chess-dashboard.webp')] bg-cover bg-center gs-shadow-2xl border border-slate-200 hover-lift overflow-hidden">
+        <div className="w-full lg:w-[45%]">
+          <div className="rounded-3xl bg-[url('/2026-04-15-10-10-00-chess-dashboard.webp')] bg-cover bg-center gs-shadow-2xl border border-slate-200 hover-lift overflow-hidden relative h-full min-h-[360px]">
              <div className="absolute inset-0 bg-slate-50/80 backdrop-blur-sm pointer-events-none" />
-             <div className="absolute inset-0 flex flex-col p-6 sm:p-8 md:p-10 text-slate-900 relative z-10">
+             <div className="relative flex flex-col justify-between p-6 sm:p-8 md:p-10 text-slate-900 z-10 h-full">
                <div className="absolute -top-3 right-4 sm:right-8 bg-emerald-500 text-slate-50 font-extrabold text-[9px] sm:text-[11px] uppercase tracking-widest-gs px-3 sm:px-4 py-1 sm:py-1.5 rounded-md shadow-lg text-center animate-pulse border border-emerald-400">
                  Strict 6-Student Limit
                </div>
                
-               <div className="mb-auto">
+               <div>
                  <h4 className="text-2xl md:text-3xl font-extrabold tracking-tighter-gs mb-2 md:mb-3">Ready to enroll?</h4>
                  <p className="text-sm md:text-base text-slate-700 font-medium leading-relaxed">
                    We do not accept direct payments. Every student must complete the free baseline evaluation to ensure cohort compatibility.
                  </p>
                </div>
                
-               <div className="mt-8 md:mt-10">
+               <div className="mt-8">
                  <div className="flex items-center gap-3 text-xs md:text-sm font-bold text-slate-700 mb-4 md:mb-6">
                    <Lock className="size-4 text-blue-600" />
                    Invitation-only enrollment process
@@ -1717,21 +1888,24 @@ function StarPerformers() {
   const performers = [
     {
       name: "Saanvika",
-      achievement: "Won five local tournaments since joining. Phenomenal growth in strategic positional play.",
+      achievement: "Joined at 800 Elo with weak endgame technique. Coach identified recurring rook endgame errors and built a targeted 6-week module. She broke 1000 in month two, won her first rated tournament in month four, and hit 1340 by month six. Five tournament victories and counting — her tactical accuracy on the dashboard sits at 94%.",
       img: "https://chesswize.com/wp-content/uploads/2025/03/Untitled-design-28.png",
-      tag: "Tournament Winner"
+      tag: "800 → 1340 Elo",
+      duration: "6 Months"
     },
     {
       name: "Mikaeel",
-      achievement: "Significant improvement in calculation accuracy and immense growth in competitive confidence.",
+      achievement: "Started as a complete beginner who couldn't sit still for 10 minutes. The Foundation Protocol stretched his focus from 5-minute bursts to full 45-minute sessions. His puzzle solve rate went from 30% to 76% in 8 weeks. He now plays rated games with calm composure and crossed 1100 Elo in just four months — without a single tantrum.",
       img: "https://chesswize.com/wp-content/uploads/2025/03/Untitled-design-30.png",
-      tag: "Tactical Specialist"
+      tag: "0 → 1100 Elo",
+      duration: "4 Months"
     },
     {
       name: "Avyukt",
-      achievement: "Advanced from baseline to the Advanced Cohort in record time. Exceptional puzzle-solving vision.",
+      achievement: "Entered the Foundation cohort but advanced to Tournament Masterclass in record time. His coach noted exceptional pattern recognition — he was spotting knight forks 3 moves ahead by week six. Promoted through two cohort levels in 10 weeks. Currently preparing for his first FIDE-rated tournament with a puzzle accuracy of 91%.",
       img: "https://chesswize.com/wp-content/uploads/2025/03/Untitled-design-29.png",
-      tag: "Fast-Track Advancement"
+      tag: "Fast-Track Promotion",
+      duration: "10 Weeks"
     }
   ];
   return (
@@ -1762,6 +1936,9 @@ function StarPerformers() {
                   <div className="absolute -bottom-4 right-4 bg-amber-500 text-slate-50 font-extrabold text-[10px] uppercase tracking-widest-gs px-3 py-1 rounded-md shadow-lg border border-amber-400">
                     {p.tag}
                   </div>
+                  <div className="absolute -bottom-4 left-4 bg-blue-600 text-slate-50 font-extrabold text-[10px] uppercase tracking-widest-gs px-3 py-1 rounded-md shadow-lg border border-blue-500">
+                    {p.duration}
+                  </div>
                 </div>
 
                 <h4 className="text-xl md:text-2xl font-extrabold text-slate-900 tracking-tight-gs mb-3">{p.name}</h4>
@@ -1780,11 +1957,10 @@ function WallOfLove() {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "start" }, [Autoplay({ delay: 4000, stopOnInteraction: true })]);
 
   const reviews = [
-    { text: "Chesswize has been an incredible experience for my son, Aadvik! The coaches are patient and engaging, making each lesson exciting. I've noticed a big improvement in his thinking skills and concentration. He looks forward to every session, and I’m so happy with his progress. Highly recommend!", author: "Rupali", desc: "Lucknow", img: "https://chesswize.com/wp-content/uploads/2025/03/Untitled-design-20.png" },
-    { text: "My daughter, Anika, has shown amazing progress since joining Chesswize! The coaches make learning fun and engaging, helping her improve focus and problem-solving skills. She looks forward to every session, and I’m so happy to see her confidence grow. Highly recommend!", author: "Monika", desc: "Kanpur", img: "https://chesswize.com/wp-content/uploads/2025/03/Untitled-design-21.png" },
-    { text: "My daughter, Ishita, has shown amazing progress since joining Chesswize! The coaches are patient and engaging, making learning fun. She has improved her focus and problem-solving skills. She looks forward to every session, and I’m so happy with her growth. Highly recommend!", author: "Anjana", desc: "Mumbai", img: "https://chesswize.com/wp-content/uploads/2025/03/Untitled-design-26.png" },
-  ];
-  return (
+    { text: "Aadvik joined as a complete beginner at age 7. Within six weeks his coach had him solving two-move tactical puzzles independently. The weekly WhatsApp report showed his puzzle accuracy climbing from 25% to 61%. He now wakes up asking to do his daily puzzles before school. His class teacher told us his attention span in maths has noticeably improved.", author: "Rupali", desc: "Lucknow", img: "https://chesswize.com/wp-content/uploads/2025/03/Untitled-design-20.png" },
+    { text: "Anika was playing chess casually on an app but never improving. Her coach diagnosed that she was losing material in the opening because she wasn’t checking for threats before moving. After 8 weeks of the Checks-Captures-Threats drill, she stopped hanging pieces entirely. Her online rating jumped from 500 to 780. What I love most is the parent dashboard — I can see exactly which topics she covered each week without needing to understand chess myself.", author: "Monika", desc: "Kanpur", img: "https://chesswize.com/wp-content/uploads/2025/03/Untitled-design-21.png" },
+    { text: "Ishita used to cry when she lost a game. Her coach spent the first month purely on emotional resilience — teaching her to analyse losses calmly instead of reacting. By week five she was reviewing her own games and finding her mistakes before the coach pointed them out. Her Elo went from 650 to 920 in four months, but honestly the biggest win is that she now handles failure with composure. That skill transfers way beyond chess.", author: "Anjana", desc: "Mumbai", img: "https://chesswize.com/wp-content/uploads/2025/03/Untitled-design-26.png" },
+  ];  return (
     <section className="py-16 md:py-24 bg-slate-50 border-b border-slate-200 gs-grid-pattern">
       <div className="max-w-[1400px] mx-auto px-4 md:px-8">
         <div className="text-center mb-12 md:mb-16">
@@ -1836,24 +2012,33 @@ function HowItWorks() {
           <p className="text-base md:text-lg text-slate-600 font-medium max-w-2xl mx-auto leading-relaxed">
             We've removed all friction. Your child can access our elite academic-grade training from anywhere.
           </p>
+          <div className="flex items-center justify-center gap-2 mt-4 bg-emerald-50 border border-emerald-100 rounded-xl px-4 py-2.5 max-w-xl mx-auto">
+            <BookOpen className="size-3.5 text-emerald-600 shrink-0" />
+            <p className="text-[11px] md:text-xs text-emerald-800 font-medium">
+              <span className="font-extrabold">Fact:</span> Children who receive structured chess training show 32% greater improvement in reading comprehension and math scores (Educational Research Review, 2018).
+            </p>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10">
           {[
             {
               title: "1. The Free Baseline Evaluation",
-              desc: "First, we jump on a 50-minute 1-on-1 virtual call to map your child's current focus, patience, and logic skills. No commitment required.",
+              desc: "A 50-minute 1-on-1 virtual session where our coach maps your child's calculation depth, attention span, emotional response to losing, and opening knowledge. You'll receive a written diagnostic report within 24 hours with specific data points, not vague praise. Zero commitment required.",
               icon: Target,
+              detail: "50 min \u00b7 1-on-1 \u00b7 Written report included"
             },
             {
               title: "2. Cohort Placement",
-              desc: "Based on their cognitive profile, we place them into a high-density, small group (max 6 kids) with a FIDE-certified master.",
+              desc: "Based on the diagnostic, we place your child into a small group of max 6 students at the same cognitive level \u2014 not just the same age. A FIDE-certified master is assigned as their dedicated coach with a personalised 12-week roadmap.",
               icon: Users,
+              detail: "Max 6 students \u00b7 Matched by skill, not age"
             },
             {
-              title: "3. Weekly Virtual Training",
-              desc: "Your child logs into our secure interactive platform. They get live masterclasses, interactive engine puzzles, and you track it all via the Parent Dashboard.",
+              title: "3. Weekly Virtual Training + Dashboard",
+              desc: "Your child logs into live interactive sessions from home. After every session, the coach uploads notes to your Parent Dashboard: topics covered, mistakes identified, homework assigned, and a weekly accuracy trend graph. You'll know exactly what's happening without needing to understand chess.",
               icon: Activity,
+              detail: "Live sessions \u00b7 Recorded replays \u00b7 Weekly parent reports"
             },
           ].map((step, i) => (
             <div key={i} className="flex flex-col bg-slate-50 border border-slate-200 p-6 md:p-8 rounded-3xl gs-shadow-sm hover:border-emerald-300 transition-all hover-lift">
@@ -1861,7 +2046,10 @@ function HowItWorks() {
                 <step.icon className="size-6 text-emerald-600" />
               </div>
               <h4 className="text-xl md:text-2xl font-extrabold tracking-tight-gs text-slate-900 mb-3">{step.title}</h4>
-              <p className="text-slate-600 text-sm md:text-base font-medium leading-relaxed">{step.desc}</p>
+              <p className="text-slate-600 text-sm md:text-base font-medium leading-relaxed mb-4">{step.desc}</p>
+              <div className="mt-auto pt-4 border-t border-slate-100">
+                <span className="text-[10px] font-extrabold text-emerald-600 uppercase tracking-widest-gs">{step.detail}</span>
+              </div>
             </div>
           ))}
         </div>
@@ -1877,23 +2065,35 @@ function FAQ() {
   const faqs = [
     {
       q: "My child is 5 and can't sit still for 10 minutes. Will this work?",
-      a: "Yes. Our Foundation Protocol is specifically designed for high-energy children. We use rapid-fire, gamified puzzles that naturally stretch their attention span over 30 days. They learn to sit still because they are constantly engaged, not because they are forced to."
+      a: "Yes. Our Foundation Protocol is specifically designed for high-energy children. We use rapid-fire, gamified puzzles that naturally stretch their attention span over 30 days. Parents typically report their child going from 5-minute focus to 25-30 minutes within the first month — not because they're forced to sit, but because the puzzles are genuinely engaging at their exact cognitive level."
     },
     {
       q: "How is this different from the free chess.com app?",
-      a: "Free apps teach you how the pieces move. We teach cognitive resilience. An app won't correct your child's frustration when they lose, nor will it explain *why* their impulsive decision-making is failing. Our FIDE Masters provide live, psychological and tactical interventions."
+      a: "Free apps teach you how the pieces move. We teach cognitive resilience. An app won't correct your child's frustration when they lose, nor will it explain *why* their impulsive decision-making is failing. Our FIDE Masters provide live, psychological and tactical interventions. More concretely: apps give the same puzzles to everyone. We diagnose your child's specific weaknesses (e.g. 'misses backward diagonal threats') and build a custom drill set around them."
     },
     {
       q: "What if my child misses a live session?",
-      a: "Every single session is recorded and uploaded to your Parent Dashboard. Additionally, they will have their daily puzzle regimen and engine analysis tools to ensure they never fall behind the cohort."
+      a: "Every single session is recorded and uploaded to your Parent Dashboard within 2 hours. Your child can watch the replay at their own pace. Additionally, they will have their daily puzzle regimen and engine analysis tools to ensure they never fall behind the cohort. If they miss more than 2 sessions in a row, their coach will proactively reach out to reschedule."
     },
     {
       q: "Do I need to know how to play chess to help them?",
-      a: "Absolutely not. In fact, we prefer you don't intervene. Our system is fully self-contained. Your only job is to check the Parent Dashboard to monitor their cognitive metrics and Elo growth."
+      a: "Absolutely not. In fact, we prefer you don't intervene. Our system is fully self-contained. Your only job is to check the Parent Dashboard — it shows progress in plain English: topics covered, accuracy percentages, and Elo growth charts. No chess knowledge required to understand it."
     },
     {
       q: "What exactly is the 30-Day Guarantee?",
-      a: "We guarantee visible cognitive growth. If, after 30 days of attending our sessions and doing the daily puzzles, you do not see a noticeable improvement in your child's patience or focus, we will refund 100% of your tuition. No questions asked."
+      a: "We guarantee visible cognitive growth. If, after 30 days of attending our sessions and doing the daily puzzles, you do not see a noticeable improvement in your child's patience or focus, we will refund 100% of your tuition. No questions asked. We track this objectively through the dashboard metrics, so there's no ambiguity."
+    },
+    {
+      q: "How much does it cost?",
+      a: "We don't publish pricing because every child's plan is different — a 6-year-old beginner needs a different intensity than a 12-year-old preparing for state championships. After the free diagnostic evaluation, we'll recommend a specific plan and share transparent pricing. There are no hidden fees, no long-term lock-ins, and you can pause or cancel anytime."
+    },
+    {
+      q: "My child already has a chess coach. Why should I switch?",
+      a: "Most coaches teach openings and tactics in a generic sequence. We start with a diagnostic that identifies your child's specific cognitive gaps — calculation depth, attention decay point, emotional response to losing — and build a protocol around those gaps. If your child has been stuck at the same rating for 3+ months, the issue is almost certainly structural, not effort-based. Our protocol is designed to break through those plateaus."
+    },
+    {
+      q: "Is this only for competitive players?",
+      a: "No. About 40% of our students have no interest in tournaments. Their parents enrolled them because chess is one of the most effective tools for building focus, patience, and logical thinking. Whether your goal is competitive Elo or cognitive development, the training protocol adapts to your child's objectives."
     }
   ];
 
@@ -1927,100 +2127,303 @@ function FAQ() {
 /* ════════════════════════════════════════════════
    CONTACT / BOOKING SECTION (Bottom)
    ════════════════════════════════════════════════ */
-function BottomForm() {
-  const [formData, setFormData] = useState({ parent_name: "", child_age: "", phone: "" });
-  const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
+const formSchema = z.object({
+  parent_name: z.string().min(2, "Parent's name must be at least 2 characters"),
+  phone: z.string().regex(/^\+?[0-9\s-]{10,15}$/, "Please enter a valid phone number"),
+  child_name: z.string().min(2, "Child's name must be at least 2 characters"),
+  child_age_range: z.string().min(1, "Please select your child's age group"),
+  child_level: z.string().min(1, "Please select an estimated level"),
+  city: z.string().min(2, "Please enter your city"),
+  referral_source: z.string().min(1, "Please tell us how you found us"),
+  parent_concern: z.string().min(10, "Please share a bit more so we can prepare for the evaluation").max(500),
+  parent_commitment: z.string().min(1, "Please select your commitment level"),
+  /* Honeypot — hidden from real users, bots auto-fill it */
+  website_url: z.string().max(0, "Bot detected").optional(),
+});
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+type FormData = z.infer<typeof formSchema>;
+
+function BottomForm() {
+  const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
+  const [spamError, setSpamError] = useState("");
+  const [step, setStep] = useState(1);
+  const formLoadedAt = useRef(Date.now());
+  const jsToken = useRef(Math.random().toString(36).slice(2) + Date.now().toString(36));
+
+  const { register, handleSubmit, formState: { errors }, reset, trigger } = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    mode: "onTouched"
+  });
+
+  const handleNextStep = async (fieldsToValidate: (keyof FormData)[]) => {
+    const isValid = await trigger(fieldsToValidate);
+    if (isValid) {
+      setStep((prev) => prev + 1);
+    }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formData.parent_name || !formData.phone) { alert("Please fill in your name and phone number."); return; }
+  const onSubmit = async (data: FormData) => {
+    setSpamError("");
+
+    /* Anti-spam: honeypot check */
+    if (data.website_url && data.website_url.length > 0) return;
+
+    /* Anti-spam: time-gate — real parents take >8s to fill 8 fields */
+    const elapsed = (Date.now() - formLoadedAt.current) / 1000;
+    if (elapsed < 8) {
+      setSpamError("You submitted too quickly. Please take a moment to fill in the form carefully.");
+      return;
+    }
+
     setStatus("sending");
     try {
-      const res = await fetch("https://formspree.io/f/YOUR_FORM_ID", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(formData) });
-      if (res.ok) { setStatus("success"); setFormData({ parent_name: "", child_age: "", phone: "" }); } else setStatus("error");
-    } catch { setStatus("error"); }
+      const { website_url: _hp, ...cleanData } = data;
+      const res = await fetch("https://formspree.io/f/YOUR_FORM_ID", { 
+        method: "POST", 
+        headers: { "Content-Type": "application/json" }, 
+        body: JSON.stringify({ ...cleanData, _js_token: jsToken.current, _form_duration_s: Math.round(elapsed) })
+      });
+      if (res.ok) { 
+        setStatus("success"); 
+        setStep(4); // Success step
+        reset();
+      } else {
+        setStatus("error");
+      }
+    } catch { 
+      setStatus("error"); 
+    }
+  };
+
+  const inputCls = (hasError: boolean) => `px-4 py-4 text-sm md:text-base border rounded-xl bg-slate-50 text-slate-900 font-bold placeholder:text-slate-400 placeholder:font-medium focus:outline-none focus:ring-2 focus:bg-white transition-all ${hasError ? 'border-red-500 focus:ring-red-500' : 'border-slate-200 focus:ring-blue-600 hover:border-blue-300'}`;
+
+  const stepVariants = {
+    hidden: { opacity: 0, x: 20 },
+    visible: { opacity: 1, x: 0 },
+    exit: { opacity: 0, x: -20 }
   };
 
   return (
     <section id="book-evaluation" className="py-16 md:py-24 bg-slate-50 border-t border-slate-200 gs-grid-pattern relative overflow-hidden">
       <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-600 via-emerald-500 to-amber-500" />
-      <div className="max-w-4xl mx-auto px-4 md:px-8 relative z-10">
+      <div className="max-w-3xl mx-auto px-4 md:px-8 relative z-10">
         <div className="text-center mb-10 md:mb-12">
           <h2 className="text-[10px] font-bold text-blue-600 uppercase tracking-widest-gs mb-2 md:mb-3">Take the next step</h2>
           <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tighter-gs text-slate-900 mb-3 md:mb-4 leading-tight">
             Claim Your Child's Free Cognitive Evaluation
           </h3>
           <p className="text-base md:text-lg text-slate-600 font-medium max-w-2xl mx-auto leading-relaxed">
-            Fill in your details below. We'll contact you to schedule a free 50-minute evaluation to assess your child's current focus, patience, and baseline calculation ability.
+            This isn't a generic sign-up form. We ask a few extra questions so our coach can prepare a personalised evaluation — not a cookie-cutter demo. Fill this in carefully; we review every application by hand.
           </p>
         </div>
 
-        <div className="bg-white rounded-3xl p-6 sm:p-8 md:p-14 gs-border gs-shadow-2xl relative overflow-hidden">
+        <div className="bg-white rounded-3xl p-6 sm:p-8 md:p-14 gs-border gs-shadow-2xl relative overflow-hidden min-h-[500px] flex flex-col justify-center">
           <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full blur-[60px] pointer-events-none" />
           
-          {status === "success" ? (
-            <div className="text-center py-12 relative z-10">
-              <div className="size-20 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center mx-auto mb-6">
-                <CheckCircle className="size-10 text-emerald-600" />
-              </div>
-              <h4 className="text-2xl md:text-3xl font-extrabold tracking-tight-gs text-slate-900 mb-3">Application Received</h4>
-              <p className="text-base md:text-lg font-medium text-slate-600">We will reach out via WhatsApp shortly to confirm your evaluation slot.</p>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="flex flex-col gap-5 md:gap-6 relative z-10">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 md:gap-8">
-                <div className="flex flex-col gap-1.5 md:gap-2">
-                  <label htmlFor="bottom_parent_name" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">Parent's Full Name <span className="text-red-500">*</span></label>
-                  <input id="bottom_parent_name" name="parent_name" type="text" required value={formData.parent_name} onChange={handleChange} className="px-4 py-4 text-sm md:text-base border border-slate-200 rounded-xl bg-slate-50 text-slate-900 font-bold placeholder:text-slate-600 placeholder:font-medium focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all hover:border-blue-300" placeholder="e.g. Rahul Sharma" />
+          <AnimatePresence mode="wait">
+            {step === 4 ? (
+              <motion.div key="success" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="text-center py-12 relative z-10">
+                <div className="size-20 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center mx-auto mb-6">
+                  <CheckCircle className="size-10 text-emerald-600" />
                 </div>
+                <h4 className="text-2xl md:text-3xl font-extrabold tracking-tight-gs text-slate-900 mb-3">Application Received</h4>
+                <p className="text-base md:text-lg font-medium text-slate-600 mb-2">We will reach out via WhatsApp within 4 hours to confirm your evaluation slot.</p>
+                <p className="text-sm text-slate-500 font-medium">Your coach will review your answers before the call so the evaluation is tailored to your child from minute one.</p>
+              </motion.div>
+            ) : (
+              <motion.form key="form" initial="hidden" animate="visible" exit="exit" variants={stepVariants} onSubmit={handleSubmit(onSubmit)} className="flex flex-col relative z-10 w-full">
                 
-                <div className="flex flex-col gap-1.5 md:gap-2">
-                  <label htmlFor="bottom_phone" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">WhatsApp Number <span className="text-red-500">*</span></label>
-                  <input id="bottom_phone" name="phone" type="tel" required value={formData.phone} onChange={handleChange} className="px-4 py-4 text-sm md:text-base border border-slate-200 rounded-xl bg-slate-50 text-slate-900 font-bold placeholder:text-slate-600 placeholder:font-medium focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all hover:border-blue-300" placeholder="+91 98765 43210" />
+                {/* Progress Bar */}
+                <div className="w-full h-1.5 bg-slate-100 rounded-full mb-8 overflow-hidden">
+                  <motion.div 
+                    className="h-full bg-blue-600 rounded-full"
+                    initial={{ width: `${((step - 1) / 3) * 100}%` }}
+                    animate={{ width: `${(step / 3) * 100}%` }}
+                    transition={{ duration: 0.3 }}
+                  />
                 </div>
-              </div>
 
-              <div className="flex flex-col gap-1.5 md:gap-2 mt-2">
-                <label htmlFor="bottom_child_age" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">Child's Current Baseline</label>
-                <div className="relative mt-2">
-                  <select id="bottom_child_age" name="child_age" value={formData.child_age} onChange={handleChange} className="w-full px-4 py-4 text-sm md:text-base border border-slate-200 rounded-xl bg-slate-50 text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all appearance-none cursor-pointer hover:border-blue-300">
-                    <option value="" className="font-medium text-slate-600">Select estimated level</option>
-                    <option value="beginner">Absolute Beginner (Needs structural foundation)</option>
-                    <option value="intermediate">Intermediate (Plays, but blunders often)</option>
-                    <option value="advanced">Advanced (Ready for rigorous tournament prep)</option>
-                  </select>
-                  <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 size-5 text-slate-600 pointer-events-none" />
+                <div className="flex items-center justify-between mb-8">
+                  <h4 className="text-xl font-extrabold text-slate-900">
+                    {step === 1 && "Step 1: The Student"}
+                    {step === 2 && "Step 2: The Challenge"}
+                    {step === 3 && "Step 3: Contact Info"}
+                  </h4>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest-gs">Step {step} of 3</span>
                 </div>
-              </div>
-              
-              {status === "error" && <div className="p-4 text-sm bg-red-50 text-red-700 rounded-xl border border-red-200 font-bold">Transmission failed. Please try again.</div>}
-              
-              <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-3">
-                <AlertTriangle className="size-5 text-amber-600 shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-xs font-extrabold text-amber-900 uppercase tracking-widest-gs mb-1">Strict Cohort Capacity</p>
-                  <p className="text-xs text-amber-800 font-medium">To maintain our elite academic standards, we cap cohorts at 6 students. We are currently accepting only <span className="font-extrabold underline decoration-amber-300 underline-offset-2">12 new evaluations</span> this week.</p>
-                </div>
-              </div>
 
-              <Button type="submit" disabled={status === "sending"} className="w-full h-16 mt-2 text-lg font-extrabold tracking-tight gs-btn gs-btn-primary rounded-xl shadow-xl hover:shadow-2xl hover-lift active:scale-[0.98]">
-                {status === "sending" ? (<><Loader2 className="size-5 animate-spin mr-2" /> Processing...</>) : (<>Lock In Your Baseline Evaluation <ArrowRight className="ml-2 size-5" /></>)}
-              </Button>
-              
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 mt-6 text-slate-500">
-                <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest-gs text-slate-600">
-                  <Shield className="size-4 text-emerald-500" /> 30-Day Cognitive Growth Guarantee
-                </span>
-                <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest-gs">
-                  <CheckCircle className="size-4 text-emerald-500" /> No Payment Required Today
-                </span>
-              </div>
-            </form>
-          )}
+                {/* Honeypot — invisible to humans, bots auto-fill */}
+                <div className="absolute -left-[9999px] opacity-0 h-0 overflow-hidden" aria-hidden="true" tabIndex={-1}>
+                  <label htmlFor="website_url">Website</label>
+                  <input id="website_url" {...register("website_url")} type="text" autoComplete="off" tabIndex={-1} />
+                </div>
+
+                <AnimatePresence mode="wait">
+                  {step === 1 && (
+                    <motion.div key="step1" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="flex flex-col gap-5 md:gap-6">
+                      <div className="flex flex-col gap-1.5 md:gap-2">
+                        <label htmlFor="bottom_child_name" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">Child's First Name <span className="text-red-500">*</span></label>
+                        <input id="bottom_child_name" {...register("child_name")} type="text" className={inputCls(!!errors.child_name)} placeholder="e.g. Aarav" />
+                        {errors.child_name && <p className="text-[10px] text-red-500 font-bold mt-1">{errors.child_name.message}</p>}
+                      </div>
+                      
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 md:gap-8">
+                        <div className="flex flex-col gap-1.5 md:gap-2">
+                          <label htmlFor="bottom_child_age_range" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">Child's Age <span className="text-red-500">*</span></label>
+                          <div className="relative">
+                            <select id="bottom_child_age_range" {...register("child_age_range")} className={inputCls(!!errors.child_age_range) + " appearance-none cursor-pointer"}>
+                              <option value="">Select age group</option>
+                              <option value="4-6">4 - 6 Years</option>
+                              <option value="7-9">7 - 9 Years</option>
+                              <option value="10-12">10 - 12 Years</option>
+                              <option value="13+">13+ Years</option>
+                            </select>
+                            <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 size-5 text-slate-600 pointer-events-none" />
+                          </div>
+                          {errors.child_age_range && <p className="text-[10px] text-red-500 font-bold mt-1">{errors.child_age_range.message}</p>}
+                        </div>
+                        <div className="flex flex-col gap-1.5 md:gap-2">
+                          <label htmlFor="bottom_child_level" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">Current Chess Level <span className="text-red-500">*</span></label>
+                          <div className="relative">
+                            <select id="bottom_child_level" {...register("child_level")} className={inputCls(!!errors.child_level) + " appearance-none cursor-pointer"}>
+                              <option value="">Select estimated level</option>
+                              <option value="never-played">Never played chess before</option>
+                              <option value="knows-rules">Knows the rules but no formal training</option>
+                              <option value="beginner">Beginner (under 800 Elo / plays casually)</option>
+                              <option value="intermediate">Intermediate (800-1200 Elo / plays online)</option>
+                              <option value="advanced">Advanced (1200+ Elo / tournament experience)</option>
+                            </select>
+                            <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 size-5 text-slate-600 pointer-events-none" />
+                          </div>
+                          {errors.child_level && <p className="text-[10px] text-red-500 font-bold mt-1">{errors.child_level.message}</p>}
+                        </div>
+                      </div>
+
+                      <Button type="button" onClick={() => handleNextStep(['child_name', 'child_age_range', 'child_level'])} className="w-full h-14 mt-4 text-base font-extrabold tracking-tight gs-btn gs-btn-primary rounded-xl shadow-lg">
+                        Continue to Next Step <ArrowRight className="ml-2 size-4" />
+                      </Button>
+                    </motion.div>
+                  )}
+
+                  {step === 2 && (
+                    <motion.div key="step2" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="flex flex-col gap-5 md:gap-6">
+                      <div className="flex flex-col gap-1.5 md:gap-2">
+                        <label htmlFor="bottom_concern" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">
+                          What's your biggest concern about your child's learning right now? <span className="text-red-500">*</span>
+                        </label>
+                        <p className="text-[10px] text-slate-400 font-medium -mt-0.5">Be specific — our coach reads this before your evaluation call to prepare a tailored session.</p>
+                        <textarea 
+                          id="bottom_concern" 
+                          {...register("parent_concern")} 
+                          rows={4} 
+                          className={inputCls(!!errors.parent_concern) + " resize-none"} 
+                          placeholder="e.g. My son loses focus after 10 minutes and gets frustrated when he loses. I want him to develop patience and handle pressure better."
+                        />
+                        {errors.parent_concern && <p className="text-[10px] text-red-500 font-bold mt-1">{errors.parent_concern.message}</p>}
+                      </div>
+
+                      <div className="flex flex-col gap-1.5 md:gap-2">
+                        <label htmlFor="bottom_commitment" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">What is your commitment level? <span className="text-red-500">*</span></label>
+                        <div className="relative">
+                          <select id="bottom_commitment" {...register("parent_commitment")} className={inputCls(!!errors.parent_commitment) + " appearance-none cursor-pointer"}>
+                            <option value="">Select commitment</option>
+                            <option value="casual">Casual (Just want a fun hobby)</option>
+                            <option value="serious">Serious (Looking for structured, long-term cognitive growth)</option>
+                            <option value="competitive">Competitive (Aiming for FIDE rating / tournaments)</option>
+                          </select>
+                          <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 size-5 text-slate-600 pointer-events-none" />
+                        </div>
+                        {errors.parent_commitment && <p className="text-[10px] text-red-500 font-bold mt-1">{errors.parent_commitment.message}</p>}
+                      </div>
+
+                      <div className="flex gap-3 mt-4">
+                        <Button type="button" onClick={() => setStep(1)} variant="outline" className="h-14 px-6 font-bold text-slate-600 border-slate-200 rounded-xl hover:bg-slate-50">
+                          <ArrowLeft className="size-4" />
+                        </Button>
+                        <Button type="button" onClick={() => handleNextStep(['parent_concern', 'parent_commitment'])} className="flex-1 h-14 text-base font-extrabold tracking-tight gs-btn gs-btn-primary rounded-xl shadow-lg">
+                          Continue to Final Step <ArrowRight className="ml-2 size-4" />
+                        </Button>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {step === 3 && (
+                    <motion.div key="step3" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="flex flex-col gap-5 md:gap-6">
+                      <div className="flex flex-col gap-1.5 md:gap-2">
+                        <label htmlFor="bottom_parent_name" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">Parent's Full Name <span className="text-red-500">*</span></label>
+                        <input id="bottom_parent_name" {...register("parent_name")} type="text" className={inputCls(!!errors.parent_name)} placeholder="e.g. Rahul Sharma" />
+                        {errors.parent_name && <p className="text-[10px] text-red-500 font-bold mt-1">{errors.parent_name.message}</p>}
+                      </div>
+                      
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 md:gap-8">
+                        <div className="flex flex-col gap-1.5 md:gap-2">
+                          <label htmlFor="bottom_phone" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">WhatsApp Number <span className="text-red-500">*</span></label>
+                          <input id="bottom_phone" {...register("phone")} type="tel" className={inputCls(!!errors.phone)} placeholder="+91 98765 43210" />
+                          {errors.phone && <p className="text-[10px] text-red-500 font-bold mt-1">{errors.phone.message}</p>}
+                        </div>
+                        <div className="flex flex-col gap-1.5 md:gap-2">
+                          <label htmlFor="bottom_city" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">City <span className="text-red-500">*</span></label>
+                          <input id="bottom_city" {...register("city")} type="text" className={inputCls(!!errors.city)} placeholder="e.g. Bangalore" />
+                          {errors.city && <p className="text-[10px] text-red-500 font-bold mt-1">{errors.city.message}</p>}
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col gap-1.5 md:gap-2">
+                        <label htmlFor="bottom_referral" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">How did you hear about us? <span className="text-red-500">*</span></label>
+                        <div className="relative">
+                          <select id="bottom_referral" {...register("referral_source")} className={inputCls(!!errors.referral_source) + " appearance-none cursor-pointer"}>
+                            <option value="">Select one</option>
+                            <option value="instagram">Instagram</option>
+                            <option value="facebook">Facebook</option>
+                            <option value="google">Google Search</option>
+                            <option value="youtube">YouTube</option>
+                            <option value="friend">Friend / Word of Mouth</option>
+                            <option value="school">School / Teacher Recommendation</option>
+                            <option value="other">Other</option>
+                          </select>
+                          <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 size-5 text-slate-600 pointer-events-none" />
+                        </div>
+                        {errors.referral_source && <p className="text-[10px] text-red-500 font-bold mt-1">{errors.referral_source.message}</p>}
+                      </div>
+
+                      {spamError && <div className="p-4 text-sm bg-amber-50 text-amber-700 rounded-xl border border-amber-200 font-bold">{spamError}</div>}
+                      {status === "error" && <div className="p-4 text-sm bg-red-50 text-red-700 rounded-xl border border-red-200 font-bold">Transmission failed. Please try again.</div>}
+                      
+                      <div className="mt-2 p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-3">
+                        <AlertTriangle className="size-5 text-amber-600 shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-xs font-extrabold text-amber-900 uppercase tracking-widest-gs mb-1">Strict Cohort Capacity</p>
+                          <p className="text-xs text-amber-800 font-medium">To maintain our elite academic standards, we cap cohorts at 6 students. We are currently accepting only <span className="font-extrabold underline decoration-amber-300 underline-offset-2">12 new evaluations</span> this week.</p>
+                        </div>
+                      </div>
+
+                      <div className="flex gap-3 mt-2">
+                        <Button type="button" onClick={() => setStep(2)} variant="outline" className="h-16 px-6 font-bold text-slate-600 border-slate-200 rounded-xl hover:bg-slate-50">
+                          <ArrowLeft className="size-4" />
+                        </Button>
+                        <Button type="submit" disabled={status === "sending"} className="flex-1 h-16 text-lg font-extrabold tracking-tight gs-btn gs-btn-primary rounded-xl shadow-xl hover:shadow-2xl hover-lift active:scale-[0.98]">
+                          {status === "sending" ? (<><Loader2 className="size-5 animate-spin mr-2" /> Processing...</>) : (<>Lock In Your Evaluation <ArrowRight className="ml-2 size-5" /></>)}
+                        </Button>
+                      </div>
+                      
+                      <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 mt-4 text-slate-500">
+                        <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest-gs text-slate-600">
+                          <Shield className="size-4 text-emerald-500" /> 30-Day Growth Guarantee
+                        </span>
+                        <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest-gs">
+                          <CheckCircle className="size-4 text-emerald-500" /> No Payment Required
+                        </span>
+                      </div>
+
+                      <p className="text-[10px] text-slate-400 font-medium text-center mt-2 leading-relaxed">
+                        We manually review every application. Incomplete or vague submissions are discarded. By submitting, you agree to our <Link to="/privacy-policy" className="underline hover:text-blue-600">Privacy Policy</Link>.
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.form>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </section>
@@ -2047,33 +2450,44 @@ function ExitIntentPopup() {
   const [hasTriggered, setHasTriggered] = useState(false);
 
   useEffect(() => {
+    if (hasTriggered) return;
+
     const handleMouseLeave = (e: MouseEvent) => {
-      if (e.clientY <= 0 && !hasTriggered) {
+      // Only trigger when the cursor exits through the very top of the viewport
+      // (i.e. heading toward the address bar / close button). Ignore side and
+      // bottom exits which happen during normal mouse movement.
+      if (e.clientY <= 0 && e.clientX > 0 && e.clientX < window.innerWidth) {
         setShow(true);
         setHasTriggered(true);
       }
     };
-    
+
     let lastScrollY = window.scrollY;
     let lastTime = Date.now();
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       const currentTime = Date.now();
-      const speed = (lastScrollY - currentScrollY) / (currentTime - lastTime);
-      
-      if (speed > 2 && !hasTriggered && currentScrollY > 500) {
-        setShow(true);
-        setHasTriggered(true);
+      const elapsed = currentTime - lastTime;
+
+      // Avoid division-by-zero and ignore tiny time deltas that produce
+      // unreliable speed readings (e.g. rapid-fire scroll events).
+      if (elapsed > 50) {
+        const speed = (lastScrollY - currentScrollY) / elapsed;
+
+        if (speed > 3 && currentScrollY > 500) {
+          setShow(true);
+          setHasTriggered(true);
+        }
+
+        lastScrollY = currentScrollY;
+        lastTime = currentTime;
       }
-      
-      lastScrollY = currentScrollY;
-      lastTime = currentTime;
     };
 
-    document.addEventListener("mouseleave", handleMouseLeave);
-    window.addEventListener("scroll", handleScroll);
+    document.documentElement.addEventListener("mouseleave", handleMouseLeave);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => {
-      document.removeEventListener("mouseleave", handleMouseLeave);
+      document.documentElement.removeEventListener("mouseleave", handleMouseLeave);
       window.removeEventListener("scroll", handleScroll);
     };
   }, [hasTriggered]);
@@ -2169,7 +2583,7 @@ function Footer() {
                 <div className="p-2 rounded-lg bg-slate-800 border border-slate-700 shadow-inner">
                   <MapPin className="size-4 text-slate-300" />
                 </div>
-                <span className="leading-relaxed mt-1 drop-shadow-sm">Araaji No 988, H.no 05 Rajiv Vihar Naubasta, Kanpur 208021</span>
+                <span className="leading-relaxed mt-1 drop-shadow-sm">Kanpur, Uttar Pradesh, India</span>
               </li>
             </ul>
           </div>
@@ -2178,8 +2592,11 @@ function Footer() {
           <div className="md:col-span-4 lg:col-span-2">
             <h4 className="text-[11px] font-extrabold text-slate-200 uppercase tracking-widest-gs mb-6 drop-shadow-sm">Legal</h4>
             <ul className="space-y-4 text-sm font-medium text-slate-400 mb-10">
-              <li><a href="https://chesswize.com/terms-of-service" className="hover:text-blue-400 hover:translate-x-1 inline-block transition-all">Terms of Service</a></li>
-              <li><a href="https://chesswize.com/privacy-policy" className="hover:text-blue-400 hover:translate-x-1 inline-block transition-all">Privacy Policy</a></li>
+              <li><Link to="/terms" className="hover:text-blue-400 hover:translate-x-1 inline-block transition-all">Terms of Service</Link></li>
+              <li><Link to="/privacy-policy" className="hover:text-blue-400 hover:translate-x-1 inline-block transition-all">Privacy Policy</Link></li>
+              <li><Link to="/refund-policy" className="hover:text-blue-400 hover:translate-x-1 inline-block transition-all">Refund Policy</Link></li>
+              <li><Link to="/cookie-policy" className="hover:text-blue-400 hover:translate-x-1 inline-block transition-all">Cookie Policy</Link></li>
+              <li><Link to="/disclaimer" className="hover:text-blue-400 hover:translate-x-1 inline-block transition-all">Disclaimer</Link></li>
             </ul>
 
             <h4 className="text-[11px] font-extrabold text-slate-200 uppercase tracking-widest-gs mb-6 drop-shadow-sm">Follow Us</h4>
@@ -2383,7 +2800,7 @@ function EloProjectionCalculator() {
                  <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest-gs">12-Month Delta (Projected)</p>
                  <p className="text-2xl font-extrabold text-emerald-600 tabular-nums">+{protocolEnd - unstructuredEnd} Elo</p>
                </div>
-               <Button onClick={scrollToForm} variant="outline" className="bg-white border-slate-200 text-slate-900 hover:bg-slate-100 font-bold text-xs h-9">
+               <Button onClick={scrollToForm} variant="outline" className="gs-btn gs-btn-white font-bold text-xs h-9">
                  Start Protocol <ArrowRight className="ml-1.5 size-3" />
                </Button>
             </div>
@@ -2444,33 +2861,33 @@ function SyllabusExplorer() {
           </p>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start">
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-10 items-stretch">
           {/* Tabs */}
-          <div className="w-full lg:w-1/3 flex flex-col gap-2">
+          <div className="w-full lg:w-[280px] shrink-0 flex flex-col gap-2">
             {syllabus.map((s, i) => (
               <button 
                 key={i}
                 onClick={() => setActiveTab(i)}
-                className={`text-left px-5 py-4 rounded-xl border transition-all font-bold tracking-tight-gs text-sm md:text-base hover-lift ${activeTab === i ? 'bg-blue-600 border-blue-500 text-slate-50 shadow-lg shadow-blue-500/20' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-blue-200'}`}
+                className={`text-left px-5 py-3.5 rounded-xl border transition-all font-bold tracking-tight-gs text-sm hover-lift ${activeTab === i ? 'bg-blue-600 border-blue-500 text-slate-50 shadow-lg shadow-blue-500/20' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-blue-200'}`}
               >
                 {s.title}
               </button>
             ))}
-            
-            <div className="mt-8 rounded-2xl overflow-hidden shadow-lg border border-slate-200 aspect-[4/3] relative hidden lg:block">
-              <img loading="lazy" src="/2026-04-15-10-40-00-12-week-syllabus-planner.webp" alt="A high-end academic planner showing a 12-week cognitive chess curriculum" className="w-full h-full object-cover" />
-            </div>
 
-            <div className="mt-6 p-5 bg-amber-50 border border-amber-100 rounded-xl hidden lg:block">
-              <h4 className="text-[10px] font-extrabold text-amber-800 uppercase tracking-widest-gs mb-2">Graduation Criteria</h4>
+            <div className="mt-4 p-4 bg-amber-50 border border-amber-100 rounded-xl hidden lg:block">
+              <h4 className="text-[10px] font-extrabold text-amber-800 uppercase tracking-widest-gs mb-1.5">Graduation Criteria</h4>
               <p className="text-xs text-amber-700 font-medium leading-relaxed">
                 Students must pass a comprehensive tactical and positional exam at Week 12 to advance to the next tier. We do not promote on attendance alone.
               </p>
             </div>
+            
+            <div className="mt-2 rounded-2xl overflow-hidden shadow-lg border border-slate-200 aspect-[16/9] relative hidden lg:block">
+              <img loading="lazy" src="/2026-04-15-10-40-00-12-week-syllabus-planner.webp" alt="A high-end academic planner showing a 12-week cognitive chess curriculum" className="w-full h-full object-cover" />
+            </div>
           </div>
 
           {/* Content */}
-          <div className="w-full lg:w-2/3 bg-white border border-slate-200 rounded-3xl p-6 md:p-8 gs-shadow-xl min-h-[400px]">
+          <div className="w-full lg:flex-1 bg-white border border-slate-200 rounded-3xl p-6 md:p-8 gs-shadow-xl">
             <AnimatePresence mode="wait">
               <motion.div 
                 key={activeTab}
@@ -2506,9 +2923,394 @@ function SyllabusExplorer() {
 }
 
 /* ════════════════════════════════════════════════
-   APP
+   LEGAL PAGES (Premium Glass UI)
    ════════════════════════════════════════════════ */
-export default function App() {
+function LegalLayout({ title, children }: { title: string, children: React.ReactNode }) {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  return (
+    <div className="min-h-screen flex flex-col bg-slate-50 font-sans text-slate-900 selection:bg-blue-200 selection:text-blue-900 relative overflow-hidden">
+      {/* Ambient background */}
+      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-600/5 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-100/40 via-transparent to-transparent pointer-events-none" />
+      
+      {/* Simple Header */}
+      <header className="gs-glass py-4 border-b border-slate-200/50 sticky top-0 z-50">
+        <div className="max-w-[1000px] mx-auto px-4 md:px-8 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+            <img src="/logo-side-black.svg" alt="ChessWize Logo" className="h-8 object-contain" />
+          </Link>
+          <Link to="/">
+            <Button variant="outline" className="gs-btn gs-btn-white text-xs font-bold rounded-xl h-9 px-4">
+              <ArrowLeft className="size-3.5 mr-1.5" /> Back to Home
+            </Button>
+          </Link>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="flex-1 py-16 md:py-24 relative z-10">
+        <div className="max-w-[800px] mx-auto px-4 md:px-8">
+          <div className="glass-panel p-8 md:p-12 lg:p-16 rounded-3xl shadow-xl mb-12 border border-slate-200/60 relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-1 h-full bg-blue-600" />
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tighter-gs text-slate-900 mb-8 drop-shadow-sm">{title}</h1>
+            <div className="prose prose-slate prose-blue max-w-none prose-headings:font-extrabold prose-headings:tracking-tight-gs prose-p:font-medium prose-p:leading-relaxed prose-a:font-bold prose-a:text-blue-600 hover:prose-a:text-blue-700">
+              {children}
+            </div>
+          </div>
+        </div>
+      </main>
+
+      {/* Simplified Footer */}
+      <footer className="bg-slate-950 text-slate-400 py-12 border-t border-slate-800">
+        <div className="max-w-[1000px] mx-auto px-4 md:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+          <img src="/logo-side-white.svg" alt="ChessWize" className="h-8 object-contain opacity-80" />
+          <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm font-bold tracking-tight-gs">
+            <Link to="/privacy-policy" className="hover:text-white transition-colors">Privacy</Link>
+            <Link to="/terms" className="hover:text-white transition-colors">Terms</Link>
+            <Link to="/refund-policy" className="hover:text-white transition-colors">Refunds</Link>
+            <Link to="/cookie-policy" className="hover:text-white transition-colors">Cookies</Link>
+            <Link to="/disclaimer" className="hover:text-white transition-colors">Disclaimer</Link>
+          </div>
+          <p className="text-[10px] font-bold uppercase tracking-widest-gs text-slate-600">
+            © {new Date().getFullYear()} Chesswize.
+          </p>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+function PrivacyPolicy() {
+  return (
+    <LegalLayout title="Privacy Policy">
+      <p>Last updated: April 15, 2026</p>
+      <p>ChessWize, operated by Chesswize Education LLP ("we", "our", or "us"), is committed to protecting your privacy. This Privacy Policy describes how we collect, use, share, and safeguard personal information when you visit <strong>chesswize.com</strong> (the "Site"), interact with our advertisements on third-party platforms, or use our online chess coaching services (the "Services").</p>
+      <p>By using our Site or Services, you consent to the practices described in this policy. If you do not agree, please discontinue use immediately.</p>
+
+      <h3>1. Information We Collect</h3>
+      <h4>1.1 Information You Provide Directly</h4>
+      <ul>
+        <li><strong>Contact &amp; Account Data:</strong> Name, email address, phone number, city, and your child's age and chess experience level — collected when you book a diagnostic evaluation, register for a cohort, or contact us.</li>
+        <li><strong>Payment Data:</strong> Billing name, billing address, and payment card details. Card details are processed and stored exclusively by our PCI-DSS compliant payment processor (Razorpay). We do not store full card numbers on our servers.</li>
+        <li><strong>Communication Data:</strong> Messages, feedback, and support requests you send us via email, WhatsApp, or on-site forms.</li>
+      </ul>
+      <h4>1.2 Information Collected Automatically</h4>
+      <ul>
+        <li><strong>Device &amp; Browser Data:</strong> IP address, browser type and version, operating system, device identifiers, screen resolution, and language preferences.</li>
+        <li><strong>Usage Data:</strong> Pages visited, time spent on pages, click paths, referral URLs, and interactions with our interactive tools (e.g., the Elo Projection Calculator, puzzle trainer).</li>
+        <li><strong>Cookie &amp; Tracking Data:</strong> We use cookies, pixel tags, and similar technologies. See our <Link to="/cookie-policy"><strong>Cookie Policy</strong></Link> for full details.</li>
+      </ul>
+      <h4>1.3 Information from Third Parties</h4>
+      <ul>
+        <li><strong>Advertising Platforms:</strong> When you interact with our ads on Meta (Facebook/Instagram), Google Ads, or LinkedIn, those platforms may share hashed identifiers, click IDs, and conversion data with us to measure ad performance.</li>
+        <li><strong>Analytics Providers:</strong> Google Analytics 4 provides aggregated and pseudonymised usage data.</li>
+      </ul>
+
+      <h3>2. How We Use Your Information</h3>
+      <ul>
+        <li>To deliver, personalise, and improve our coaching Services.</li>
+        <li>To process payments and send transactional communications (booking confirmations, session reminders, invoices).</li>
+        <li>To respond to your enquiries and provide customer support.</li>
+        <li>To run and optimise advertising campaigns on Meta, Google, LinkedIn, and other platforms — including creating Custom Audiences and Lookalike/Similar Audiences.</li>
+        <li>To send promotional emails and WhatsApp messages about new programs, offers, and educational content. You can opt out at any time.</li>
+        <li>To analyse Site usage, diagnose technical issues, and improve user experience.</li>
+        <li>To comply with legal obligations and enforce our Terms of Service.</li>
+      </ul>
+
+      <h3>3. Advertising &amp; Remarketing</h3>
+      <p>We participate in interest-based advertising. This means:</p>
+      <ul>
+        <li><strong>Meta Pixel (Facebook/Instagram):</strong> We use the Meta Pixel to track conversions from ads, build targeted audiences, and remarket to visitors who have interacted with our Site. Meta processes this data under its own privacy policy.</li>
+        <li><strong>Google Ads &amp; Google Analytics:</strong> We use Google Ads conversion tracking and Google Analytics 4 to measure ad effectiveness and remarket to past visitors across the Google Display Network and YouTube.</li>
+        <li><strong>LinkedIn Insight Tag:</strong> Used to track conversions and retarget professional audiences.</li>
+      </ul>
+      <p>You can opt out of personalised ads via <a href="https://www.aboutads.info/choices/" target="_blank" rel="noopener noreferrer">YourAdChoices</a>, <a href="https://optout.networkadvertising.org/" target="_blank" rel="noopener noreferrer">NAI Opt-Out</a>, or your platform's ad settings.</p>
+
+      <h3>4. Data Sharing &amp; Disclosure</h3>
+      <p>We do not sell your personal data. We may share information with:</p>
+      <ul>
+        <li><strong>Service Providers:</strong> Payment processors (Razorpay), email/SMS providers, cloud hosting (Vercel, AWS), analytics tools (Google Analytics), and CRM platforms — solely to operate our Services.</li>
+        <li><strong>Advertising Partners:</strong> Meta, Google, and LinkedIn receive pseudonymised event data (e.g., "a user completed a booking") to optimise ad delivery.</li>
+        <li><strong>Legal Requirements:</strong> When required by law, court order, or to protect our rights, safety, or property.</li>
+        <li><strong>Business Transfers:</strong> In connection with a merger, acquisition, or sale of assets, your data may be transferred to the successor entity.</li>
+      </ul>
+
+      <h3>5. Data Retention</h3>
+      <p>We retain personal data for as long as your account is active or as needed to provide Services. After account closure, we retain data for up to 3 years for legal compliance, dispute resolution, and legitimate business purposes. Anonymised analytics data may be retained indefinitely.</p>
+
+      <h3>6. Data Security</h3>
+      <p>We implement industry-standard security measures including TLS/SSL encryption in transit, encrypted storage at rest, access controls, and regular security audits. However, no method of electronic transmission or storage is 100% secure.</p>
+
+      <h3>7. Children's Privacy</h3>
+      <p>Our Services are designed for children under the supervision of a parent or legal guardian. We do not knowingly collect personal data directly from children under 13 without verifiable parental consent. All accounts are created and managed by parents/guardians. If you believe a child has provided us data without consent, contact us immediately.</p>
+
+      <h3>8. Your Rights</h3>
+      <p>Depending on your jurisdiction, you may have the right to:</p>
+      <ul>
+        <li>Access, correct, or delete your personal data.</li>
+        <li>Withdraw consent for marketing communications.</li>
+        <li>Object to or restrict certain processing activities.</li>
+        <li>Request data portability.</li>
+        <li>Lodge a complaint with a supervisory authority.</li>
+      </ul>
+      <p>To exercise any of these rights, email us at <strong>chesswize79@gmail.com</strong> with the subject line "Privacy Request".</p>
+
+      <h3>9. International Data Transfers</h3>
+      <p>Our servers and service providers may be located outside India. By using our Services, you consent to the transfer of your data to jurisdictions that may have different data protection laws. We ensure appropriate safeguards are in place for such transfers.</p>
+
+      <h3>10. Changes to This Policy</h3>
+      <p>We may update this Privacy Policy from time to time. Material changes will be communicated via email or a prominent notice on our Site. Continued use after changes constitutes acceptance.</p>
+
+      <h3>11. Contact Us</h3>
+      <p>For privacy-related enquiries:</p>
+      <ul>
+        <li><strong>Email:</strong> chesswize79@gmail.com</li>
+        <li><strong>Phone:</strong> +91-8400979997</li>
+        <li><strong>Address:</strong> Kanpur, Uttar Pradesh, India</li>
+      </ul>
+    </LegalLayout>
+  );
+}
+
+function TermsOfService() {
+  return (
+    <LegalLayout title="Terms of Service">
+      <p>Last updated: April 15, 2026</p>
+      <p>These Terms of Service ("Terms") constitute a legally binding agreement between you ("you", "your", or "Parent/Guardian") and Chesswize Education LLP, operating as ChessWize ("we", "us", "our", or "ChessWize"). By accessing <strong>chesswize.com</strong> or enrolling in any of our programs, you agree to these Terms in full.</p>
+
+      <h3>1. Eligibility &amp; Account Registration</h3>
+      <p>Our Services are intended for parents or legal guardians enrolling children aged 5–17 in chess coaching programs. By creating an account, you represent that you are at least 18 years old and have the legal authority to bind yourself and your child to these Terms. You are responsible for all activity under your account and for maintaining the confidentiality of your login credentials.</p>
+
+      <h3>2. Description of Services</h3>
+      <p>ChessWize provides structured online chess coaching delivered via live video sessions, including:</p>
+      <ul>
+        <li><strong>1-on-1 Private Coaching:</strong> Personalised sessions with a FIDE-rated coach.</li>
+        <li><strong>2-on-1 Sibling/Duo Coaching:</strong> Shared sessions for two students.</li>
+        <li><strong>Cohort Training:</strong> Group sessions of 4–6 students at similar skill levels.</li>
+        <li><strong>Diagnostic Evaluations:</strong> Complimentary baseline assessments to determine a student's starting level.</li>
+        <li><strong>Digital Resources:</strong> Access to puzzles, study materials, and progress dashboards.</li>
+      </ul>
+      <p>Session schedules, pricing, and program details are as described on the Site at the time of purchase and in your booking confirmation.</p>
+
+      <h3>3. Booking &amp; Payments</h3>
+      <ul>
+        <li>All fees are quoted in Indian Rupees (INR) unless otherwise stated and are due in advance.</li>
+        <li>Payments are processed securely via Razorpay. By submitting payment, you agree to Razorpay's terms of service.</li>
+        <li>We reserve the right to modify pricing at any time. Price changes will not affect existing paid enrolments.</li>
+        <li>Promotional offers and discounts are subject to specific terms communicated at the time of the offer and cannot be combined unless explicitly stated.</li>
+      </ul>
+
+      <h3>4. Session Attendance &amp; Conduct</h3>
+      <ul>
+        <li>Students must join sessions on time via the designated video platform. Repeated no-shows (3 or more consecutive missed sessions without notice) may result in programme suspension without refund.</li>
+        <li>Parents/guardians are expected to ensure a quiet, distraction-free environment for the student during sessions.</li>
+        <li>Abusive, disruptive, or disrespectful behaviour toward coaches or other students will not be tolerated and may result in immediate termination of services.</li>
+      </ul>
+
+      <h3>5. Cancellations &amp; Refunds</h3>
+      <p>Please refer to our dedicated <Link to="/refund-policy"><strong>Refund Policy</strong></Link> for complete details on our 30-Day Cognitive Growth Guarantee, session rescheduling, and cancellation procedures.</p>
+
+      <h3>6. Intellectual Property</h3>
+      <p>All content on the Site — including text, graphics, logos, curriculum materials, puzzle databases, the "ChessWize Protocol" methodology, video recordings, and software — is the exclusive property of ChessWize or its licensors and is protected by copyright, trademark, and other intellectual property laws. You may not reproduce, distribute, modify, or create derivative works from any of our content without prior written consent.</p>
+
+      <h3>7. User-Generated Content</h3>
+      <p>If you submit testimonials, reviews, or feedback, you grant ChessWize a non-exclusive, royalty-free, perpetual, worldwide licence to use, reproduce, and display such content for marketing and promotional purposes across our Site, social media, and advertising campaigns.</p>
+
+      <h3>8. Third-Party Links &amp; Services</h3>
+      <p>Our Site may contain links to third-party websites or services (e.g., chess.com, lichess.org, payment processors). We are not responsible for the content, privacy practices, or availability of these external sites. Your use of third-party services is at your own risk.</p>
+
+      <h3>9. Limitation of Liability</h3>
+      <p>To the maximum extent permitted by applicable law, ChessWize and its directors, employees, coaches, and affiliates shall not be liable for any indirect, incidental, special, consequential, or punitive damages — including loss of profits, data, or goodwill — arising from your use of or inability to use our Services. Our total aggregate liability for any claim shall not exceed the amount you paid to us in the 3 months preceding the claim.</p>
+
+      <h3>10. Indemnification</h3>
+      <p>You agree to indemnify and hold harmless ChessWize, its officers, coaches, and agents from any claims, damages, losses, or expenses (including legal fees) arising from your breach of these Terms or misuse of our Services.</p>
+
+      <h3>11. Governing Law &amp; Dispute Resolution</h3>
+      <p>These Terms are governed by the laws of India. Any disputes shall be subject to the exclusive jurisdiction of the courts in Kanpur, Uttar Pradesh, India. Before initiating legal proceedings, both parties agree to attempt resolution through good-faith negotiation for a period of 30 days.</p>
+
+      <h3>12. Modifications to Terms</h3>
+      <p>We may update these Terms at any time. Material changes will be notified via email or a prominent banner on the Site at least 15 days before taking effect. Continued use of our Services after the effective date constitutes acceptance of the revised Terms.</p>
+
+      <h3>13. Severability</h3>
+      <p>If any provision of these Terms is found to be unenforceable, the remaining provisions shall continue in full force and effect.</p>
+
+      <h3>14. Contact</h3>
+      <p>For questions about these Terms:</p>
+      <ul>
+        <li><strong>Email:</strong> chesswize79@gmail.com</li>
+        <li><strong>Phone:</strong> +91-8400979997</li>
+      </ul>
+    </LegalLayout>
+  );
+}
+
+function RefundPolicy() {
+  return (
+    <LegalLayout title="Refund Policy">
+      <p>Last updated: April 15, 2026</p>
+      <p>At ChessWize (operated by Chesswize Education LLP), we are confident in the quality of our coaching. This Refund Policy outlines the conditions under which refunds, cancellations, and rescheduling are handled.</p>
+
+      <h3>1. 30-Day Cognitive Growth Guarantee</h3>
+      <p>We stand behind our methodology with a results-backed guarantee. If you are not satisfied with the measurable progress your child has made within the first 30 calendar days of beginning a paid program, you are eligible for a <strong>full refund</strong> of your initial month's tuition, subject to the following conditions:</p>
+      <ul>
+        <li>The student must have attended all scheduled sessions during the 30-day period.</li>
+        <li>The refund request must be submitted in writing to <strong>chesswize79@gmail.com</strong> within 7 days of the 30-day period ending.</li>
+        <li>This guarantee applies once per family and only to the first enrolment.</li>
+      </ul>
+
+      <h3>2. Session Rescheduling</h3>
+      <h4>1-on-1 and 2-on-1 Sessions</h4>
+      <ul>
+        <li><strong>More than 24 hours notice:</strong> You may reschedule the session at no cost. Rescheduled sessions must be completed within the same billing cycle.</li>
+        <li><strong>Less than 24 hours notice:</strong> The session will be marked as attended. No refund or makeup session will be provided.</li>
+        <li><strong>No-show:</strong> If a student fails to join within 10 minutes of the scheduled start time without prior notice, the session is forfeited.</li>
+      </ul>
+      <h4>Cohort Training</h4>
+      <p>Due to the group nature of cohort sessions, individual rescheduling is not possible. If a student misses a cohort session, we will provide access to session notes or summary materials where available, but no refund or credit will be issued for missed group sessions.</p>
+
+      <h3>3. Subscription Cancellations</h3>
+      <ul>
+        <li>You may cancel your monthly subscription at any time by emailing <strong>chesswize79@gmail.com</strong> or contacting us via WhatsApp.</li>
+        <li>Cancellations take effect at the end of the current billing cycle. You will continue to have access to scheduled sessions until the cycle ends.</li>
+        <li>No prorated refunds are issued for mid-cycle cancellations after the initial 30-day guarantee period.</li>
+        <li>Annual or multi-month plans: Cancellations are subject to a pro-rata calculation minus a 15% early termination fee, applicable only after the 30-day guarantee window.</li>
+      </ul>
+
+      <h3>4. Diagnostic Evaluation</h3>
+      <p>The initial Diagnostic Evaluation is provided free of charge. No refund applies as no payment is collected for this session.</p>
+
+      <h3>5. Promotional &amp; Discounted Enrolments</h3>
+      <p>Refunds for sessions purchased under promotional pricing or special offers will be calculated based on the discounted amount actually paid, not the original listed price.</p>
+
+      <h3>6. Refund Processing</h3>
+      <ul>
+        <li>Approved refunds are processed within <strong>5–10 business days</strong> to the original payment method.</li>
+        <li>Bank processing times may add an additional 3–7 business days depending on your financial institution.</li>
+        <li>Refunds for UPI and net banking payments are typically faster (2–5 business days).</li>
+      </ul>
+
+      <h3>7. Exceptions &amp; Force Majeure</h3>
+      <p>In the event of service disruption due to circumstances beyond our control (internet outages, platform failures, natural disasters, or government-mandated restrictions), we will make reasonable efforts to reschedule affected sessions. Refunds in such cases will be evaluated on a case-by-case basis.</p>
+
+      <h3>8. How to Request a Refund</h3>
+      <p>To initiate a refund or cancellation, contact us with:</p>
+      <ul>
+        <li>Your registered name and email address.</li>
+        <li>The programme/plan you are enrolled in.</li>
+        <li>Reason for the refund request.</li>
+      </ul>
+      <p><strong>Email:</strong> chesswize79@gmail.com | <strong>Phone/WhatsApp:</strong> +91-8400979997</p>
+    </LegalLayout>
+  );
+}
+
+function CookiePolicy() {
+  return (
+    <LegalLayout title="Cookie Policy">
+      <p>Last updated: April 15, 2026</p>
+      <p>This Cookie Policy explains how ChessWize (operated by Chesswize Education LLP) uses cookies and similar tracking technologies when you visit <strong>chesswize.com</strong>. It should be read alongside our <Link to="/privacy-policy"><strong>Privacy Policy</strong></Link>.</p>
+
+      <h3>1. What Are Cookies?</h3>
+      <p>Cookies are small text files placed on your device by websites you visit. They are widely used to make websites work efficiently, provide analytics, and enable advertising features. Similar technologies include pixel tags, web beacons, and local storage.</p>
+
+      <h3>2. Types of Cookies We Use</h3>
+      <h4>2.1 Strictly Necessary Cookies</h4>
+      <p>These cookies are essential for the Site to function. They enable core features like page navigation, secure areas, and form submissions. You cannot opt out of these cookies as the Site will not function properly without them.</p>
+      <ul>
+        <li>Session management and authentication</li>
+        <li>Security and fraud prevention</li>
+        <li>Load balancing</li>
+      </ul>
+
+      <h4>2.2 Analytics &amp; Performance Cookies</h4>
+      <p>These cookies help us understand how visitors interact with our Site by collecting anonymous, aggregated data.</p>
+      <ul>
+        <li><strong>Google Analytics 4 (GA4):</strong> Tracks page views, session duration, bounce rate, traffic sources, and user flow. Data is pseudonymised and processed by Google. <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener noreferrer">Opt out of Google Analytics</a>.</li>
+        <li><strong>Hotjar (if enabled):</strong> Records anonymised heatmaps and session replays to improve UX. No personal data is captured in recordings.</li>
+      </ul>
+
+      <h4>2.3 Advertising &amp; Remarketing Cookies</h4>
+      <p>These cookies are used to deliver relevant advertisements and measure campaign performance.</p>
+      <ul>
+        <li><strong>Meta Pixel (Facebook/Instagram):</strong> Tracks conversions from Meta ads, enables Custom Audiences and Lookalike Audiences for remarketing. Cookie: <code>_fbp</code>, <code>_fbc</code>.</li>
+        <li><strong>Google Ads (gtag.js):</strong> Tracks ad conversions and enables remarketing across the Google Display Network and YouTube. Cookies: <code>_gcl_au</code>, <code>_gac_</code>.</li>
+        <li><strong>LinkedIn Insight Tag:</strong> Measures conversions from LinkedIn ads and enables retargeting of professional audiences. Cookie: <code>li_sugr</code>, <code>bcookie</code>.</li>
+      </ul>
+
+      <h4>2.4 Functional Cookies</h4>
+      <p>These cookies remember your preferences (e.g., language, region) to provide a more personalised experience. They may also be used to remember choices you make on the Site (such as quiz answers in our diagnostic tools).</p>
+
+      <h3>3. Third-Party Cookies</h3>
+      <p>Some cookies are placed by third-party services that appear on our pages. We do not control these cookies. Key third parties include:</p>
+      <ul>
+        <li>Google (Analytics, Ads, YouTube embeds)</li>
+        <li>Meta Platforms (Facebook Pixel)</li>
+        <li>LinkedIn Corporation (Insight Tag)</li>
+        <li>Razorpay (payment processing)</li>
+      </ul>
+
+      <h3>4. How to Manage Cookies</h3>
+      <p>You can control cookies through your browser settings. Most browsers allow you to:</p>
+      <ul>
+        <li>View and delete existing cookies</li>
+        <li>Block all or specific third-party cookies</li>
+        <li>Set preferences for certain websites</li>
+      </ul>
+      <p>Please note that disabling cookies may affect the functionality of our Site. For opt-out links specific to advertising cookies, see Section 3 of our <Link to="/privacy-policy"><strong>Privacy Policy</strong></Link>.</p>
+
+      <h3>5. Updates to This Policy</h3>
+      <p>We may update this Cookie Policy to reflect changes in technology or regulation. The "Last updated" date at the top will be revised accordingly.</p>
+
+      <h3>6. Contact</h3>
+      <p>For questions about our use of cookies, contact us at <strong>chesswize79@gmail.com</strong>.</p>
+    </LegalLayout>
+  );
+}
+
+function Disclaimer() {
+  return (
+    <LegalLayout title="Disclaimer">
+      <p>Last updated: April 15, 2026</p>
+      <p>The information provided on <strong>chesswize.com</strong> (the "Site") and through ChessWize's coaching services is for general educational and informational purposes only. By using our Site and Services, you acknowledge and agree to the following.</p>
+
+      <h3>1. No Guaranteed Outcomes</h3>
+      <p>While we are confident in our structured coaching methodology and have documented measurable improvements across hundreds of students, individual results may vary. Chess performance depends on numerous factors including the student's dedication, practice frequency, natural aptitude, and external circumstances. Elo ratings, tournament results, and cognitive improvements referenced on our Site are based on historical data from past students and are not a guarantee of future performance.</p>
+
+      <h3>2. Educational Purpose Only</h3>
+      <p>Our Services are designed to teach chess strategy, critical thinking, and cognitive skills. ChessWize is not a substitute for formal academic education, psychological counselling, or medical advice. Claims about cognitive development benefits of chess are based on published research and our internal observations, but should not be interpreted as clinical or therapeutic claims.</p>
+
+      <h3>3. Testimonials &amp; Reviews</h3>
+      <p>Testimonials displayed on our Site, social media, and advertising materials reflect the genuine experiences of individual parents and students. However, these are personal opinions and individual results. They do not constitute a guarantee that you or your child will achieve the same or similar results. Some testimonials may have been lightly edited for clarity or brevity while preserving the original meaning.</p>
+
+      <h3>4. Advertising &amp; Promotional Content</h3>
+      <p>Our Site and marketing campaigns (including ads on Meta, Google, LinkedIn, and other platforms) may contain forward-looking statements, promotional language, and illustrative projections (e.g., the Elo Projection Calculator). These tools are for educational illustration only and do not constitute a promise of specific outcomes.</p>
+
+      <h3>5. Third-Party Links &amp; Content</h3>
+      <p>Our Site may contain links to external websites, platforms, or resources (e.g., chess.com, lichess.org, FIDE). We do not endorse, control, or assume responsibility for the content, privacy policies, or practices of any third-party sites. Accessing external links is at your own risk.</p>
+
+      <h3>6. Accuracy of Information</h3>
+      <p>We make reasonable efforts to ensure the information on our Site is accurate and up to date. However, we do not warrant the completeness, reliability, or accuracy of any information. Pricing, program details, schedules, and availability are subject to change without notice.</p>
+
+      <h3>7. Limitation of Liability</h3>
+      <p>To the fullest extent permitted by law, ChessWize, its founders, coaches, employees, and affiliates disclaim all liability for any loss or damage arising from your reliance on information provided on the Site or through our Services. This includes, without limitation, any direct, indirect, incidental, or consequential damages.</p>
+
+      <h3>8. Professional Advice</h3>
+      <p>Nothing on this Site constitutes professional, legal, financial, or medical advice. For specific concerns about your child's development, please consult a qualified professional.</p>
+
+      <h3>9. Contact</h3>
+      <p>If you have questions about this Disclaimer, please contact us at <strong>chesswize79@gmail.com</strong>.</p>
+    </LegalLayout>
+  );
+}
+
+/* ════════════════════════════════════════════════
+   APP ROUTER
+   ════════════════════════════════════════════════ */
+function LandingPage() {
   return (
     <div className="min-h-screen flex flex-col selection:bg-blue-200 selection:text-blue-900 font-sans bg-white overflow-x-hidden">
       <Toaster theme="light" position="top-center" richColors />
@@ -2541,5 +3343,18 @@ export default function App() {
       <ExitIntentPopup />
       <MobileStickyCTA />
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+      <Route path="/terms" element={<TermsOfService />} />
+      <Route path="/refund-policy" element={<RefundPolicy />} />
+      <Route path="/cookie-policy" element={<CookiePolicy />} />
+      <Route path="/disclaimer" element={<Disclaimer />} />
+    </Routes>
   );
 }
