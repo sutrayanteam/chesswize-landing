@@ -3710,7 +3710,6 @@ function LandingPage() {
           FounderStory, ParentAssessmentQuiz, DailyRegimen, MidPageCTA, EloProjectionCalculator,
           InteractivePuzzle — all hurt conversion or duplicated content ── */}
       <WhatsAppWidget />
-      <ExitIntentPopup />
       <MobileStickyCTA />
     </div>
   );
