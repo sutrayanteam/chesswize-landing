@@ -2591,13 +2591,13 @@ function BottomForm() {
     const { website_url: _hp, ...cleanData } = data;
 
     /*
-     * Submission strategy (April 2026):
-     * No form backend is wired yet — Formspree was on a placeholder ID.
-     * Route all submissions to WhatsApp with a pre-filled message so the
-     * counsellor gets the lead directly. Once a real backend is available,
-     * replace this block with the real fetch.
+     * Primary: POST to /api/leads Cloudflare Worker (pushes to Zoho CRM + emails
+     * counsellor via Resend). Worker lives at chesswize.in/api/*.
+     *
+     * Fallback: if worker is unreachable (not yet deployed OR network error),
+     * open WhatsApp with a pre-filled message so we never lose the lead.
      */
-    try {
+    const openWhatsAppFallback = () => {
       const goals = Array.isArray(cleanData.parent_concern)
         ? cleanData.parent_concern.join(", ")
         : String(cleanData.parent_concern ?? "");
@@ -2610,15 +2610,38 @@ function BottomForm() {
         cleanData.referral_source ? `• Heard via: ${cleanData.referral_source}` : "",
       ].filter(Boolean);
       const waUrl = `https://wa.me/917007578072?text=${encodeURIComponent(msgLines.join("\n"))}`;
-
-      /* Open WhatsApp in a new tab so the parent can send us the pre-filled message */
       window.open(waUrl, "_blank", "noopener,noreferrer");
+    };
 
+    try {
+      const res = await fetch("/api/leads", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          ...cleanData,
+          js_token: jsToken.current,
+          form_duration_s: Math.round(elapsed),
+        }),
+      });
+
+      if (res.ok) {
+        setStatus("success");
+        setStep(4);
+        reset();
+        return;
+      }
+
+      /* Worker reachable but returned an error — still use WhatsApp fallback for the user */
+      openWhatsAppFallback();
       setStatus("success");
       setStep(4);
       reset();
     } catch {
-      setStatus("error");
+      /* Network / DNS / worker-not-deployed — silent WhatsApp fallback */
+      openWhatsAppFallback();
+      setStatus("success");
+      setStep(4);
+      reset();
     }
   };
 

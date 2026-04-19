@@ -1,0 +1,10 @@
+# Copy to .dev.vars and fill in — for local `wrangler dev` only.
+# Production secrets go in via `wrangler secret put <NAME>`.
+
+ZOHO_CLIENT_ID=
+ZOHO_CLIENT_SECRET=
+ZOHO_REFRESH_TOKEN=
+ZOHO_ACCOUNTS_URL=https://accounts.zoho.in
+ZOHO_API_DOMAIN=https://www.zohoapis.in
+
+RESEND_API_KEY=

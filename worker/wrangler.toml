@@ -1,0 +1,41 @@
+name = "chesswize-lead-api"
+main = "src/index.ts"
+compatibility_date = "2025-04-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Route the worker under chesswize.in/api/* — same-origin, no CORS needed
+[[routes]]
+pattern = "chesswize.in/api/*"
+zone_name = "chesswize.in"
+
+[[routes]]
+pattern = "www.chesswize.in/api/*"
+zone_name = "chesswize.in"
+
+# Observability
+[observability]
+enabled = true
+
+# ── Environment variables (set via `wrangler secret put <NAME>` in production) ──
+# Required for Zoho CRM integration. Absent values → worker falls back to
+# email-only notification or returns a neutral success (no CRM push).
+#
+#   ZOHO_CLIENT_ID          — from api-console.zoho.com (Self-Client)
+#   ZOHO_CLIENT_SECRET      — same
+#   ZOHO_REFRESH_TOKEN      — one-time generated via grant-token exchange
+#   ZOHO_ACCOUNTS_URL       — e.g. https://accounts.zoho.in (India DC)
+#   ZOHO_API_DOMAIN         — e.g. https://www.zohoapis.in
+#
+# Required for Resend email notifications:
+#   RESEND_API_KEY          — from resend.com/api-keys
+#   NOTIFY_EMAIL            — internal inbox that receives new-lead emails
+#   FROM_EMAIL              — verified sender, e.g. "ChessWize <noreply@chesswize.in>"
+#
+# Optional:
+#   ALLOWED_ORIGINS         — comma-separated (default: chesswize.in,www.chesswize.in)
+
+# Public non-secret defaults — safe to commit
+[vars]
+FROM_EMAIL = "ChessWize <noreply@chesswize.in>"
+NOTIFY_EMAIL = "chesswize79@gmail.com"
+ALLOWED_ORIGINS = "chesswize.in,www.chesswize.in,localhost"

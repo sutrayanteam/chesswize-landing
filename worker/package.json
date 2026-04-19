@@ -1,0 +1,19 @@
+{
+  "name": "chesswize-lead-worker",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Cloudflare Worker for chesswize.in/api — Zoho CRM + Resend email notifications",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail",
+    "secrets:zoho": "bash scripts/set-zoho-secrets.sh",
+    "secrets:resend": "bash scripts/set-resend-secret.sh"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250401.0",
+    "typescript": "^5.4.0",
+    "wrangler": "^3.50.0"
+  }
+}
