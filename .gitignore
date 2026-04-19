@@ -18,3 +18,12 @@ full-page-desktop.png
 chesswize-full-page.jpeg
 chesswize-mobile.jpeg
 package-lock.json
+
+# Local dev artefacts / working files
+HANDOFF.md
+.claude/
+localhost-*.png
+tablet-*.png
+full-page-*.png
+chesswize-mobile.jpeg
+tmp-*.json
