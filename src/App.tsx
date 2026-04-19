@@ -258,7 +258,7 @@ function Hero() {
               <div className="absolute -top-4 -right-4 md:-top-6 md:-right-6 w-24 md:w-32 h-24 md:h-32 bg-blue-400/20 blur-2xl md:blur-3xl rounded-full" />
               <div className="relative rounded-xl md:rounded-2xl overflow-hidden bg-slate-50 border border-slate-200 group shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)]">
                 <div className="absolute top-3 left-3 md:top-4 md:left-4 z-20 flex flex-col gap-2">
-                  <Badge className="bg-red-500/90 backdrop-blur-md text-white border-0 font-bold px-2 py-1 md:px-3 md:py-1 rounded shadow-lg uppercase tracking-widest-gs text-[9px] md:text-[10px] animate-pulse ring-1 ring-white/20">Inside Live Training</Badge>
+                  <Badge className="bg-red-500/90 backdrop-blur-md text-white border-0 font-bold px-2 py-1 md:px-3 md:py-1 rounded shadow-lg uppercase tracking-widest-gs text-[9px] md:text-[10px] ring-1 ring-white/20">Inside Live Training</Badge>
                 </div>
                 
                 <video
@@ -2588,22 +2588,37 @@ function BottomForm() {
     }
 
     setStatus("sending");
+    const { website_url: _hp, ...cleanData } = data;
+
+    /*
+     * Submission strategy (April 2026):
+     * No form backend is wired yet — Formspree was on a placeholder ID.
+     * Route all submissions to WhatsApp with a pre-filled message so the
+     * counsellor gets the lead directly. Once a real backend is available,
+     * replace this block with the real fetch.
+     */
     try {
-      const { website_url: _hp, ...cleanData } = data;
-      const res = await fetch("https://formspree.io/f/YOUR_FORM_ID", { 
-        method: "POST", 
-        headers: { "Content-Type": "application/json" }, 
-        body: JSON.stringify({ ...cleanData, _js_token: jsToken.current, _form_duration_s: Math.round(elapsed) })
-      });
-      if (res.ok) { 
-        setStatus("success"); 
-        setStep(4); // Success step
-        reset();
-      } else {
-        setStatus("error");
-      }
-    } catch { 
-      setStatus("error"); 
+      const goals = Array.isArray(cleanData.parent_concern)
+        ? cleanData.parent_concern.join(", ")
+        : String(cleanData.parent_concern ?? "");
+      const msgLines = [
+        "Hi ChessWize, I'd like to book a free demo:",
+        `• Child: ${cleanData.child_name ?? ""} (${cleanData.child_age_range ?? ""}, ${cleanData.child_level ?? ""})`,
+        `• Parent: ${cleanData.parent_name ?? ""} · ${cleanData.phone ?? ""} · ${cleanData.city ?? ""}`,
+        goals ? `• Goals: ${goals}` : "",
+        cleanData.parent_commitment ? `• Commitment: ${cleanData.parent_commitment}` : "",
+        cleanData.referral_source ? `• Heard via: ${cleanData.referral_source}` : "",
+      ].filter(Boolean);
+      const waUrl = `https://wa.me/917007578072?text=${encodeURIComponent(msgLines.join("\n"))}`;
+
+      /* Open WhatsApp in a new tab so the parent can send us the pre-filled message */
+      window.open(waUrl, "_blank", "noopener,noreferrer");
+
+      setStatus("success");
+      setStep(4);
+      reset();
+    } catch {
+      setStatus("error");
     }
   };
 
@@ -2718,6 +2733,7 @@ function BottomForm() {
                             </select>
                             <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-slate-400 pointer-events-none" />
                           </div>
+                          <p className="text-[10px] md:text-[11px] text-slate-500 font-medium mt-1">Not sure? Pick your best guess — the coach confirms on the demo call.</p>
                           {errors.child_level && <p className="text-[10px] text-red-500 font-bold mt-1">{errors.child_level.message}</p>}
                         </div>
                       </div>
@@ -2790,19 +2806,19 @@ function BottomForm() {
                     <motion.div key="step3" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="flex flex-col gap-4 md:gap-5">
                       <div className="flex flex-col gap-1.5 md:gap-2">
                         <label htmlFor="bottom_parent_name" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">Parent's Full Name <span className="text-red-500">*</span></label>
-                        <input id="bottom_parent_name" {...register("parent_name")} type="text" className={inputCls(!!errors.parent_name)} placeholder="e.g. Rahul Sharma" />
+                        <input id="bottom_parent_name" {...register("parent_name")} type="text" autoComplete="name" className={inputCls(!!errors.parent_name)} placeholder="e.g. Rahul Sharma" />
                         {errors.parent_name && <p className="text-[10px] text-red-500 font-bold mt-1">{errors.parent_name.message}</p>}
                       </div>
                       
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5">
                         <div className="flex flex-col gap-1.5 md:gap-2">
                           <label htmlFor="bottom_phone" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">WhatsApp Number <span className="text-red-500">*</span></label>
-                          <input id="bottom_phone" {...register("phone")} type="tel" className={inputCls(!!errors.phone)} placeholder="+91 98765 43210" />
+                          <input id="bottom_phone" {...register("phone")} type="tel" inputMode="tel" autoComplete="tel" className={inputCls(!!errors.phone)} placeholder="+91 98765 43210" />
                           {errors.phone && <p className="text-[10px] text-red-500 font-bold mt-1">{errors.phone.message}</p>}
                         </div>
                         <div className="flex flex-col gap-1.5 md:gap-2">
                           <label htmlFor="bottom_city" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">City <span className="text-red-500">*</span></label>
-                          <input id="bottom_city" {...register("city")} type="text" className={inputCls(!!errors.city)} placeholder="e.g. Bangalore" />
+                          <input id="bottom_city" {...register("city")} type="text" autoComplete="address-level2" className={inputCls(!!errors.city)} placeholder="e.g. Bangalore" />
                           {errors.city && <p className="text-[10px] text-red-500 font-bold mt-1">{errors.city.message}</p>}
                         </div>
                       </div>
@@ -3020,7 +3036,7 @@ function Footer() {
                 <div className="p-2 rounded-lg bg-slate-800 border border-slate-700 group-hover:border-blue-500/50 group-hover:bg-blue-500/10 transition-colors shadow-inner">
                   <Phone className="size-4 text-slate-300 group-hover:text-blue-400 transition-colors" />
                 </div>
-                <a href="tel:+918400979997" className="hover:text-blue-400 transition-colors mt-1.5 drop-shadow-sm">+91-8400979997</a>
+                <a href="tel:+917007578072" className="hover:text-blue-400 transition-colors mt-1.5 drop-shadow-sm">+91-70075-78072</a>
               </li>
               <li className="flex items-start gap-3 group">
                 <div className="p-2 rounded-lg bg-slate-800 border border-slate-700 group-hover:border-blue-500/50 group-hover:bg-blue-500/10 transition-colors shadow-inner">
@@ -3084,13 +3100,23 @@ function Footer() {
 
 function MobileStickyCTA() {
   const [isVisible, setIsVisible] = useState(false);
+
   useEffect(() => {
     const handleScroll = () => {
       const scrolledPastHero = window.scrollY > 400;
       const nearBottom = (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 300;
-      setIsVisible(scrolledPastHero && !nearBottom);
+      /* Hide the sticky bar when the bottom form itself is in the viewport —
+         having 2 CTAs stacked (sticky + in-form) causes mis-clicks + looks cluttered */
+      const form = document.getElementById("book-evaluation");
+      let formInView = false;
+      if (form) {
+        const rect = form.getBoundingClientRect();
+        formInView = rect.top < window.innerHeight * 0.9 && rect.bottom > 0;
+      }
+      setIsVisible(scrolledPastHero && !nearBottom && !formInView);
     };
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -3530,7 +3556,7 @@ function PrivacyPolicy() {
       <p>For privacy-related enquiries:</p>
       <ul>
         <li><strong>Email:</strong> chesswize79@gmail.com</li>
-        <li><strong>Phone:</strong> +91-8400979997</li>
+        <li><strong>Phone:</strong> +91-70075-78072</li>
         <li><strong>Address:</strong> Kanpur, Uttar Pradesh, India</li>
       </ul>
     </LegalLayout>
@@ -3603,7 +3629,7 @@ function TermsOfService() {
       <p>For questions about these Terms:</p>
       <ul>
         <li><strong>Email:</strong> chesswize79@gmail.com</li>
-        <li><strong>Phone:</strong> +91-8400979997</li>
+        <li><strong>Phone:</strong> +91-70075-78072</li>
       </ul>
     </LegalLayout>
   );
@@ -3664,7 +3690,7 @@ function RefundPolicy() {
         <li>The programme/plan you are enrolled in.</li>
         <li>Reason for the refund request.</li>
       </ul>
-      <p><strong>Email:</strong> chesswize79@gmail.com | <strong>Phone/WhatsApp:</strong> +91-8400979997</p>
+      <p><strong>Email:</strong> chesswize79@gmail.com | <strong>Phone/WhatsApp:</strong> +91-70075-78072</p>
     </LegalLayout>
   );
 }
