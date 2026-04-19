@@ -3661,24 +3661,30 @@ function LandingPage() {
       <Toaster theme="light" position="top-center" richColors />
       <TopNav />
       <Hero />
-      {/* ── Consensus CRO order from Codex + Gemini + Claude 3-way audit ── */}
       <VideoShowcase />
-      <StarPerformers />
+      <ProgramStats />
       <WallOfLove />
       <TheProblem />
+      <Transformation />
       <WhoIsThisFor />
       <HowItWorks />
+      <Curriculum />
+      <LearningModes />
       <Mentors />
-      <ValueStack />
+      <FounderStory />
+      <StarPerformers />
+      <ParentAssessmentQuiz />
+      <DailyRegimen />
       <Platform />
+      <ValueStack />
       <CertificateSection />
-      <SyllabusExplorer />
+      <MidPageCTA />
       <FAQ />
       <BottomForm />
+      <EloProjectionCalculator />
+      <SyllabusExplorer />
+      <InteractivePuzzle />
       <Footer />
-      {/* ── Removed per consensus: ProgramStats, Transformation, Curriculum, LearningModes,
-          FounderStory, ParentAssessmentQuiz, DailyRegimen, MidPageCTA, EloProjectionCalculator,
-          InteractivePuzzle — all hurt conversion or duplicated content ── */}
       <WhatsAppWidget />
       <ExitIntentPopup />
       <MobileStickyCTA />
