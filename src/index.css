@@ -310,6 +310,11 @@ select, input, textarea {
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* Force Vidstack player in testimonial cards to use portrait aspect ratio */
+.video-card-contain [data-media-player][data-view-type='video'] {
+  aspect-ratio: 9 / 16 !important;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

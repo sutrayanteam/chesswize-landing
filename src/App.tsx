@@ -1,16 +1,10 @@
 import React, { useState, useEffect, useRef, lazy, Suspense } from "react";
 import {
-  CheckCircle,
-  Trophy,
   Calendar,
   TrendingUp,
   FileText,
-  PlayCircle,
   Lock,
   XCircle,
-  Star,
-  Shield,
-  Target,
   Layers,
   Activity,
   BarChart3,
@@ -21,7 +15,6 @@ import {
   Users,
   User,
   UserPlus,
-  BrainCircuit,
   Zap,
   Check,
   ArrowUpRight,
@@ -42,8 +35,26 @@ import {
   Mail,
   Phone,
   ArrowLeft,
-  BookOpen
 } from "lucide-react";
+import {
+  CheckMark as CheckCircle,
+  SolidCheck,
+  Shield,
+  Trophy,
+  TrophyGold,
+  SealBadge,
+  BrainChess as BrainCircuit,
+  Target,
+  BookOpen,
+  PlayCircle,
+  CalendarCheck,
+  SparkStar as Star,
+  FocusIcon,
+  LogicIcon,
+  MathIcon,
+  PatienceIcon,
+  ConfidenceIcon,
+} from "./components/Icons";
 import { motion, AnimatePresence, useInView } from "motion/react";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
@@ -112,8 +123,7 @@ function TopNav() {
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "gs-glass py-2 md:py-3" : "bg-white border-b border-slate-200 py-3 md:py-4"}`}>
       <div className="max-w-[1400px] mx-auto px-4 md:px-8 flex items-center justify-between">
         <div className="flex items-center gap-2 md:gap-3 cursor-pointer" onClick={() => window.scrollTo(0, 0)}>
-          <img src="/Untitled-design-22.png.bv.webp" alt="ChessWize Logo" className="h-8 md:h-10 object-contain" />
-          <span className="font-extrabold tracking-tighter-gs text-slate-900 text-[1.25rem] md:text-[1.5rem] leading-none">ChessWize.</span>
+          <img src="/logo-side-black.svg" alt="ChessWize Logo" className="h-7 md:h-9 w-auto object-contain" />
         </div>
         <nav className="hidden lg:flex items-center gap-8">
           {["Programs", "Mentors", "Testimonials", "Methodology", "Tuition"].map((item) => (
@@ -161,10 +171,14 @@ function Hero() {
                 <div className="size-2 rounded-full bg-blue-500 animate-pulse" />
                 <span className="text-[10px] md:text-[11px] font-extrabold text-blue-800 uppercase tracking-widest-gs">Strictly Max 6 Kids Per Batch</span>
               </div>
+              <div className="trust-badge-container bg-amber-50/60 border-amber-200">
+                <CalendarCheck className="size-3 text-amber-700" />
+                <span className="text-[10px] md:text-[11px] font-extrabold text-amber-800 uppercase tracking-widest-gs">Next Batch: {getNextCohortDate()}</span>
+              </div>
             </motion.div>
 
             <motion.h1 variants={fadeUp} className="text-3xl sm:text-4xl md:text-[2.75rem] lg:text-[3.25rem] font-extrabold tracking-tighter-gs text-slate-900 leading-[1.12] drop-shadow-sm">
-              Turn idle screen time into{' '}
+              Turn passive screen time into{' '}
               <span className="text-gradient-primary">strategic intelligence.</span>
             </motion.h1>
 
@@ -172,17 +186,31 @@ function Hero() {
               Stop wasting hours on unstructured play. Our rigorous, level-based chess curriculum transforms impulsive kids into focused, patient, and analytical thinkers—guided by elite FIDE-certified masters.
             </motion.p>
 
+            <motion.div variants={fadeUp} className="flex flex-wrap items-center gap-2 max-w-xl">
+              {[
+                { label: "Focus", Icon: FocusIcon, color: "text-blue-600" },
+                { label: "Logic", Icon: LogicIcon, color: "text-indigo-600" },
+                { label: "Math", Icon: MathIcon, color: "text-emerald-600" },
+                { label: "Patience", Icon: PatienceIcon, color: "text-amber-600" },
+                { label: "Confidence", Icon: ConfidenceIcon, color: "text-rose-600" },
+              ].map(({ label, Icon, color }) => (
+                <span key={label} className="inline-flex items-center gap-1.5 text-[11px] md:text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-full px-3 py-1.5 shadow-sm">
+                  <Icon className={`size-3.5 ${color}`} /> {label}
+                </span>
+              ))}
+            </motion.div>
+
             <motion.div variants={fadeUp} className="flex items-start gap-3 bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 max-w-xl">
               <BookOpen className="size-4 text-blue-600 shrink-0 mt-0.5" />
               <p className="text-xs md:text-sm text-blue-800 font-medium leading-relaxed">
-                <span className="font-extrabold">Research:</span> A 2019 University of Trier meta-analysis of 24 studies found chess instruction significantly improves children's mathematical and cognitive abilities.
+                <span className="font-extrabold">Backed by research:</span> A 2019 University of Trier meta-analysis (24 studies) confirmed chess instruction measurably improves children's math, logic, and concentration in school.
               </p>
             </motion.div>
 
             <motion.div variants={fadeUp} className="bg-white p-5 md:p-6 rounded-2xl depth-panel mt-2 md:mt-4 max-w-xl relative overflow-hidden hover-lift">
               <div className="absolute top-0 left-0 w-1 h-full bg-blue-600" />
               <h3 className="text-sm font-extrabold text-slate-900 uppercase tracking-widest-gs mb-4 flex items-center gap-2">
-                <Target className="size-4 text-blue-600" /> Start Your Free Evaluation
+                <Target className="size-4 text-blue-600" /> Book Free Demo &amp; Counseling
               </h3>
               <div className="flex flex-col sm:flex-row gap-3">
                 <div className="relative flex-1">
@@ -196,15 +224,16 @@ function Hero() {
                   <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 size-4 md:size-5 text-slate-500 pointer-events-none" />
                 </div>
                 <Button onClick={scrollToForm} size="lg" className="w-full sm:w-auto h-12 md:h-14 px-6 md:px-8 gs-btn gs-btn-primary rounded-xl text-sm md:text-base font-bold transition-all">
-                  Request Eval <ArrowRight className="ml-2 size-4" />
+                  Book Free Demo <ArrowRight className="ml-2 size-4" />
                 </Button>
               </div>
+              <p className="text-[10px] md:text-[11px] text-slate-500 font-medium mt-2">50-min demo class + parent counseling session. We match your child to the right coach &amp; batch on the call.</p>
               <div className="flex items-center gap-4 mt-4 pt-4 border-t border-slate-100">
                 <span className="flex items-center gap-1.5 text-[10px] md:text-xs font-bold text-slate-500">
                   <CheckCircle className="size-3.5 text-emerald-500 drop-shadow-sm" /> Zero Financial Risk
                 </span>
                 <span className="flex items-center gap-1.5 text-[10px] md:text-xs font-bold text-slate-500">
-                  <CheckCircle className="size-3.5 text-emerald-500 drop-shadow-sm" /> 100% Free Baseline Report
+                  <CheckCircle className="size-3.5 text-emerald-500 drop-shadow-sm" /> Parents can observe class
                 </span>
               </div>
             </motion.div>
@@ -225,6 +254,8 @@ function Hero() {
                   loop
                   muted
                   playsInline
+                  preload="metadata"
+                  poster="/hero-poster.webp"
                   className="w-full aspect-[4/3] object-cover opacity-80 group-hover:opacity-100 transition-opacity"
                 />                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-slate-900/20 to-transparent opacity-90 pointer-events-none" />
                 
@@ -249,7 +280,7 @@ function Hero() {
                   <span className="text-xs md:text-sm font-extrabold text-slate-900 tracking-tight-gs">Evaluation</span>
                 </div>
                 <div className="pill-badge rounded-lg md:rounded-xl p-2 md:p-3 flex flex-col items-center justify-center text-center hover:bg-white hover:border-slate-200 hover:shadow-sm transition-all cursor-default">
-                  <img src="/gold-thropy.webp" className="size-5 md:size-7 object-contain mb-1 md:mb-2 drop-shadow-sm" alt="Trophy" />
+                  <TrophyGold className="size-5 md:size-7 mb-1 md:mb-2 drop-shadow-sm" />
                   <span className="text-[8px] md:text-[9px] font-bold text-slate-500 uppercase tracking-widest-gs">Expert</span>
                   <span className="text-xs md:text-sm font-extrabold text-slate-900 tracking-tight-gs">FIDE Masters</span>
                 </div>
@@ -279,7 +310,7 @@ function ProgramStats() {
   ];
 
   return (
-    <section className="py-12 md:py-16 bg-slate-50 text-slate-900 relative">
+    <section className="py-12 md:py-16 bg-white text-slate-900 relative">
       <div className="absolute inset-0 bg-gradient-to-r from-blue-900/20 via-transparent to-emerald-900/20"></div>
       <div className="max-w-[1400px] mx-auto px-4 md:px-8 relative z-10">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-y-10 md:gap-y-4 gap-x-4 divide-x-0 md:divide-x divide-slate-200">
@@ -403,8 +434,8 @@ function ParentAssessmentQuiz() {
   const totalScore = Object.values(answers).reduce((a, b) => a + b, 0);
 
   const getProfile = () => {
-    if (totalScore <= 7) return { title: "The Unstructured Tactician", desc: "Your child has raw potential but acts impulsively and struggles with emotional resilience. They lack a mental framework for decision making. They require our strict Foundation Protocol to build patience before advancing.", track: "Foundation Protocol", icon: Target, color: "text-blue-600", bg: "bg-blue-500/20", border: "border-blue-500/30" };
-    if (totalScore <= 11) return { title: "The Cautious Planner", desc: "Your child has a good baseline attention span but lacks aggressive calculation and pattern recognition. They hesitate under pressure. They need our Tactical Vision training to build ruthless competitive confidence.", track: "Tactical Vision Protocol", icon: Layers, color: "text-amber-600", bg: "bg-amber-500/20", border: "border-amber-500/30" };
+    if (totalScore <= 7) return { title: "The Unstructured Tactician", desc: "Your child has raw potential but acts impulsively and struggles with emotional resilience. They lack a mental framework for decision making. They require our strict Foundation Programme to build patience before advancing.", track: "Foundation Programme", icon: Target, color: "text-blue-600", bg: "bg-blue-500/20", border: "border-blue-500/30" };
+    if (totalScore <= 11) return { title: "The Cautious Planner", desc: "Your child has a good baseline attention span but lacks aggressive calculation and pattern recognition. They hesitate under pressure. They need our Tactical Vision training to build ruthless competitive confidence.", track: "Tactical Vision Programme", icon: Layers, color: "text-amber-600", bg: "bg-amber-500/20", border: "border-amber-500/30" };
     return { title: "The Analytical Competitor", desc: "Your child already possesses deep analytical traits, emotional composure, and strategic patience. They are primed for rigorous, tournament-level calculation training to maximize their FIDE potential.", track: "Tournament Masterclass", icon: Trophy, color: "text-emerald-600", bg: "bg-emerald-500/20", border: "border-emerald-500/30" };
   };
 
@@ -424,7 +455,7 @@ function ParentAssessmentQuiz() {
             Is your child ready for <span className="text-blue-600">serious growth?</span>
           </h3>
           <p className="text-base md:text-lg text-slate-600 font-medium max-w-2xl mx-auto">
-            Take this 45-second assessment to map your child's Cognitive Profile. We use this data to determine if they qualify for our intensive cohorts.
+            Take this 45-second assessment to map your child's learning profile. We use this to recommend the right batch and coach on your free demo call.
           </p>
         </div>
 
@@ -543,17 +574,14 @@ function TheProblem() {
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 items-start">
           <div className="w-full lg:w-1/2 sticky top-24">
             <h2 className="text-[10px] font-bold text-red-600 uppercase tracking-widest-gs mb-3 flex items-center gap-2">
-              <AlertTriangle className="size-3" /> The Screen-Time Crisis
+              <AlertTriangle className="size-3" /> The Attention Crisis
             </h2>
             <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tighter-gs text-slate-900 mb-4 md:mb-6 leading-tight">
               Casual hobby classes are <span className="text-red-600">wasting your child's potential.</span>
             </h3>
             <div className="space-y-4 md:space-y-6 text-base md:text-lg text-slate-600 font-medium leading-relaxed">
               <p>
-                Today’s children are overwhelmed by screen distractions. Most local clubs treat chess as just another after-school activity where kids play aimlessly, without learning the rigorous cognitive frameworks required to build patience, strategic foresight, and academic focus.
-              </p>
-              <p>
-                At ChessWize, we operate an <strong>academic-grade training environment</strong>. We teach children how to sit still, calculate variations deeply, analyze their own mistakes, and perform under psychological pressure—skills that translate directly to better grades.
+                Most children's screen time trains distraction, not focus. ChessWize flips that — live online classes with FIDE-certified coaches on a platform built for deep attention, so sitting still and thinking deeply become automatic skills that carry straight into school.
               </p>
             </div>
             <div className="mt-8 p-4 bg-red-50 border border-red-100 rounded-xl flex items-start gap-4">
@@ -567,11 +595,11 @@ function TheProblem() {
             <div className="mt-8 grid grid-cols-2 gap-4">
               <div className="rounded-2xl overflow-hidden shadow-lg border border-slate-200 aspect-square relative group">
                 <img loading="lazy" src="/2026-04-15-10-30-00-distracted-child-screen.webp" alt="A distracted child scrolling on an iPad" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 grayscale sepia-[0.3]" />
-                <div className="absolute top-2 left-2 bg-red-600 text-slate-50 text-[10px] font-extrabold uppercase tracking-widest-gs px-2 py-1 rounded shadow">The Status Quo</div>
+                <div className="absolute top-2 left-2 bg-red-600 text-slate-50 text-[10px] font-extrabold uppercase tracking-widest-gs px-2 py-1 rounded shadow">Passive Scrolling</div>
               </div>
               <div className="rounded-2xl overflow-hidden shadow-lg border border-slate-200 aspect-square relative group">
-                 <img loading="lazy" src="/2026-04-15-10-00-00-focused-child-chess.webp" alt="A child deeply focused on a chess board, overcoming screen-time addiction" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                 <div className="absolute top-2 left-2 bg-blue-600 text-slate-50 text-[10px] font-extrabold uppercase tracking-widest-gs px-2 py-1 rounded shadow">The Solution</div>
+                 <img loading="lazy" src="/2026-04-15-10-00-00-focused-child-chess.webp" alt="A child focused on a chess board during a live online class" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                 <div className="absolute top-2 left-2 bg-blue-600 text-slate-50 text-[10px] font-extrabold uppercase tracking-widest-gs px-2 py-1 rounded shadow">Purposeful Training</div>
               </div>
             </div>
           </div>
@@ -586,13 +614,13 @@ function TheProblem() {
                 <div className="grid grid-cols-[1fr_100px_100px] md:grid-cols-[1fr_120px_120px] gap-2 mb-2 pb-2 border-b border-slate-200 text-[9px] md:text-[10px] font-extrabold uppercase tracking-widest-gs text-slate-600">
                   <div>Feature</div>
                   <div className="text-center text-red-500">Hobby Clubs</div>
-                  <div className="text-center text-blue-600">ChessWize Protocol</div>
+                  <div className="text-center text-blue-600">ChessWize Programme</div>
                 </div>
 
                 {[
                   { feature: "Instructor Caliber", bad: "Amateurs (1200 Elo)", good: "FIDE-Rated Masters" },
                   { feature: "Curriculum Design", bad: "Random Play", good: "Level-Based Syllabus" },
-                  { feature: "Cognitive Tracking", bad: "None", good: "Engine Matrix Analysis" },
+                  { feature: "Progress Tracking", bad: "None", good: "Move-by-move Analysis" },
                   { feature: "Class Density", bad: "15-20 Kids", good: "Strictly Max 6 Kids" },
                   { feature: "Parental Reporting", bad: "Guesswork", good: "Weekly Dashboards" },
                   { feature: "Psychology Training", bad: "Ignored", good: "Resilience Focused" }
@@ -612,7 +640,7 @@ function TheProblem() {
               </div>
 
               <Button onClick={scrollToForm} className="w-full mt-8 h-14 gs-btn gs-btn-primary rounded-xl font-bold shadow-lg">
-                Upgrade Their Education Standard
+                Book Free Demo &amp; Counseling <ArrowRight className="ml-2 size-4" />
               </Button>
             </div>
           </div>
@@ -738,7 +766,7 @@ function DailyRegimen() {
             Consistent, Measurable Growth
           </h3>
           <p className="text-base md:text-lg text-slate-600 font-medium max-w-2xl mx-auto leading-relaxed">
-            This is the weekly routine we use to replace idle screen time with focus, discipline, and competitive excellence.
+            This is the weekly routine we use to convert passive screen time into focus, discipline, and competitive excellence.
           </p>
         </div>
 
@@ -829,7 +857,7 @@ function Platform() {
                     <span className="font-extrabold text-white text-lg drop-shadow-md">S</span>
                   </div>
                   <div>
-                    <div className="text-sm font-extrabold text-slate-900">Saanvika's Telemetry</div>
+                    <div className="text-sm font-extrabold text-slate-900">Saanvika's Progress</div>
                     <div className="text-[10px] text-blue-600 uppercase tracking-widest-gs font-bold">Tournament Masterclass &middot; Age 9</div>
                   </div>
                 </div>
@@ -1063,19 +1091,18 @@ function InteractivePuzzle() {
         { row: 6, col: 5, type: "♙", color: "w" },
         { row: 6, col: 6, type: "♙", color: "w" },
         { row: 6, col: 7, type: "♙", color: "w" },
-        // Black: Ke8, Qd7, Rf8, pawns a7 d6 f7 g7 h7
+        // Black: Ke8, Qd7, Rf8, pawns a7 d6 f7 h7 (g7 already traded earlier)
         { row: 0, col: 4, type: "♚", color: "b" },
         { row: 1, col: 3, type: "♛", color: "b" },
         { row: 0, col: 5, type: "♜", color: "b" },
         { row: 1, col: 0, type: "♟", color: "b" },
         { row: 2, col: 3, type: "♟", color: "b" },
         { row: 1, col: 5, type: "♟", color: "b" },
-        { row: 1, col: 6, type: "♟", color: "b" },
         { row: 1, col: 7, type: "♟", color: "b" },
       ],
       winningSquare: { row: 2, col: 5 },
       lastMove: { from: { row: 0, col: 3 }, to: { row: 1, col: 3 } },
-      captured: { white: ["♟","♝","♜"], black: ["♞","♟","♟"] },
+      captured: { white: ["♟","♟","♝","♜"], black: ["♞","♟","♟"] },
       moveHistory: ["18. Nd5 Qd7??", "19. Nf6+"],
       solutionMove: "Nf6+",
       evalStart: 52, evalEnd: 85, evalText: "+6.4",
@@ -1340,7 +1367,7 @@ function InteractivePuzzle() {
                 </Button>
               )}
               <Button onClick={scrollToForm} className="w-full h-12 gs-btn bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-extrabold text-sm shadow-lg shadow-blue-900/30 border-0">
-                {solved ? "Claim Evaluation Based On This Result" : "Book Free Evaluation"} <ArrowRight className="ml-2 size-4" />
+                {solved ? "Book My Free Demo Now" : "Book Free Demo"} <ArrowRight className="ml-2 size-4" />
               </Button>
             </div>
           </div>
@@ -1355,9 +1382,9 @@ function InteractivePuzzle() {
    ════════════════════════════════════════════════ */
 function WhoIsThisFor() {
   const personas = [
-    { title: "The Absolute Beginner", badge: "Ages 4-8", icon: Target, img: "/2026-04-15-10-16-00-absolute-beginner.webp", desc: "For children who don't know the rules but want to build a strong foundation in logical thinking, pattern recognition, and deep concentration.", pain: "Lacks focus and structure in learning." },
-    { title: "The Casual Player", badge: "Ages 7-12", icon: Layers, img: "/2026-04-15-10-17-00-casual-player.webp", desc: "Plays casually but hasn't seen real progress. Needs structure to turn a passing hobby into a disciplined, measurable cognitive routine.", pain: "Plays aimlessly without seeing real improvement." },
-    { title: "The Tournament Hopeful", badge: "Ages 9-16", icon: Trophy, img: "/2026-04-15-10-18-00-tournament-hopeful.webp", desc: "Already playing competitively but struggles under pressure. Needs psychological resilience and advanced calculation training to win.", pain: "Loses focus and blunders under time pressure." },
+    { title: "The Absolute Beginner", badge: "Foundation", ageBadge: "Ages 4-8", icon: Target, img: "/2026-04-15-10-16-00-absolute-beginner.webp", desc: "For students who don't yet know the rules but want to build a strong foundation in logical thinking, pattern recognition, and deep concentration.", pain: "Lacks focus and structure in learning.", bestFor: "Shy, high-energy, or easily-distracted kids" },
+    { title: "The Casual Player", badge: "Developing", ageBadge: "Ages 7-12", icon: Layers, img: "/2026-04-15-10-17-00-casual-player.webp", desc: "Plays casually but hasn't seen real progress. Needs structure to turn a passing hobby into a disciplined, measurable cognitive routine.", pain: "Plays aimlessly without seeing real improvement.", bestFor: "Curious kids who plateau without structure" },
+    { title: "The Tournament Hopeful", badge: "Competitive", ageBadge: "Ages 9-16", icon: Trophy, img: "/2026-04-15-10-18-00-tournament-hopeful.webp", desc: "Already playing competitively but struggles under pressure. Needs psychological resilience and advanced calculation training to win.", pain: "Loses focus and blunders under time pressure.", bestFor: "Driven kids who crack under time pressure" },
   ];
 
   return (
@@ -1382,19 +1409,28 @@ function WhoIsThisFor() {
                 <div className="h-48 md:h-56 w-full relative overflow-hidden">
                   <img loading="lazy" src={p.img} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-100/60 to-transparent" />
-                  <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
-                    <div className="size-10 rounded-xl bg-white/20 backdrop-blur-md border border-slate-300 flex items-center justify-center">
+                  <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between gap-2">
+                    <div className="size-10 rounded-xl bg-white/20 backdrop-blur-md border border-slate-300 flex items-center justify-center shrink-0">
                       <Icon className="size-5 text-slate-800" />
                     </div>
-                    <Badge variant="outline" className="text-[9px] md:text-[10px] uppercase tracking-widest-gs font-bold text-slate-800 border-slate-300 rounded bg-white/90 backdrop-blur-sm">
-                      {p.badge}
-                    </Badge>
+                    <div className="flex items-center gap-1.5 flex-wrap justify-end">
+                      <Badge className="text-[9px] md:text-[10px] uppercase tracking-widest-gs font-bold text-white bg-blue-600 hover:bg-blue-700 border-0 rounded">
+                        {p.badge}
+                      </Badge>
+                      <Badge variant="outline" className="text-[9px] md:text-[10px] uppercase tracking-widest-gs font-bold text-slate-800 border-slate-300 rounded bg-white/90 backdrop-blur-sm">
+                        {p.ageBadge}
+                      </Badge>
+                    </div>
                   </div>
                 </div>
                 <div className="p-6 md:p-8 flex flex-col flex-1">
                   <h4 className="text-xl md:text-2xl font-extrabold text-slate-900 tracking-tight-gs mb-3 md:mb-4 leading-tight">{p.title}</h4>
-                  <p className="text-slate-600 text-sm font-medium leading-relaxed mb-6 md:mb-8 flex-1">{p.desc}</p>
-                  <div className="bg-red-50 text-red-800 p-4 rounded-2xl text-xs font-bold border border-red-100 flex gap-3 items-start mt-auto">
+                  <p className="text-slate-600 text-sm font-medium leading-relaxed mb-4 md:mb-5 flex-1">{p.desc}</p>
+                  <div className="bg-emerald-50 text-emerald-800 p-3.5 rounded-2xl text-xs font-bold border border-emerald-100 flex gap-3 items-start mb-3">
+                    <CheckCircle className="shrink-0 size-4 text-emerald-600 mt-0.5" />
+                    <span className="leading-snug">Best for: {p.bestFor}</span>
+                  </div>
+                  <div className="bg-red-50 text-red-800 p-3.5 rounded-2xl text-xs font-bold border border-red-100 flex gap-3 items-start mt-auto">
                     <AlertTriangle className="shrink-0 size-4 text-red-500 mt-0.5" />
                     <span className="leading-snug">Solves: {p.pain}</span>
                   </div>
@@ -1414,7 +1450,7 @@ function WhoIsThisFor() {
 function LearningModes() {
   const modes = [
     { title: "Individual (1-on-1)", badge: "Highest Intensity", icon: User, img: "/2026-04-15-10-05-00-1-on-1-coaching.webp", desc: "Surgical attention and customized training at the student's exact pace. Best for rapid rating gain and tailored opening repertoires." },
-    { title: "Two-on-One", badge: "Collaborative", icon: Users, img: "/2026-04-15-10-06-00-two-on-one-coaching.webp", desc: "Designed for friends or siblings to learn together. Fosters healthy competition while maintaining high pedagogical density." },
+    { title: "Two-on-One", badge: "Collaborative", icon: Users, img: "/2026-04-15-10-06-00-two-on-one-coaching.webp", desc: "Designed for friends or siblings to learn together. Fosters healthy competition while keeping teaching quality high." },
     { title: "Cohort Training", badge: "Max 4-6 Students", icon: UserPlus, img: "/2026-04-15-10-15-00-cohort-coaching.webp", desc: "Elite small batches to ensure quality learning, peer-to-peer tactical sparring, and structured academic progression." },
   ];
 
@@ -1424,10 +1460,10 @@ function LearningModes() {
         <div className="mb-12 md:mb-16 max-w-3xl">
           <h2 className="text-[10px] font-bold text-blue-600 uppercase tracking-widest-gs mb-3">Class Formats</h2>
           <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tighter-gs mb-4 md:mb-6 leading-tight">
-            Architected for maximum focus.
+            Designed for deep focus.
           </h3>
           <p className="text-base md:text-lg text-slate-600 font-medium leading-relaxed max-w-3xl">
-            We cap our class sizes ruthlessly to maintain pedagogical integrity. Choose the delivery mechanism that fits your child's psychology.
+            We cap our class sizes strictly so every child gets real attention. Pick the format that fits your child best.
           </p>
         </div>
 
@@ -1452,7 +1488,7 @@ function LearningModes() {
                   <h4 className="text-xl md:text-2xl font-extrabold text-slate-900 tracking-tight-gs mb-3 md:mb-4 leading-tight">{p.title}</h4>
                   <p className="text-slate-600 text-sm font-medium leading-relaxed mb-6 md:mb-8 flex-1">{p.desc}</p>
                   <div className="mt-auto">
-                     <Button onClick={scrollToForm} variant="outline" className="gs-btn gs-btn-white w-full font-bold h-12 rounded-xl">Secure Placement</Button>
+                     <Button onClick={scrollToForm} variant="outline" className="gs-btn gs-btn-white w-full font-bold h-12 rounded-xl">Book Free Demo</Button>
                   </div>
                 </div>
               </div>
@@ -1469,7 +1505,7 @@ function LearningModes() {
    ════════════════════════════════════════════════ */
 function Curriculum() {
   const modules = [
-    { week: "Phase 1", title: "Foundation Protocol", duration: "Beginners", details: "Strict structural training for complete beginners. Focuses heavily on board vision, piece safety, and instilling the patience required to calculate before acting.", tools: ["Checks, Captures, Threats", "Board Vision", "Patience Building"], img: "/2026-04-15-10-02-00-foundation-protocol.webp" },
+    { week: "Phase 1", title: "Foundation Programme", duration: "Beginners", details: "Strict structural training for complete beginners. Focuses heavily on board vision, piece safety, and instilling the patience required to calculate before acting.", tools: ["Checks, Captures, Threats", "Board Vision", "Patience Building"], img: "/2026-04-15-10-02-00-foundation-protocol.webp" },
     { week: "Phase 2", title: "Tactical Geometry", duration: "Intermediate", details: "Intensive calculation training. Students learn to spot multi-move combinations, execute forks/pins/skewers, and develop basic opening principles to survive the first 15 moves.", tools: ["Multi-move Calculation", "Opening Principles"], img: "/2026-04-15-10-03-00-tactical-geometry.webp" },
     { week: "Phase 3", title: "Tournament Masterclass", duration: "Advanced", details: "Elite prep for rated players. Covers deep theoretical endgames, pawn structure manipulation, and psychological resilience under severe time pressure.", tools: ["Positional Play", "Theoretical Endgames", "Clock Management"], img: "/2026-04-15-10-04-00-tournament-masterclass.webp" }
   ];
@@ -1480,7 +1516,7 @@ function Curriculum() {
         <div className="mb-12 md:mb-20 text-center">
           <h2 className="text-[10px] font-bold text-blue-600 uppercase tracking-widest-gs mb-3">Structured Syllabus</h2>
           <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tighter-gs text-slate-900 mb-4 md:mb-6 leading-tight">
-            The <span className="text-blue-600">Cognitive Framework</span>
+            The <span className="text-blue-600">Focus-Building Curriculum</span>
           </h3>
           <p className="text-base md:text-lg text-slate-600 font-medium max-w-3xl mx-auto leading-relaxed">
             A structured, academically rigorous progression. Just like math or science, students only advance when they prove complete mastery of the current cognitive phase.
@@ -1543,17 +1579,17 @@ type VideoItem = { src: string; title: string; label: string; badge: string };
 
 function VideoCard({ v }: { v: VideoItem }) {
   return (
-    <div className="depth-panel rounded-2xl overflow-hidden hover-lift group relative flex-shrink-0 w-[260px] md:w-auto">
+    <div className="rounded-2xl overflow-hidden hover-lift group relative flex-shrink-0 w-[180px] md:w-full bg-white border border-slate-200 shadow-md">
       <div className="absolute top-3 left-3 z-20">
         <Badge className="bg-amber-500 text-white border-0 text-[10px] font-bold shadow-lg">
           <PlayCircle className="size-3 mr-1" /> {v.badge}
         </Badge>
       </div>
-      <div className="relative w-full" style={{ paddingBottom: '177.78%' }}>
+      <div className="relative w-full aspect-[9/16] bg-black video-card-contain">
         <MediaPlayer
           title={v.title}
           src={v.src}
-          className="absolute inset-0 w-full h-full [--media-aspect-ratio:9/16]"
+          className="absolute inset-0 w-full h-full"
           crossOrigin=""
           playsInline
         >
@@ -1631,8 +1667,14 @@ function VideoShowcase() {
         <div className="md:hidden">
           <VideoCarousel videos={videos} />
         </div>
+        {/* Tablet: 2-column grid */}
+        <div className="hidden md:grid lg:hidden md:grid-cols-2 max-w-2xl mx-auto gap-5">
+          {videos.map((v, i) => (
+            <VideoCard key={i} v={v} />
+          ))}
+        </div>
         {/* Desktop: 4-column grid */}
-        <div className="hidden md:grid md:grid-cols-4 max-w-6xl mx-auto gap-5">
+        <div className="hidden lg:grid lg:grid-cols-4 max-w-6xl mx-auto gap-5">
           {videos.map((v, i) => (
             <VideoCard key={i} v={v} />
           ))}
@@ -1655,11 +1697,22 @@ function Mentors() {
               <Shield className="size-3" /> The Faculty Standard
             </h2>
             <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tighter-gs mb-4 md:mb-6 text-slate-900 leading-tight">
-              Expert Coaching by <span className="text-blue-700">Titled Masters.</span>
+              Only the top <span className="text-blue-700">1% of coaches</span> make it in.
             </h3>
-            <p className="text-base md:text-lg text-slate-600 font-medium leading-relaxed mb-6 md:mb-8">
-              We strictly filter our faculty. We do not hire hobbyists or 1500-rated amateurs. Our head coaches hold official titles from the World Chess Federation (FIDE) and possess years of rigorous pedagogical experience.
+            <p className="text-base md:text-lg text-slate-600 font-medium leading-relaxed mb-5 md:mb-6">
+              We reject hobbyists and 1500-rated amateurs. Our head coaches hold official FIDE titles, have background-verified IDs, and train under our in-house teaching rubric before they ever take a live class.
             </p>
+            <div className="flex flex-wrap gap-2 mb-6 md:mb-8">
+              <span className="inline-flex items-center gap-1.5 text-[11px] md:text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-full px-3 py-1.5 shadow-sm">
+                <Shield className="size-3.5 text-blue-600" /> Background-verified
+              </span>
+              <span className="inline-flex items-center gap-1.5 text-[11px] md:text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-full px-3 py-1.5 shadow-sm">
+                <CheckCircle className="size-3.5 text-emerald-500" /> FIDE-titled only
+              </span>
+              <span className="inline-flex items-center gap-1.5 text-[11px] md:text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-full px-3 py-1.5 shadow-sm">
+                <PlayCircle className="size-3.5 text-blue-600" /> Classes recorded for parent review
+              </span>
+            </div>
             
             <div className="flex flex-col gap-4">
                <div className="flex items-start gap-4">
@@ -1676,8 +1729,8 @@ function Mentors() {
                     <span className="text-blue-700 font-extrabold text-xs">2</span>
                  </div>
                  <div>
-                   <h4 className="font-extrabold text-slate-900 text-sm md:text-base">Cognitive Pedagogy Training</h4>
-                   <p className="text-xs md:text-sm text-slate-600 font-medium mt-1">Every coach is trained to teach patience, calculation protocols, and resilience—not just piece movements.</p>
+                   <h4 className="font-extrabold text-slate-900 text-sm md:text-base">Teaching &amp; Child-Safety Training</h4>
+                   <p className="text-xs md:text-sm text-slate-600 font-medium mt-1">Every coach is background-verified and trained to teach patience, calculation, and emotional resilience — not just piece movements.</p>
                  </div>
                </div>
             </div>
@@ -1699,11 +1752,11 @@ function Mentors() {
                   <div className="relative shrink-0">
                     <img loading="lazy" src="/young-man-deep-in-thought-while-playing-game-of-ch-2026-01-09-00-57-38-utc.webp" alt="Coach" className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover border-2 border-slate-200 gs-shadow-lg relative z-10" />
                     <div className="absolute -bottom-3 -right-3 bg-white border border-slate-200 rounded-lg p-1.5 gs-shadow-lg z-20">
-                       <img src="/star-badge.webp" className="size-6 object-contain" alt="FIDE" />
+                       <SealBadge className="size-6 text-amber-500" />
                     </div>
                   </div>
                   <div>
-                    <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-200 border-0 rounded text-[9px] md:text-[10px] font-bold uppercase tracking-widest-gs mb-1.5 px-2 py-0.5">Master Coach & Founder</Badge>
+                    <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-200 border-0 rounded text-[9px] md:text-[10px] font-bold uppercase tracking-widest-gs mb-1.5 px-2 py-0.5">Head Coach & Founder</Badge>
                     <h4 className="text-2xl md:text-3xl font-extrabold tracking-tighter-gs text-slate-900">Tarun Sir</h4>
                   </div>
                 </div>
@@ -1712,15 +1765,43 @@ function Mentors() {
                 
                 {/* Credentials list */}
                 <div className="grid grid-cols-1 gap-y-3.5 text-xs md:text-sm font-bold text-slate-700">
-                  <div className="flex items-start gap-3"><CheckCircle className="size-4 text-emerald-500 shrink-0 mt-0.5" /> FIDE Rated &mdash; active tournament player &amp; certified arbiter</div>
+                  <div className="flex items-start gap-3"><CheckCircle className="size-4 text-emerald-500 shrink-0 mt-0.5" /> FIDE Rated &mdash; active tournament player &amp; certified arbiter <a href="https://ratings.fide.com/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700 underline underline-offset-2 ml-1 whitespace-nowrap">Verify FIDE profile →</a></div>
                   <div className="flex items-start gap-3"><CheckCircle className="size-4 text-emerald-500 shrink-0 mt-0.5" /> 10+ years academic pedagogy &mdash; trained 200+ students across 3 countries</div>
-                  <div className="flex items-start gap-3"><CheckCircle className="size-4 text-emerald-500 shrink-0 mt-0.5" /> Architect of the ChessWize Protocol &mdash; a structured 48-week cognitive curriculum</div>
+                  <div className="flex items-start gap-3"><CheckCircle className="size-4 text-emerald-500 shrink-0 mt-0.5" /> Designed the ChessWize Programme &mdash; a structured 48-week curriculum focused on thinking, not memorising</div>
                   <div className="flex items-start gap-3"><CheckCircle className="size-4 text-emerald-500 shrink-0 mt-0.5" /> Students coached to 15+ state-level tournament podium finishes</div>
-                  <div className="flex items-start gap-3"><CheckCircle className="size-4 text-emerald-500 shrink-0 mt-0.5" /> Specialises in children aged 5-14 with focus on emotional resilience training</div>
+                  <div className="flex items-start gap-3"><CheckCircle className="size-4 text-emerald-500 shrink-0 mt-0.5" /> Specialises in emotional resilience training across every skill level — from absolute beginner to tournament player</div>
+                  <div className="flex items-start gap-3"><CheckCircle className="size-4 text-emerald-500 shrink-0 mt-0.5" /> <span>Your child stays with the <strong>same coach</strong> for the entire programme — no rotation, no handoffs</span></div>
                 </div>
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ════════════════════════════════════════════════
+   MID-PAGE CTA BREAK
+   ════════════════════════════════════════════════ */
+function MidPageCTA() {
+  return (
+    <section className="py-12 md:py-16 bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.1),transparent_60%)]" />
+      <div className="max-w-[900px] mx-auto px-4 md:px-8 relative z-10 text-center">
+        <h3 className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-white tracking-tighter-gs mb-3 md:mb-4 leading-tight">
+          Ready to see the difference structured coaching makes?
+        </h3>
+        <p className="text-blue-100 text-sm md:text-base font-medium max-w-xl mx-auto mb-6 md:mb-8">
+          A 50-min demo class plus counseling with a FIDE-rated coach. Zero obligation. Parents are welcome to observe any class.
+        </p>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 md:gap-4">
+          <Button onClick={scrollToForm} size="lg" className="h-12 md:h-14 px-8 md:px-10 bg-white text-blue-700 hover:bg-blue-50 rounded-xl text-sm md:text-base font-bold shadow-xl shadow-blue-900/30 transition-all hover:shadow-2xl hover:scale-[1.02]">
+            Book Free Demo <ArrowRight className="ml-2 size-4" />
+          </Button>
+          <span className="text-blue-200 text-xs font-medium flex items-center gap-1.5">
+            <CheckCircle className="size-3.5" /> No credit card required
+          </span>
         </div>
       </div>
     </section>
@@ -1738,8 +1819,9 @@ function FounderStory() {
           <div className="w-full md:w-1/3 shrink-0 relative">
             <div className="absolute inset-0 bg-blue-500/20 blur-2xl rounded-full" />
            <img loading="lazy" src="/2026-04-15-10-34-00-founder-tarun-portrait.webp" alt="Tarun Sir, Founder and Head Coach" className="w-full aspect-square object-cover rounded-2xl border border-slate-200 relative z-10 shadow-lg grayscale hover:grayscale-0 transition-all duration-700" />
-          </div>          <div className="w-full md:w-2/3 flex flex-col">
-            <h2 className="text-[10px] font-bold text-blue-600 uppercase tracking-widest-gs mb-3">Origin Directive</h2>
+          </div>
+          <div className="w-full md:w-2/3 flex flex-col">
+            <h2 className="text-[10px] font-bold text-blue-600 uppercase tracking-widest-gs mb-3">A Note From The Founder</h2>
             <h3 className="text-2xl md:text-3xl font-extrabold tracking-tighter-gs text-slate-900 mb-4 leading-tight">
               "I built ChessWize because the casual system failed my students."
             </h3>
@@ -1750,7 +1832,7 @@ function FounderStory() {
             </div>
             <div className="mt-6 pt-6 border-t border-slate-200 flex flex-col">
               <span className="font-extrabold text-slate-900 tracking-tight-gs text-lg">Tarun Sir</span>
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-widest-gs mt-1">Founder & Chief Architect</span>
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-widest-gs mt-1">Founder & Head Coach</span>
             </div>
           </div>
         </div>
@@ -1775,31 +1857,77 @@ function CertificateSection() {
               Graduate with <span className="text-amber-600">Distinction.</span>
             </h3>
             <p className="text-base md:text-lg text-slate-600 font-medium leading-relaxed mb-6 md:mb-8">
-              Upon successful completion of our rigorous training protocols, students receive a verified Certificate of Excellence—a testament to their focus, logic, and strategic capabilities.
+              Every student who completes a phase receives a verified Certificate of Excellence — signed by FIDE-titled masters and ready for school admission portfolios, extracurricular records, or a proud share on the family group.
             </p>
             <ul className="space-y-4">
-              <li className="flex items-center gap-3 text-sm font-bold text-slate-700"><CheckCircle className="size-5 text-emerald-600 shrink-0" /> Mathematically validated skill progression</li>
-              <li className="flex items-center gap-3 text-sm font-bold text-slate-700"><CheckCircle className="size-5 text-emerald-600 shrink-0" /> Signed by FIDE Titled Masters</li>
-              <li className="flex items-center gap-3 text-sm font-bold text-slate-700"><CheckCircle className="size-5 text-emerald-600 shrink-0" /> Powerful academic profile enhancer</li>
+              <li className="flex items-center gap-3 text-sm font-bold text-slate-700"><CheckCircle className="size-5 text-emerald-600 shrink-0" /> Validated skill progression with phase-by-phase milestones</li>
+              <li className="flex items-center gap-3 text-sm font-bold text-slate-700"><CheckCircle className="size-5 text-emerald-600 shrink-0" /> Signed by FIDE-titled masters with verifiable coach ID</li>
+              <li className="flex items-center gap-3 text-sm font-bold text-slate-700"><CheckCircle className="size-5 text-emerald-600 shrink-0" /> Strong academic profile &amp; school admissions signal</li>
+              <li className="flex items-center gap-3 text-sm font-bold text-slate-700"><CheckCircle className="size-5 text-emerald-600 shrink-0" /> Digital + printable — share-ready for family WhatsApp &amp; LinkedIn</li>
             </ul>
           </div>
           <div className="w-full lg:w-[55%] relative mt-8 lg:mt-0">
-            <div className="bg-white p-6 md:p-8 rounded-3xl border border-slate-200 shadow-xl relative z-10 rotate-1 sm:rotate-2 hover:rotate-0 transition-transform duration-500 cursor-pointer">
-              <div className="border-[4px] border-amber-500/30 rounded-2xl p-8 md:p-10 bg-slate-50 text-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-transparent pointer-events-none" />
-                <img src="/gold-thropy.webp" className="size-20 mx-auto mb-6 relative z-10 drop-shadow-2xl" alt="Trophy" />
-                <h4 className="text-3xl font-extrabold tracking-tighter-gs text-slate-900 uppercase relative z-10">Certificate of Excellence</h4>
-                <p className="text-slate-600 font-medium text-sm mt-4 relative z-10 max-w-sm mx-auto">Awarded for mastering advanced strategic planning and tactical calculation.</p>
-                <div className="mt-10 border-t border-slate-200 pt-8 flex justify-between items-center px-4 relative z-10">
-                  <div className="text-left relative z-10">
-                    <p className="text-[10px] uppercase tracking-widest-gs font-bold text-slate-500 mb-1">Head Coach</p>
-                    <p className="font-extrabold text-slate-900 text-lg">Tarun Sir</p>
+            <div className="bg-[#fffdf5] p-6 md:p-10 rounded-3xl border border-amber-200/60 shadow-2xl relative z-10 rotate-1 sm:rotate-2 hover:rotate-0 transition-transform duration-500 cursor-pointer ring-1 ring-amber-100/50">
+              {/* Watermark pattern */}
+              <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 35px, #b45309 35px, #b45309 36px)' }} />
+              
+              <div className="border-[3px] border-double border-amber-600/40 rounded-xl p-6 md:p-10 bg-gradient-to-b from-[#fffef8] to-[#fefcf0] text-center relative overflow-hidden">
+                {/* Corner ornaments */}
+                <div className="absolute top-3 left-3 w-8 h-8 border-t-2 border-l-2 border-amber-500/40 rounded-tl-sm" />
+                <div className="absolute top-3 right-3 w-8 h-8 border-t-2 border-r-2 border-amber-500/40 rounded-tr-sm" />
+                <div className="absolute bottom-3 left-3 w-8 h-8 border-b-2 border-l-2 border-amber-500/40 rounded-bl-sm" />
+                <div className="absolute bottom-3 right-3 w-8 h-8 border-b-2 border-r-2 border-amber-500/40 rounded-br-sm" />
+
+                {/* Inner decorative border */}
+                <div className="absolute inset-5 border border-amber-400/15 rounded-lg pointer-events-none" />
+
+                {/* Logo & org */}
+                <div className="flex items-center justify-center gap-2 mb-2 relative z-10">
+                  <TrophyGold className="size-10 drop-shadow-lg" />
+                </div>
+                <p className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.25em] text-amber-700/70 mb-4 relative z-10">ChessWize Academy</p>
+
+                <div className="w-16 h-px bg-gradient-to-r from-transparent via-amber-500/40 to-transparent mx-auto mb-4" />
+
+                <h4 className="text-2xl md:text-3xl font-extrabold tracking-tighter-gs text-slate-900 uppercase relative z-10">Certificate of Excellence</h4>
+                <p className="text-[10px] md:text-xs text-slate-500 font-medium mt-1 relative z-10 italic">This certificate is proudly presented to</p>
+
+                {/* Student name placeholder */}
+                <div className="mt-4 mb-2 relative z-10">
+                  <p className="text-xl md:text-2xl font-extrabold text-amber-700 tracking-tight" style={{ fontFamily: 'Georgia, serif' }}>Aarav Sharma</p>
+                  <div className="w-48 h-px bg-amber-600/30 mx-auto mt-1" />
+                </div>
+
+                <p className="text-slate-600 font-medium text-xs md:text-sm mt-3 relative z-10 max-w-xs mx-auto leading-relaxed">
+                  For mastering advanced strategic planning, tactical calculation, and demonstrating exceptional cognitive growth.
+                </p>
+
+                {/* Date & ID */}
+                <div className="flex items-center justify-center gap-4 mt-4 relative z-10">
+                  <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Date: 15 Apr 2026</span>
+                  <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">ID: CW-2026-0847</span>
+                </div>
+
+                {/* Signatures */}
+                <div className="mt-8 border-t border-amber-200/60 pt-6 grid grid-cols-3 items-end gap-4 px-2 relative z-10">
+                  <div className="text-center">
+                    <p className="text-sm md:text-base font-extrabold text-slate-800 italic" style={{ fontFamily: 'Georgia, serif' }}>Tarun</p>
+                    <div className="w-full h-px bg-slate-300 mt-1 mb-1" />
+                    <p className="text-[8px] md:text-[9px] uppercase tracking-[0.2em] font-bold text-slate-500">Head Coach</p>
                   </div>
-                  <img src="/star-badge.webp" className="size-16 opacity-90 drop-shadow-lg relative z-10" alt="Seal" />
+                  <div className="flex justify-center">
+                    <SealBadge className="size-14 md:size-16 text-amber-600 drop-shadow-xl" />
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm md:text-base font-extrabold text-slate-800 italic" style={{ fontFamily: 'Georgia, serif' }}>FIDE Verified</p>
+                    <div className="w-full h-px bg-slate-300 mt-1 mb-1" />
+                    <p className="text-[8px] md:text-[9px] uppercase tracking-[0.2em] font-bold text-slate-500">Certification</p>
+                  </div>
                 </div>
               </div>
             </div>
-            <div className="absolute top-0 left-0 w-full h-full bg-amber-600/20 rounded-3xl -rotate-2 sm:-rotate-3 z-0 shadow-lg border border-amber-500/20"></div>
+            {/* Shadow card behind */}
+            <div className="absolute top-2 left-2 w-full h-full bg-amber-700/10 rounded-3xl -rotate-2 sm:-rotate-3 z-0 shadow-lg border border-amber-500/10"></div>
           </div>
         </div>
       </div>
@@ -1808,73 +1936,180 @@ function CertificateSection() {
 }
 
 /* ════════════════════════════════════════════════
-   VALUE STACK
+   VALUE STACK (Pricing)
    ════════════════════════════════════════════════ */
 function ValueStack() {
+  const formats = [
+    {
+      title: "Group Sessions",
+      subtitle: "Max 6 students per batch",
+      icon: Users,
+      perSession: 375,
+      unit: "per student / session",
+      accent: "slate",
+      badge: null,
+      tiers: [
+        { sessions: 24, total: 9000, discountPct: 10, final: 8100 },
+        { sessions: 48, total: 18000, discountPct: 15, final: 15300 },
+        { sessions: 96, total: 36000, discountPct: 20, final: 28800 },
+      ],
+    },
+    {
+      title: "Two-on-One",
+      subtitle: "Siblings or friend pairs",
+      icon: UserPlus,
+      perSession: 550,
+      unit: "per student / session",
+      accent: "blue",
+      badge: "Most Popular",
+      tiers: [
+        { sessions: 24, total: 13200, discountPct: 10, final: 11880 },
+        { sessions: 48, total: 26400, discountPct: 15, final: 22440 },
+        { sessions: 96, total: 52800, discountPct: 20, final: 42240 },
+      ],
+    },
+    {
+      title: "Individual (1-on-1)",
+      subtitle: "Highest-intensity personalisation",
+      icon: User,
+      perSession: 1000,
+      unit: "per session",
+      accent: "amber",
+      badge: null,
+      tiers: [
+        { sessions: 24, total: 24000, discountPct: 10, final: 21600 },
+        { sessions: 48, total: 48000, discountPct: 15, final: 40800 },
+        { sessions: 96, total: 96000, discountPct: 20, final: 76800 },
+      ],
+    },
+  ];
+
+  const inclusions = [
+    "Live training with FIDE-rated coaches",
+    "24×7 access to the ChessWize student platform",
+    "Daily puzzle routines & homework tracking",
+    "Mistake analysis & behavioural review",
+    "Parental dashboard with progress telemetry",
+    "Official certificate on programme completion",
+  ];
+
+  const fmtINR = (n: number) => `₹${n.toLocaleString("en-IN")}`;
+
   return (
     <section id="tuition" className="py-16 md:py-24 bg-white relative overflow-hidden border-t border-slate-200">
       <div className="max-w-[1200px] mx-auto px-4 md:px-8 relative z-10">
         <div className="text-center mb-12 md:mb-16">
-          <Badge className="bg-amber-100 text-amber-800 border-0 rounded-full font-bold mb-4 md:mb-6 px-3 py-1 text-[9px] md:text-[10px] uppercase tracking-widest-gs">The Arsenal</Badge>
+          <Badge className="bg-amber-100 text-amber-800 border-0 rounded-full font-bold mb-4 md:mb-6 px-3 py-1 text-[9px] md:text-[10px] uppercase tracking-widest-gs">Tuition &amp; Investment</Badge>
           <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tighter-gs mb-4 md:mb-6 text-slate-900 leading-tight">
-            The Complete <span className="text-blue-600">Cognitive Stack</span>
+            Transparent pricing. <span className="text-blue-600">Pick your format.</span>
           </h3>
           <p className="text-base md:text-lg text-slate-600 font-medium max-w-2xl mx-auto leading-relaxed">
-            Everything required to build a resilient thinker, bundled into our rigorous training environment.
+            All three formats include the same curriculum, coaches, and platform access. Choose the attention level that fits your child.
           </p>
-        </div>
-
-        <div className="flex flex-col lg:flex-row gap-8 items-stretch">
-        {/* Stack details */}
-        <div className="w-full lg:w-[55%] flex flex-col gap-3">
-          <h4 className="text-lg md:text-xl font-extrabold text-slate-900 mb-2 md:mb-4 tracking-tight-gs">What your investment covers:</h4>
-          {[
-            { label: "Live Cognitive Training with FIDE Masters", value: "Core" },
-            { label: "Daily Puzzle Routines to Build Focus", value: "Tech" },
-            { label: "Mistake Analysis & Behavioral Review", value: "Core" },
-            { label: "Parental Dashboard & Telemetry Updates", value: "Comms" },
-            { label: "Official Certification of Cognitive Progress", value: "Included" }
-          ].map((item, i) => (
-            <div key={i} className="flex items-center justify-between p-4 md:p-5 bg-slate-50 rounded-xl border border-slate-200 gs-shadow-sm hover:border-blue-300 transition-all hover:bg-white hover-lift cursor-default">
-              <div className="flex items-center gap-3 md:gap-4">
-                <CheckCircle className="size-4 md:size-5 text-emerald-600 shrink-0" />
-                <span className="font-bold text-slate-800 text-xs sm:text-sm md:text-base leading-tight">{item.label}</span>
-              </div>
-              <Badge variant="secondary" className="bg-white text-slate-600 border border-slate-200 uppercase tracking-widest-gs font-bold text-[9px]">
-                {item.value}
-              </Badge>
-            </div>
-          ))}
-        </div>
-
-        {/* Call to Action Card */}
-        <div className="w-full lg:w-[45%]">
-          <div className="rounded-3xl bg-[url('/2026-04-15-10-10-00-chess-dashboard.webp')] bg-cover bg-center gs-shadow-2xl border border-slate-200 hover-lift overflow-hidden relative h-full min-h-[360px]">
-             <div className="absolute inset-0 bg-slate-50/80 backdrop-blur-sm pointer-events-none" />
-             <div className="relative flex flex-col justify-between p-6 sm:p-8 md:p-10 text-slate-900 z-10 h-full">
-               <div className="absolute -top-3 right-4 sm:right-8 bg-emerald-500 text-slate-50 font-extrabold text-[9px] sm:text-[11px] uppercase tracking-widest-gs px-3 sm:px-4 py-1 sm:py-1.5 rounded-md shadow-lg text-center animate-pulse border border-emerald-400">
-                 Strict 6-Student Limit
-               </div>
-               
-               <div>
-                 <h4 className="text-2xl md:text-3xl font-extrabold tracking-tighter-gs mb-2 md:mb-3">Ready to enroll?</h4>
-                 <p className="text-sm md:text-base text-slate-700 font-medium leading-relaxed">
-                   We do not accept direct payments. Every student must complete the free baseline evaluation to ensure cohort compatibility.
-                 </p>
-               </div>
-               
-               <div className="mt-8">
-                 <div className="flex items-center gap-3 text-xs md:text-sm font-bold text-slate-700 mb-4 md:mb-6">
-                   <Lock className="size-4 text-blue-600" />
-                   Invitation-only enrollment process
-                 </div>
-                 <Button onClick={scrollToForm} className="w-full h-14 md:h-16 gs-btn bg-blue-600 text-slate-50 hover:bg-blue-700 font-extrabold text-base shadow-xl rounded-xl">
-                   Book Baseline Evaluation <ArrowRight className="ml-2 size-5" />
-                 </Button>
-               </div>
-             </div>
+          <div className="mt-5 md:mt-6 inline-flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-900 font-bold text-xs md:text-sm rounded-full px-4 py-2">
+            <CalendarCheck className="size-4 text-amber-700" />
+            <span>Next batch starts <span className="text-amber-900">{getNextCohortDate()}</span> · limited seats per format</span>
           </div>
         </div>
+
+        {/* Pricing cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mb-10 md:mb-14">
+          {formats.map((fmt, i) => {
+            const Icon = fmt.icon;
+            const featured = fmt.accent === "blue";
+            return (
+              <div
+                key={i}
+                className={`relative rounded-3xl border flex flex-col hover-lift transition-all overflow-hidden ${
+                  featured
+                    ? "bg-slate-900 text-slate-50 border-blue-500 shadow-2xl shadow-blue-500/20 md:-translate-y-2"
+                    : "bg-slate-50 text-slate-900 border-slate-200 gs-shadow-md hover:border-blue-300"
+                }`}
+              >
+                {fmt.badge && (
+                  <div className="absolute top-0 right-0 bg-blue-500 text-white text-[10px] font-extrabold uppercase tracking-widest-gs px-3 py-1.5 rounded-bl-xl shadow-lg">
+                    {fmt.badge}
+                  </div>
+                )}
+
+                <div className="p-6 md:p-8 border-b border-slate-200/20">
+                  <div className={`size-12 rounded-xl flex items-center justify-center mb-4 ${featured ? "bg-blue-500/20" : "bg-blue-100"}`}>
+                    <Icon className={`size-6 ${featured ? "text-blue-300" : "text-blue-600"}`} />
+                  </div>
+                  <h4 className="text-xl md:text-2xl font-extrabold tracking-tight-gs mb-1">{fmt.title}</h4>
+                  <p className={`text-xs md:text-sm font-medium ${featured ? "text-slate-400" : "text-slate-600"}`}>{fmt.subtitle}</p>
+
+                  <div className="mt-5 flex items-baseline gap-2">
+                    <span className="text-3xl md:text-4xl font-extrabold tracking-tighter-gs">{fmtINR(fmt.perSession)}</span>
+                    <span className={`text-xs font-medium ${featured ? "text-slate-400" : "text-slate-500"}`}>{fmt.unit}</span>
+                  </div>
+                </div>
+
+                <div className="p-6 md:p-8 flex flex-col gap-3 flex-1">
+                  {fmt.tiers.map((t, j) => (
+                    <div
+                      key={j}
+                      className={`rounded-xl px-4 py-3 flex items-center justify-between border ${
+                        featured
+                          ? "bg-slate-800/60 border-slate-700"
+                          : "bg-white border-slate-200"
+                      }`}
+                    >
+                      <div className="flex flex-col">
+                        <span className="text-sm font-extrabold">{t.sessions} sessions</span>
+                        <span className={`text-[10px] md:text-[11px] font-bold uppercase tracking-widest-gs ${featured ? "text-emerald-400" : "text-emerald-600"}`}>
+                          Save {t.discountPct}%
+                        </span>
+                      </div>
+                      <div className="flex flex-col items-end">
+                        <span className="text-base md:text-lg font-extrabold tracking-tight-gs">{fmtINR(t.final)}</span>
+                        <span className={`text-[10px] md:text-[11px] line-through ${featured ? "text-slate-500" : "text-slate-400"}`}>{fmtINR(t.total)}</span>
+                      </div>
+                    </div>
+                  ))}
+
+                  <Button
+                    onClick={scrollToForm}
+                    className={`mt-3 h-12 md:h-14 w-full font-extrabold text-sm md:text-base rounded-xl shadow-lg ${
+                      featured
+                        ? "bg-blue-500 hover:bg-blue-400 text-white"
+                        : "gs-btn bg-blue-600 hover:bg-blue-700 text-slate-50"
+                    }`}
+                  >
+                    Book Free Demo <ArrowRight className="ml-2 size-4" />
+                  </Button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Inclusions strip */}
+        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 md:p-8">
+          <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6 mb-5 md:mb-6">
+            <h4 className="text-lg md:text-xl font-extrabold tracking-tight-gs text-slate-900 shrink-0">Every format includes</h4>
+            <div className="h-px flex-1 bg-slate-200 hidden md:block" />
+          </div>
+          <ul className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+            {inclusions.map((item, i) => (
+              <li key={i} className="flex items-start gap-3 text-sm font-bold text-slate-700">
+                <CheckCircle className="size-5 text-emerald-600 shrink-0 mt-0.5" />
+                <span className="leading-snug">{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Footer note */}
+        <div className="mt-6 md:mt-8 flex flex-col md:flex-row items-center justify-between gap-3 text-xs md:text-sm text-slate-500 font-medium">
+          <div className="flex items-center gap-2">
+            <Lock className="size-4 text-slate-400" />
+            <span>Secure payments via Razorpay · GST included where applicable</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Phone className="size-4 text-slate-400" />
+            <span>Questions? Call <a href="tel:+917007578072" className="text-blue-600 font-bold">+91-70075-78072</a></span>
+          </div>
         </div>
       </div>
     </section>
@@ -1889,13 +2124,15 @@ function StarPerformers() {
     {
       name: "Saanvika",
       achievement: "Joined at 800 Elo with weak endgame technique. Coach identified recurring rook endgame errors and built a targeted 6-week module. She broke 1000 in month two, won her first rated tournament in month four, and hit 1340 by month six. Five tournament victories and counting — her tactical accuracy on the dashboard sits at 94%.",
+      schoolImpact: "Parents report visibly sharper math problem-solving at school.",
       img: "https://chesswize.com/wp-content/uploads/2025/03/Untitled-design-28.png",
       tag: "800 → 1340 Elo",
       duration: "6 Months"
     },
     {
       name: "Mikaeel",
-      achievement: "Started as a complete beginner who couldn't sit still for 10 minutes. The Foundation Protocol stretched his focus from 5-minute bursts to full 45-minute sessions. His puzzle solve rate went from 30% to 76% in 8 weeks. He now plays rated games with calm composure and crossed 1100 Elo in just four months — without a single tantrum.",
+      achievement: "Started as a complete beginner who couldn't sit still for 10 minutes. The Foundation Programme stretched his focus from 5-minute bursts to full 45-minute sessions. His puzzle solve rate went from 30% to 76% in 8 weeks. He now plays rated games with calm composure and crossed 1100 Elo in just four months — without a single tantrum.",
+      schoolImpact: "His class teacher noted improved sitting tolerance and homework focus.",
       img: "https://chesswize.com/wp-content/uploads/2025/03/Untitled-design-30.png",
       tag: "0 → 1100 Elo",
       duration: "4 Months"
@@ -1903,6 +2140,7 @@ function StarPerformers() {
     {
       name: "Avyukt",
       achievement: "Entered the Foundation cohort but advanced to Tournament Masterclass in record time. His coach noted exceptional pattern recognition — he was spotting knight forks 3 moves ahead by week six. Promoted through two cohort levels in 10 weeks. Currently preparing for his first FIDE-rated tournament with a puzzle accuracy of 91%.",
+      schoolImpact: "Earned the school's logic olympiad selection in his grade.",
       img: "https://chesswize.com/wp-content/uploads/2025/03/Untitled-design-29.png",
       tag: "Fast-Track Promotion",
       duration: "10 Weeks"
@@ -1919,7 +2157,7 @@ function StarPerformers() {
             Excellence is <span className="text-amber-600">engineered.</span>
           </h3>
           <p className="text-base md:text-lg text-slate-600 font-medium max-w-2xl mx-auto">
-            Meet the students who have fully embraced the ChessWize Protocol and are dominating their local tournament circuits.
+            Meet the students who have fully embraced the ChessWize Programme and are dominating their local tournament circuits.
           </p>
         </div>
 
@@ -1942,9 +2180,13 @@ function StarPerformers() {
                 </div>
 
                 <h4 className="text-xl md:text-2xl font-extrabold text-slate-900 tracking-tight-gs mb-3">{p.name}</h4>
-                <p className="text-sm md:text-base text-slate-600 font-medium leading-relaxed">
+                <p className="text-sm md:text-base text-slate-600 font-medium leading-relaxed mb-4">
                   {p.achievement}
                 </p>
+                <div className="mt-auto pt-4 border-t border-slate-100 flex items-start gap-2.5 text-xs font-bold text-blue-800 bg-blue-50 border border-blue-100 rounded-xl p-3">
+                  <BookOpen className="size-4 text-blue-600 shrink-0 mt-0.5" />
+                  <span className="leading-snug">School impact: {p.schoolImpact}</span>
+                </div>
               </div>
             </Tilt>
           ))}
@@ -1964,7 +2206,7 @@ function WallOfLove() {
     <section className="py-16 md:py-24 bg-slate-50 border-b border-slate-200 gs-grid-pattern">
       <div className="max-w-[1400px] mx-auto px-4 md:px-8">
         <div className="text-center mb-12 md:mb-16">
-          <h2 className="text-[10px] font-bold text-blue-600 uppercase tracking-widest-gs mb-3">Written Telemetry</h2>
+          <h2 className="text-[10px] font-bold text-blue-600 uppercase tracking-widest-gs mb-3">Parent Reviews</h2>
           <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tighter-gs mb-4 leading-tight">
             Verified by parents worldwide.
           </h3>
@@ -1999,8 +2241,56 @@ function WallOfLove() {
    HOW IT WORKS
    ════════════════════════════════════════════════ */
 function HowItWorks() {
+  const steps = [
+    {
+      num: "01",
+      title: "Free Demo &amp; Counseling",
+      desc: "A 50-minute 1-on-1 virtual session where our coach maps your child's calculation depth, attention span, emotional response to losing, and opening knowledge — and you get a personalised plan from a counselor.",
+      bullets: [
+        "Personalised diagnostic — not a generic quiz",
+        "Written report delivered within 24 hours",
+        "Specific data points, not vague praise",
+      ],
+      icon: Target,
+      detail: "50 min · 1-on-1 · Written report included",
+      color: "blue",
+    },
+    {
+      num: "02",
+      title: "Cohort Placement",
+      desc: "Based on the diagnostic, we place your child into a small group of max 6 students at the same cognitive level — not just the same age.",
+      bullets: [
+        "FIDE-certified master assigned as dedicated coach",
+        "Personalised 12-week roadmap built from diagnostic",
+        "Grouped by skill level, not age or school grade",
+      ],
+      icon: Users,
+      detail: "Max 6 students · Matched by skill, not age",
+      color: "emerald",
+    },
+    {
+      num: "03",
+      title: "Weekly Virtual Training + Dashboard",
+      desc: "Your child logs into live interactive sessions from home. After every session, the coach uploads detailed notes to your Parent Dashboard.",
+      bullets: [
+        "Topics covered, mistakes identified, homework assigned",
+        "Weekly accuracy trend graph and Elo tracker",
+        "Recorded replays available within 2 hours",
+      ],
+      icon: Activity,
+      detail: "Live sessions · Recorded replays · Weekly parent reports",
+      color: "amber",
+    },
+  ];
+
+  const colorMap: Record<string, { bg: string; border: string; text: string; numBg: string; numText: string; bulletDot: string }> = {
+    blue: { bg: "bg-blue-50", border: "border-blue-200 hover:border-blue-400", text: "text-blue-600", numBg: "bg-blue-600", numText: "text-white", bulletDot: "bg-blue-400" },
+    emerald: { bg: "bg-emerald-50", border: "border-emerald-200 hover:border-emerald-400", text: "text-emerald-600", numBg: "bg-emerald-600", numText: "text-white", bulletDot: "bg-emerald-400" },
+    amber: { bg: "bg-amber-50", border: "border-amber-200 hover:border-amber-400", text: "text-amber-600", numBg: "bg-amber-600", numText: "text-white", bulletDot: "bg-amber-400" },
+  };
+
   return (
-    <section className="py-16 md:py-24 bg-slate-50 border-t border-slate-200 relative overflow-hidden">
+    <section className="py-16 md:py-24 bg-white border-t border-slate-200 relative overflow-hidden">
       <div className="max-w-[1200px] mx-auto px-4 md:px-8 relative z-10">
         <div className="text-center mb-12 md:mb-16">
           <Badge className="bg-emerald-100 text-emerald-800 border-0 rounded-full font-bold mb-4 md:mb-6 px-3 py-1 text-[9px] md:text-[10px] uppercase tracking-widest-gs">
@@ -2010,48 +2300,59 @@ function HowItWorks() {
             How our <span className="text-emerald-600">training process</span> works.
           </h3>
           <p className="text-base md:text-lg text-slate-600 font-medium max-w-2xl mx-auto leading-relaxed">
-            We've removed all friction. Your child can access our elite academic-grade training from anywhere.
+            Three clear steps from first contact to measurable results. No guesswork, no wasted time.
           </p>
-          <div className="flex items-center justify-center gap-2 mt-4 bg-emerald-50 border border-emerald-100 rounded-xl px-4 py-2.5 max-w-xl mx-auto">
-            <BookOpen className="size-3.5 text-emerald-600 shrink-0" />
-            <p className="text-[11px] md:text-xs text-emerald-800 font-medium">
-              <span className="font-extrabold">Fact:</span> Children who receive structured chess training show 32% greater improvement in reading comprehension and math scores (Educational Research Review, 2018).
-            </p>
-          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10">
-          {[
-            {
-              title: "1. The Free Baseline Evaluation",
-              desc: "A 50-minute 1-on-1 virtual session where our coach maps your child's calculation depth, attention span, emotional response to losing, and opening knowledge. You'll receive a written diagnostic report within 24 hours with specific data points, not vague praise. Zero commitment required.",
-              icon: Target,
-              detail: "50 min \u00b7 1-on-1 \u00b7 Written report included"
-            },
-            {
-              title: "2. Cohort Placement",
-              desc: "Based on the diagnostic, we place your child into a small group of max 6 students at the same cognitive level \u2014 not just the same age. A FIDE-certified master is assigned as their dedicated coach with a personalised 12-week roadmap.",
-              icon: Users,
-              detail: "Max 6 students \u00b7 Matched by skill, not age"
-            },
-            {
-              title: "3. Weekly Virtual Training + Dashboard",
-              desc: "Your child logs into live interactive sessions from home. After every session, the coach uploads notes to your Parent Dashboard: topics covered, mistakes identified, homework assigned, and a weekly accuracy trend graph. You'll know exactly what's happening without needing to understand chess.",
-              icon: Activity,
-              detail: "Live sessions \u00b7 Recorded replays \u00b7 Weekly parent reports"
-            },
-          ].map((step, i) => (
-            <div key={i} className="flex flex-col bg-slate-50 border border-slate-200 p-6 md:p-8 rounded-3xl gs-shadow-sm hover:border-emerald-300 transition-all hover-lift">
-              <div className="size-12 md:size-14 rounded-2xl bg-white border border-slate-200 flex items-center justify-center mb-6 shadow-sm">
-                <step.icon className="size-6 text-emerald-600" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+          {steps.map((step, i) => {
+            const c = colorMap[step.color];
+            return (
+              <div key={i} className={`flex flex-col ${c.bg} border ${c.border} p-6 md:p-8 rounded-3xl transition-all hover-lift relative overflow-hidden`}>
+                {/* Step number */}
+                <div className={`${c.numBg} ${c.numText} text-xs font-extrabold w-8 h-8 rounded-lg flex items-center justify-center mb-5 shadow-sm`}>
+                  {step.num}
+                </div>
+
+                {/* Icon */}
+                <div className={`size-12 md:size-14 rounded-2xl bg-white border border-slate-200 flex items-center justify-center mb-5 shadow-sm`}>
+                  <step.icon className={`size-6 ${c.text}`} />
+                </div>
+
+                <h4 className="text-lg md:text-xl font-extrabold tracking-tight-gs text-slate-900 mb-3">{step.title}</h4>
+                <p className="text-slate-600 text-sm font-medium leading-relaxed mb-4">{step.desc}</p>
+
+                {/* Bullet points */}
+                <ul className="space-y-2 mb-5">
+                  {step.bullets.map((b, j) => (
+                    <li key={j} className="flex items-start gap-2.5 text-sm text-slate-700 font-medium">
+                      <span className={`${c.bulletDot} size-1.5 rounded-full mt-2 shrink-0`} />
+                      {b}
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="mt-auto pt-4 border-t border-slate-200/60">
+                  <span className={`text-[10px] font-extrabold ${c.text} uppercase tracking-widest-gs`}>{step.detail}</span>
+                </div>
               </div>
-              <h4 className="text-xl md:text-2xl font-extrabold tracking-tight-gs text-slate-900 mb-3">{step.title}</h4>
-              <p className="text-slate-600 text-sm md:text-base font-medium leading-relaxed mb-4">{step.desc}</p>
-              <div className="mt-auto pt-4 border-t border-slate-100">
-                <span className="text-[10px] font-extrabold text-emerald-600 uppercase tracking-widest-gs">{step.detail}</span>
-              </div>
-            </div>
-          ))}
+            );
+          })}
+        </div>
+
+        {/* Connector arrows (desktop only) */}
+        <div className="hidden md:flex items-center justify-center gap-4 mt-10">
+          <div className="flex items-center gap-2 text-xs font-bold text-slate-400">
+            <span className="size-2 rounded-full bg-blue-400" /> Evaluate
+          </div>
+          <ArrowRight className="size-4 text-slate-300" />
+          <div className="flex items-center gap-2 text-xs font-bold text-slate-400">
+            <span className="size-2 rounded-full bg-emerald-400" /> Place
+          </div>
+          <ArrowRight className="size-4 text-slate-300" />
+          <div className="flex items-center gap-2 text-xs font-bold text-slate-400">
+            <span className="size-2 rounded-full bg-amber-400" /> Train
+          </div>
         </div>
       </div>
     </section>
@@ -2062,54 +2363,104 @@ function HowItWorks() {
    FAQ
    ════════════════════════════════════════════════ */
 function FAQ() {
-  const faqs = [
-    {
-      q: "My child is 5 and can't sit still for 10 minutes. Will this work?",
-      a: "Yes. Our Foundation Protocol is specifically designed for high-energy children. We use rapid-fire, gamified puzzles that naturally stretch their attention span over 30 days. Parents typically report their child going from 5-minute focus to 25-30 minutes within the first month — not because they're forced to sit, but because the puzzles are genuinely engaging at their exact cognitive level."
-    },
-    {
-      q: "How is this different from the free chess.com app?",
-      a: "Free apps teach you how the pieces move. We teach cognitive resilience. An app won't correct your child's frustration when they lose, nor will it explain *why* their impulsive decision-making is failing. Our FIDE Masters provide live, psychological and tactical interventions. More concretely: apps give the same puzzles to everyone. We diagnose your child's specific weaknesses (e.g. 'misses backward diagonal threats') and build a custom drill set around them."
-    },
-    {
-      q: "What if my child misses a live session?",
-      a: "Every single session is recorded and uploaded to your Parent Dashboard within 2 hours. Your child can watch the replay at their own pace. Additionally, they will have their daily puzzle regimen and engine analysis tools to ensure they never fall behind the cohort. If they miss more than 2 sessions in a row, their coach will proactively reach out to reschedule."
-    },
-    {
-      q: "Do I need to know how to play chess to help them?",
-      a: "Absolutely not. In fact, we prefer you don't intervene. Our system is fully self-contained. Your only job is to check the Parent Dashboard — it shows progress in plain English: topics covered, accuracy percentages, and Elo growth charts. No chess knowledge required to understand it."
-    },
-    {
-      q: "What exactly is the 30-Day Guarantee?",
-      a: "We guarantee visible cognitive growth. If, after 30 days of attending our sessions and doing the daily puzzles, you do not see a noticeable improvement in your child's patience or focus, we will refund 100% of your tuition. No questions asked. We track this objectively through the dashboard metrics, so there's no ambiguity."
-    },
-    {
-      q: "How much does it cost?",
-      a: "We don't publish pricing because every child's plan is different — a 6-year-old beginner needs a different intensity than a 12-year-old preparing for state championships. After the free diagnostic evaluation, we'll recommend a specific plan and share transparent pricing. There are no hidden fees, no long-term lock-ins, and you can pause or cancel anytime."
-    },
-    {
-      q: "My child already has a chess coach. Why should I switch?",
-      a: "Most coaches teach openings and tactics in a generic sequence. We start with a diagnostic that identifies your child's specific cognitive gaps — calculation depth, attention decay point, emotional response to losing — and build a protocol around those gaps. If your child has been stuck at the same rating for 3+ months, the issue is almost certainly structural, not effort-based. Our protocol is designed to break through those plateaus."
-    },
-    {
-      q: "Is this only for competitive players?",
-      a: "No. About 40% of our students have no interest in tournaments. Their parents enrolled them because chess is one of the most effective tools for building focus, patience, and logical thinking. Whether your goal is competitive Elo or cognitive development, the training protocol adapts to your child's objectives."
-    }
+  type FaqCategory = "fit" | "logistics" | "pricing";
+  const [activeCategory, setActiveCategory] = useState<FaqCategory>("fit");
+
+  const categories: { id: FaqCategory; label: string }[] = [
+    { id: "fit", label: "Learning & Fit" },
+    { id: "logistics", label: "Logistics" },
+    { id: "pricing", label: "Pricing & Guarantee" },
   ];
+
+  const faqs: { q: string; a: string; category: FaqCategory }[] = [
+    {
+      category: "fit",
+      q: "My child is 5 and can't sit still for 10 minutes. Will this work?",
+      a: "Yes. Our Foundation Programme is specifically designed for high-energy children. We use rapid-fire, gamified puzzles that naturally stretch their attention span over 30 days. Parents typically report their child going from 5-minute focus to 25-30 minutes within the first month — not because they're forced to sit, but because the puzzles are genuinely engaging at their exact skill level.",
+    },
+    {
+      category: "fit",
+      q: "How is this different from the free chess.com app?",
+      a: "Free apps teach you how the pieces move. We teach a child how to think under pressure. An app won't correct your child's frustration when they lose, nor will it explain why their impulsive decision-making is failing. Our FIDE masters provide live tactical and emotional coaching. Apps give everyone the same puzzles; we diagnose your child's specific weaknesses and build a custom drill set around them.",
+    },
+    {
+      category: "fit",
+      q: "My child already has a chess coach. Why should I switch?",
+      a: "Most coaches teach openings and tactics in a generic sequence. We start with a diagnostic that identifies your child's specific gaps — calculation depth, attention decay, emotional response to losing — and build a programme around them. If your child has been stuck at the same rating for 3+ months, the issue is usually structural, not effort. Our programme is built to break those plateaus.",
+    },
+    {
+      category: "fit",
+      q: "Is this only for competitive players?",
+      a: "No. About 40% of our students have no interest in tournaments. Their parents enrolled them because chess is one of the most effective tools for building focus, patience, and logical thinking — skills that carry straight into school. Whether you want competitive Elo growth or cognitive development, the programme adapts to your child's goals.",
+    },
+    {
+      category: "logistics",
+      q: "What if my child misses a live session?",
+      a: "Every session is recorded and uploaded to your parent dashboard within 2 hours. Your child can watch the replay at their own pace. Daily puzzles and the analysis tools ensure they stay with the cohort. If they miss more than 2 sessions in a row, their coach proactively reaches out to reschedule.",
+    },
+    {
+      category: "logistics",
+      q: "Do I need to know chess to help them?",
+      a: "Absolutely not. Our system is fully self-contained. Your only job is to check the parent dashboard — it shows progress in plain English: topics covered, accuracy percentages, and Elo growth charts. No chess knowledge needed.",
+    },
+    {
+      category: "logistics",
+      q: "Can parents observe a class?",
+      a: "Yes — parents are welcome to sit in on any class, anytime. No advance notice needed. You can also watch recorded class replays from your dashboard.",
+    },
+    {
+      category: "logistics",
+      q: "What software or device does my child need?",
+      a: "Any laptop, desktop, or tablet with a stable internet connection and a webcam. Classes run on Zoom plus our own student platform for puzzles, homework, and progress tracking. Nothing to install — it all runs in the browser.",
+    },
+    {
+      category: "pricing",
+      q: "How much does it cost?",
+      a: "We publish all our rates transparently — see the Tuition section above. Group sessions start at ₹375/session, Two-on-One at ₹550, and 1-on-1 at ₹1,000. You get 10–20% off depending on package size (24, 48, or 96 sessions). No hidden fees, no long-term lock-in. You can pause or cancel anytime.",
+    },
+    {
+      category: "pricing",
+      q: "What exactly is the 30-day guarantee?",
+      a: "We guarantee visible growth. If, after 30 days of attending our sessions and doing the daily puzzles, you don't see noticeable improvement in your child's patience or focus, we refund 100% of your tuition. No questions asked. We track this objectively via dashboard metrics, so there's no ambiguity.",
+    },
+  ];
+
+  const visibleFaqs = faqs.filter((f) => f.category === activeCategory);
 
   return (
     <section id="faq" className="py-16 md:py-24 bg-slate-50 text-slate-900 gs-grid-pattern border-t border-slate-200">
       <div className="max-w-[800px] mx-auto px-4 md:px-8">
-        <div className="text-center mb-10 md:mb-16">
+        <div className="text-center mb-8 md:mb-12">
           <h2 className="text-[10px] font-bold text-blue-600 uppercase tracking-widest-gs mb-3">Frequently Asked Questions</h2>
           <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tighter-gs mb-4 text-slate-900 leading-tight">
-            Frequently Asked <span className="text-blue-600">Questions</span>
+            Parents usually ask <span className="text-blue-600">these first.</span>
           </h3>
         </div>
 
+        <div role="tablist" className="flex flex-wrap items-center justify-center gap-2 mb-6 md:mb-8">
+          {categories.map((c) => {
+            const active = c.id === activeCategory;
+            return (
+              <button
+                key={c.id}
+                role="tab"
+                aria-selected={active}
+                onClick={() => setActiveCategory(c.id)}
+                className={`px-4 py-2 rounded-full text-xs md:text-sm font-extrabold uppercase tracking-widest-gs border transition-all ${
+                  active
+                    ? "bg-blue-600 text-white border-blue-600 shadow-md"
+                    : "bg-white text-slate-700 border-slate-200 hover:border-blue-300 hover:text-blue-700"
+                }`}
+              >
+                {c.label}
+              </button>
+            );
+          })}
+        </div>
+
         <Accordion className="w-full space-y-4">
-          {faqs.map((faq, i) => (
-            <AccordionItem key={i} value={`item-${i}`} className="border border-slate-200 bg-white/80 gs-shadow-xl rounded-2xl px-4 md:px-6 py-2 gs-shadow-sm">
+          {visibleFaqs.map((faq, i) => (
+            <AccordionItem key={`${activeCategory}-${i}`} value={`item-${activeCategory}-${i}`} className="border border-slate-200 bg-white/80 gs-shadow-xl rounded-2xl px-4 md:px-6 py-2 gs-shadow-sm">
               <AccordionTrigger className="text-left text-base md:text-lg font-extrabold tracking-tight-gs hover:text-blue-600 hover:no-underline transition-colors py-4">
                 {faq.q}
               </AccordionTrigger>
@@ -2135,7 +2486,7 @@ const formSchema = z.object({
   child_level: z.string().min(1, "Please select an estimated level"),
   city: z.string().min(2, "Please enter your city"),
   referral_source: z.string().min(1, "Please tell us how you found us"),
-  parent_concern: z.string().min(10, "Please share a bit more so we can prepare for the evaluation").max(500),
+  parent_concern: z.array(z.string()).min(1, "Pick at least one goal so our coach can prepare"),
   parent_commitment: z.string().min(1, "Please select your commitment level"),
   /* Honeypot — hidden from real users, bots auto-fill it */
   website_url: z.string().max(0, "Bot detected").optional(),
@@ -2195,7 +2546,7 @@ function BottomForm() {
     }
   };
 
-  const inputCls = (hasError: boolean) => `px-4 py-4 text-sm md:text-base border rounded-xl bg-slate-50 text-slate-900 font-bold placeholder:text-slate-400 placeholder:font-medium focus:outline-none focus:ring-2 focus:bg-white transition-all ${hasError ? 'border-red-500 focus:ring-red-500' : 'border-slate-200 focus:ring-blue-600 hover:border-blue-300'}`;
+  const inputCls = (hasError: boolean) => `px-4 py-3 text-sm md:text-base border rounded-xl bg-slate-50 text-slate-900 font-bold placeholder:text-slate-400 placeholder:font-medium focus:outline-none focus:ring-2 focus:bg-white transition-all ${hasError ? 'border-red-500 focus:ring-red-500' : 'border-slate-200 focus:ring-blue-600 hover:border-blue-300'}`;
 
   const stepVariants = {
     hidden: { opacity: 0, x: 20 },
@@ -2210,14 +2561,25 @@ function BottomForm() {
         <div className="text-center mb-10 md:mb-12">
           <h2 className="text-[10px] font-bold text-blue-600 uppercase tracking-widest-gs mb-2 md:mb-3">Take the next step</h2>
           <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tighter-gs text-slate-900 mb-3 md:mb-4 leading-tight">
-            Claim Your Child's Free Cognitive Evaluation
+            Book Your Child's Free Demo &amp; Counseling
           </h3>
           <p className="text-base md:text-lg text-slate-600 font-medium max-w-2xl mx-auto leading-relaxed">
             This isn't a generic sign-up form. We ask a few extra questions so our coach can prepare a personalised evaluation — not a cookie-cutter demo. Fill this in carefully; we review every application by hand.
           </p>
+          <div className="mt-5 md:mt-6 flex flex-wrap justify-center gap-2 md:gap-3">
+            <span className="inline-flex items-center gap-1.5 text-[11px] md:text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-full px-3 py-1.5 shadow-sm">
+              <CheckCircle className="size-3.5 text-emerald-500" /> 50-min demo + counseling
+            </span>
+            <span className="inline-flex items-center gap-1.5 text-[11px] md:text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-full px-3 py-1.5 shadow-sm">
+              <CheckCircle className="size-3.5 text-emerald-500" /> Parents welcome to observe any class
+            </span>
+            <span className="inline-flex items-center gap-1.5 text-[11px] md:text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-full px-3 py-1.5 shadow-sm">
+              <CheckCircle className="size-3.5 text-emerald-500" /> WhatsApp reply in 4 hours
+            </span>
+          </div>
         </div>
 
-        <div className="bg-white rounded-3xl p-6 sm:p-8 md:p-14 gs-border gs-shadow-2xl relative overflow-hidden min-h-[500px] flex flex-col justify-center">
+        <div className="bg-white rounded-3xl p-6 sm:p-8 md:p-10 gs-border gs-shadow-2xl relative overflow-hidden flex flex-col justify-center">
           <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full blur-[60px] pointer-events-none" />
           
           <AnimatePresence mode="wait">
@@ -2234,7 +2596,7 @@ function BottomForm() {
               <motion.form key="form" initial="hidden" animate="visible" exit="exit" variants={stepVariants} onSubmit={handleSubmit(onSubmit)} className="flex flex-col relative z-10 w-full">
                 
                 {/* Progress Bar */}
-                <div className="w-full h-1.5 bg-slate-100 rounded-full mb-8 overflow-hidden">
+                <div className="w-full h-1.5 bg-slate-100 rounded-full mb-6 overflow-hidden">
                   <motion.div 
                     className="h-full bg-blue-600 rounded-full"
                     initial={{ width: `${((step - 1) / 3) * 100}%` }}
@@ -2243,7 +2605,7 @@ function BottomForm() {
                   />
                 </div>
 
-                <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center justify-between mb-6">
                   <h4 className="text-xl font-extrabold text-slate-900">
                     {step === 1 && "Step 1: The Student"}
                     {step === 2 && "Step 2: The Challenge"}
@@ -2260,32 +2622,32 @@ function BottomForm() {
 
                 <AnimatePresence mode="wait">
                   {step === 1 && (
-                    <motion.div key="step1" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="flex flex-col gap-5 md:gap-6">
+                    <motion.div key="step1" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="flex flex-col gap-4 md:gap-5">
                       <div className="flex flex-col gap-1.5 md:gap-2">
                         <label htmlFor="bottom_child_name" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">Child's First Name <span className="text-red-500">*</span></label>
                         <input id="bottom_child_name" {...register("child_name")} type="text" className={inputCls(!!errors.child_name)} placeholder="e.g. Aarav" />
                         {errors.child_name && <p className="text-[10px] text-red-500 font-bold mt-1">{errors.child_name.message}</p>}
                       </div>
                       
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 md:gap-8">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5">
                         <div className="flex flex-col gap-1.5 md:gap-2">
                           <label htmlFor="bottom_child_age_range" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">Child's Age <span className="text-red-500">*</span></label>
                           <div className="relative">
-                            <select id="bottom_child_age_range" {...register("child_age_range")} className={inputCls(!!errors.child_age_range) + " appearance-none cursor-pointer"}>
+                            <select id="bottom_child_age_range" {...register("child_age_range")} className={inputCls(!!errors.child_age_range) + " appearance-none cursor-pointer pr-10"}>
                               <option value="">Select age group</option>
                               <option value="4-6">4 - 6 Years</option>
                               <option value="7-9">7 - 9 Years</option>
                               <option value="10-12">10 - 12 Years</option>
                               <option value="13+">13+ Years</option>
                             </select>
-                            <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 size-5 text-slate-600 pointer-events-none" />
+                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-slate-400 pointer-events-none" />
                           </div>
                           {errors.child_age_range && <p className="text-[10px] text-red-500 font-bold mt-1">{errors.child_age_range.message}</p>}
                         </div>
                         <div className="flex flex-col gap-1.5 md:gap-2">
                           <label htmlFor="bottom_child_level" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">Current Chess Level <span className="text-red-500">*</span></label>
                           <div className="relative">
-                            <select id="bottom_child_level" {...register("child_level")} className={inputCls(!!errors.child_level) + " appearance-none cursor-pointer"}>
+                            <select id="bottom_child_level" {...register("child_level")} className={inputCls(!!errors.child_level) + " appearance-none cursor-pointer pr-10"}>
                               <option value="">Select estimated level</option>
                               <option value="never-played">Never played chess before</option>
                               <option value="knows-rules">Knows the rules but no formal training</option>
@@ -2293,45 +2655,61 @@ function BottomForm() {
                               <option value="intermediate">Intermediate (800-1200 Elo / plays online)</option>
                               <option value="advanced">Advanced (1200+ Elo / tournament experience)</option>
                             </select>
-                            <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 size-5 text-slate-600 pointer-events-none" />
+                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-slate-400 pointer-events-none" />
                           </div>
                           {errors.child_level && <p className="text-[10px] text-red-500 font-bold mt-1">{errors.child_level.message}</p>}
                         </div>
                       </div>
 
-                      <Button type="button" onClick={() => handleNextStep(['child_name', 'child_age_range', 'child_level'])} className="w-full h-14 mt-4 text-base font-extrabold tracking-tight gs-btn gs-btn-primary rounded-xl shadow-lg">
+                      <Button type="button" onClick={() => handleNextStep(['child_name', 'child_age_range', 'child_level'])} className="w-full h-14 mt-2 text-base font-extrabold tracking-tight gs-btn gs-btn-primary rounded-xl shadow-lg">
                         Continue to Next Step <ArrowRight className="ml-2 size-4" />
                       </Button>
                     </motion.div>
                   )}
 
                   {step === 2 && (
-                    <motion.div key="step2" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="flex flex-col gap-5 md:gap-6">
+                    <motion.div key="step2" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="flex flex-col gap-4 md:gap-5">
                       <div className="flex flex-col gap-1.5 md:gap-2">
-                        <label htmlFor="bottom_concern" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">
-                          What's your biggest concern about your child's learning right now? <span className="text-red-500">*</span>
+                        <label className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">
+                          What do you want chess to do for your child? <span className="text-red-500">*</span>
                         </label>
-                        <p className="text-[10px] text-slate-400 font-medium -mt-0.5">Be specific — our coach reads this before your evaluation call to prepare a tailored session.</p>
-                        <textarea 
-                          id="bottom_concern" 
-                          {...register("parent_concern")} 
-                          rows={4} 
-                          className={inputCls(!!errors.parent_concern) + " resize-none"} 
-                          placeholder="e.g. My son loses focus after 10 minutes and gets frustrated when he loses. I want him to develop patience and handle pressure better."
-                        />
-                        {errors.parent_concern && <p className="text-[10px] text-red-500 font-bold mt-1">{errors.parent_concern.message}</p>}
+                        <p className="text-[10px] text-slate-400 font-medium -mt-0.5">Pick all that apply — our coach uses this to tailor the demo.</p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-1">
+                          {[
+                            { value: "focus", label: "Improve focus & attention span" },
+                            { value: "math", label: "Boost math, logic &amp; school performance" },
+                            { value: "screen_time", label: "Replace passive screen time" },
+                            { value: "tournament", label: "Train for tournaments / FIDE rating" },
+                            { value: "confidence", label: "Build confidence &amp; emotional resilience" },
+                            { value: "exploring", label: "Just exploring — not sure yet" },
+                          ].map((opt) => (
+                            <label key={opt.value} className="flex items-start gap-2.5 p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-white hover:border-blue-300 transition-all cursor-pointer has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 has-[:checked]:shadow-sm">
+                              <input
+                                type="checkbox"
+                                value={opt.value}
+                                {...register("parent_concern")}
+                                className="mt-0.5 size-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer shrink-0"
+                              />
+                              <span
+                                className="text-xs md:text-[13px] font-bold text-slate-800 leading-snug"
+                                dangerouslySetInnerHTML={{ __html: opt.label }}
+                              />
+                            </label>
+                          ))}
+                        </div>
+                        {errors.parent_concern && <p className="text-[10px] text-red-500 font-bold mt-1">{(errors.parent_concern as any).message}</p>}
                       </div>
 
                       <div className="flex flex-col gap-1.5 md:gap-2">
                         <label htmlFor="bottom_commitment" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">What is your commitment level? <span className="text-red-500">*</span></label>
                         <div className="relative">
-                          <select id="bottom_commitment" {...register("parent_commitment")} className={inputCls(!!errors.parent_commitment) + " appearance-none cursor-pointer"}>
+                          <select id="bottom_commitment" {...register("parent_commitment")} className={inputCls(!!errors.parent_commitment) + " appearance-none cursor-pointer pr-10"}>
                             <option value="">Select commitment</option>
                             <option value="casual">Casual (Just want a fun hobby)</option>
                             <option value="serious">Serious (Looking for structured, long-term cognitive growth)</option>
                             <option value="competitive">Competitive (Aiming for FIDE rating / tournaments)</option>
                           </select>
-                          <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 size-5 text-slate-600 pointer-events-none" />
+                          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-slate-400 pointer-events-none" />
                         </div>
                         {errors.parent_commitment && <p className="text-[10px] text-red-500 font-bold mt-1">{errors.parent_commitment.message}</p>}
                       </div>
@@ -2348,14 +2726,14 @@ function BottomForm() {
                   )}
 
                   {step === 3 && (
-                    <motion.div key="step3" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="flex flex-col gap-5 md:gap-6">
+                    <motion.div key="step3" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="flex flex-col gap-4 md:gap-5">
                       <div className="flex flex-col gap-1.5 md:gap-2">
                         <label htmlFor="bottom_parent_name" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">Parent's Full Name <span className="text-red-500">*</span></label>
                         <input id="bottom_parent_name" {...register("parent_name")} type="text" className={inputCls(!!errors.parent_name)} placeholder="e.g. Rahul Sharma" />
                         {errors.parent_name && <p className="text-[10px] text-red-500 font-bold mt-1">{errors.parent_name.message}</p>}
                       </div>
                       
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 md:gap-8">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5">
                         <div className="flex flex-col gap-1.5 md:gap-2">
                           <label htmlFor="bottom_phone" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">WhatsApp Number <span className="text-red-500">*</span></label>
                           <input id="bottom_phone" {...register("phone")} type="tel" className={inputCls(!!errors.phone)} placeholder="+91 98765 43210" />
@@ -2371,7 +2749,7 @@ function BottomForm() {
                       <div className="flex flex-col gap-1.5 md:gap-2">
                         <label htmlFor="bottom_referral" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">How did you hear about us? <span className="text-red-500">*</span></label>
                         <div className="relative">
-                          <select id="bottom_referral" {...register("referral_source")} className={inputCls(!!errors.referral_source) + " appearance-none cursor-pointer"}>
+                          <select id="bottom_referral" {...register("referral_source")} className={inputCls(!!errors.referral_source) + " appearance-none cursor-pointer pr-10"}>
                             <option value="">Select one</option>
                             <option value="instagram">Instagram</option>
                             <option value="facebook">Facebook</option>
@@ -2381,7 +2759,7 @@ function BottomForm() {
                             <option value="school">School / Teacher Recommendation</option>
                             <option value="other">Other</option>
                           </select>
-                          <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 size-5 text-slate-600 pointer-events-none" />
+                          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-slate-400 pointer-events-none" />
                         </div>
                         {errors.referral_source && <p className="text-[10px] text-red-500 font-bold mt-1">{errors.referral_source.message}</p>}
                       </div>
@@ -2431,16 +2809,26 @@ function BottomForm() {
 }
 
 function WhatsAppWidget() {
+  const WA_HREF = "https://wa.me/917007578072?text=Hi%2C%20I%27d%20like%20to%20book%20a%20free%20demo%20for%20my%20child.";
   return (
-    <a 
-      href="https://wa.me/919876543210?text=Hi%2C%20I'm%20interested%20in%20a%20baseline%20evaluation." 
-      target="_blank" 
+    <a
+      href={WA_HREF}
+      target="_blank"
       rel="noopener noreferrer"
-      className="fixed bottom-20 right-4 md:bottom-8 md:right-8 z-50 flex items-center justify-center size-14 md:size-16 bg-emerald-500 text-slate-900 rounded-full shadow-2xl hover:scale-110 hover:bg-emerald-600 transition-all cursor-pointer border-2 border-emerald-400"
+      aria-label="Chat with an academic counselor on WhatsApp"
+      className="group fixed bottom-24 right-4 md:bottom-24 lg:bottom-8 md:right-8 z-[110] flex items-center gap-3 bg-emerald-500 text-white rounded-full shadow-2xl hover:bg-emerald-600 transition-all cursor-pointer border-2 border-emerald-400 pl-2 pr-3 md:pr-5 py-2"
     >
-      <svg viewBox="0 0 24 24" fill="currentColor" className="size-7 md:size-8">
-        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-      </svg>
+      <span className="relative flex items-center justify-center size-10 md:size-11 bg-white/15 rounded-full shrink-0">
+        <span className="absolute -top-0.5 -right-0.5 size-3 rounded-full bg-green-400 ring-2 ring-emerald-500" />
+        <svg viewBox="0 0 24 24" fill="currentColor" className="size-5 md:size-6">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+        </svg>
+      </span>
+      <div className="hidden md:flex flex-col leading-tight pr-1">
+        <span className="text-[11px] font-bold uppercase tracking-widest-gs text-emerald-100">Academic Counselor</span>
+        <span className="text-sm font-extrabold">Chat on WhatsApp</span>
+        <span className="text-[10px] font-bold text-emerald-100">Replies in &lt;10 min</span>
+      </div>
     </a>
   );
 }
@@ -2535,7 +2923,7 @@ function ExitIntentPopup() {
 
 function Footer() {
   return (
-    <footer className="bg-gradient-to-b from-slate-900 to-slate-950 text-slate-400 pt-20 md:pt-32 pb-12 border-t border-slate-800 relative overflow-hidden">
+    <footer className="bg-gradient-to-b from-slate-900 to-slate-950 text-slate-400 pt-20 md:pt-32 pb-24 lg:pb-12 border-t border-slate-800 relative overflow-hidden">
       {/* Background Textures */}
       <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_rgba(15,23,42,0.8),_transparent)] pointer-events-none" />
@@ -2619,11 +3007,12 @@ function Footer() {
         <Separator className="bg-slate-800 mb-8 shadow-inner" />
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 relative z-10">
           <p className="text-[10px] font-bold uppercase tracking-widest-gs text-slate-500 drop-shadow-sm">
-            © 2025 by Chesswize. All rights reserved.
+            © 2026 by Chesswize. All rights reserved.
           </p>
           <div className="flex items-center gap-2">
-            <a href="https://engazedigital.com" target="_blank" rel="noopener noreferrer" className="text-[10px] font-extrabold tracking-widest-gs text-slate-500 hover:text-slate-300 transition-colors drop-shadow-sm">
-              Engaze
+            <span className="text-[10px] font-bold tracking-widest-gs text-slate-500 drop-shadow-sm">Designed by</span>
+            <a href="https://engazedigital.com" target="_blank" rel="noopener noreferrer" className="text-[10px] font-extrabold tracking-widest-gs text-slate-400 hover:text-white transition-colors drop-shadow-sm">
+              Engaze Digital
             </a>
           </div>
         </div>
@@ -2637,7 +3026,7 @@ function MobileStickyCTA() {
   useEffect(() => {
     const handleScroll = () => {
       const scrolledPastHero = window.scrollY > 400;
-      const nearBottom = (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 800;
+      const nearBottom = (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 300;
       setIsVisible(scrolledPastHero && !nearBottom);
     };
     window.addEventListener("scroll", handleScroll);
@@ -2655,8 +3044,8 @@ function MobileStickyCTA() {
         >
           <div className="absolute inset-0 bg-gradient-to-t from-white/90 to-white/50 pointer-events-none" />
           <div className="flex flex-col relative z-10">
-            <span className="text-[10px] font-extrabold text-blue-600 uppercase tracking-widest-gs drop-shadow-sm">Baseline Assessment</span>
-            <span className="text-xs font-bold text-slate-900 drop-shadow-sm">Secure Your Slot</span>
+            <span className="text-[10px] font-extrabold text-blue-600 uppercase tracking-widest-gs drop-shadow-sm">Free Demo &amp; Counseling</span>
+            <span className="text-xs font-bold text-slate-900 drop-shadow-sm">30 min · No obligation</span>
           </div>
           <Button onClick={scrollToForm} size="default" className="gs-btn gs-btn-primary relative z-10 rounded-xl font-bold tracking-tight-gs px-6 h-12 text-sm shadow-[0_8px_16px_rgba(37,99,235,0.2)]">
             Book Now
@@ -2692,7 +3081,7 @@ function EloProjectionCalculator() {
             Project Your Child's <span className="text-blue-600">Elo Potential.</span>
           </h3>
           <p className="text-base md:text-lg text-slate-600 font-medium max-w-2xl mx-auto">
-            Input their current baseline and weekly commitment. See the mathematical difference between casual play and the ChessWize Protocol over 12 months.
+            Enter your child's current level and weekly practice time. See the difference between casual play and the ChessWize Programme over 12 months.
           </p>
         </div>
 
@@ -2758,7 +3147,7 @@ function EloProjectionCalculator() {
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-1 bg-blue-500 rounded-full shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
-                <span className="text-[9px] font-bold text-blue-600 uppercase tracking-widest-gs drop-shadow-sm">ChessWize Protocol</span>
+                <span className="text-[9px] font-bold text-blue-600 uppercase tracking-widest-gs drop-shadow-sm">ChessWize Programme</span>
               </div>
             </div>
             
@@ -2801,7 +3190,7 @@ function EloProjectionCalculator() {
                  <p className="text-2xl font-extrabold text-emerald-600 tabular-nums">+{protocolEnd - unstructuredEnd} Elo</p>
                </div>
                <Button onClick={scrollToForm} variant="outline" className="gs-btn gs-btn-white font-bold text-xs h-9">
-                 Start Protocol <ArrowRight className="ml-1.5 size-3" />
+                 Book Free Demo <ArrowRight className="ml-1.5 size-3" />
                </Button>
             </div>
           </div>
@@ -2842,7 +3231,7 @@ function SyllabusExplorer() {
         { w: "Week 9", topic: "Positional Assessment", desc: "Evaluating imbalances. Knights vs Bishops in closed vs open positions." },
         { w: "Week 10", topic: "Time Management Psychology", desc: "Clock utilization under pressure. Preventing panic blunders in time trouble." },
         { w: "Week 11", topic: "Prophylactic Thinking", desc: "What is my opponent threatening? Stopping their plan before executing ours." },
-        { w: "Week 12", topic: "Live Cohort Simulation", desc: "Full tournament conditions. Post-mortem analysis and final baseline evaluation." }
+        { w: "Week 12", topic: "Live Cohort Simulation", desc: "Full tournament conditions. Post-mortem analysis and end-of-phase assessment." }
       ]
     }
   ];
@@ -2857,7 +3246,7 @@ function SyllabusExplorer() {
             The 12-Week Syllabus.
           </h3>
           <p className="text-base md:text-lg text-slate-600 font-medium">
-            We don't "wing it." Every class is mapped to a strict pedagogical timeline designed to compound knowledge mathematically.
+            We don't "wing it." Every class follows a strict teaching timeline designed so that one lesson builds cleanly on the next.
           </p>
         </div>
 
@@ -2976,7 +3365,8 @@ function LegalLayout({ title, children }: { title: string, children: React.React
             <Link to="/disclaimer" className="hover:text-white transition-colors">Disclaimer</Link>
           </div>
           <p className="text-[10px] font-bold uppercase tracking-widest-gs text-slate-600">
-            © {new Date().getFullYear()} Chesswize.
+            © {new Date().getFullYear()} Chesswize. <span className="text-slate-500">Designed by</span>{" "}
+            <a href="https://engazedigital.com" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-white transition-colors">Engaze Digital</a>
           </p>
         </div>
       </footer>
@@ -3115,7 +3505,7 @@ function TermsOfService() {
       <p>Please refer to our dedicated <Link to="/refund-policy"><strong>Refund Policy</strong></Link> for complete details on our 30-Day Cognitive Growth Guarantee, session rescheduling, and cancellation procedures.</p>
 
       <h3>6. Intellectual Property</h3>
-      <p>All content on the Site — including text, graphics, logos, curriculum materials, puzzle databases, the "ChessWize Protocol" methodology, video recordings, and software — is the exclusive property of ChessWize or its licensors and is protected by copyright, trademark, and other intellectual property laws. You may not reproduce, distribute, modify, or create derivative works from any of our content without prior written consent.</p>
+      <p>All content on the Site — including text, graphics, logos, curriculum materials, puzzle databases, the "ChessWize Programme" methodology, video recordings, and software — is the exclusive property of ChessWize or its licensors and is protected by copyright, trademark, and other intellectual property laws. You may not reproduce, distribute, modify, or create derivative works from any of our content without prior written consent.</p>
 
       <h3>7. User-Generated Content</h3>
       <p>If you submit testimonials, reviews, or feedback, you grant ChessWize a non-exclusive, royalty-free, perpetual, worldwide licence to use, reproduce, and display such content for marketing and promotional purposes across our Site, social media, and advertising campaigns.</p>
@@ -3316,28 +3706,29 @@ function LandingPage() {
       <Toaster theme="light" position="top-center" richColors />
       <TopNav />
       <Hero />
+      <VideoShowcase />
       <ProgramStats />
+      <WallOfLove />
       <TheProblem />
       <Transformation />
-      <DailyRegimen />
-      <ParentAssessmentQuiz />
-      <Platform />
-      <InteractivePuzzle />
-      <EloProjectionCalculator />
       <WhoIsThisFor />
-      <LearningModes />
+      <HowItWorks />
       <Curriculum />
-      <SyllabusExplorer />
-      <VideoShowcase />
+      <LearningModes />
       <Mentors />
       <FounderStory />
-      <CertificateSection />
       <StarPerformers />
-      <WallOfLove />
+      <ParentAssessmentQuiz />
+      <DailyRegimen />
+      <Platform />
       <ValueStack />
-      <HowItWorks />
+      <CertificateSection />
+      <MidPageCTA />
       <FAQ />
       <BottomForm />
+      <EloProjectionCalculator />
+      <SyllabusExplorer />
+      <InteractivePuzzle />
       <Footer />
       <WhatsAppWidget />
       <ExitIntentPopup />
