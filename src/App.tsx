@@ -123,7 +123,7 @@ function TopNav() {
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "gs-glass py-2 md:py-3" : "bg-white border-b border-slate-200 py-3 md:py-4"}`}>
       <div className="max-w-[1400px] mx-auto px-4 md:px-8 flex items-center justify-between">
         <div className="flex items-center gap-2 md:gap-3 cursor-pointer" onClick={() => window.scrollTo(0, 0)}>
-          <img src="/logo-side-black.svg" alt="ChessWize Logo" className="h-7 md:h-9 w-auto object-contain" />
+          <img src="/logo-side-black-v2.svg" alt="ChessWize Logo" className="h-7 md:h-9 w-auto object-contain" />
         </div>
         <nav className="hidden lg:flex items-center gap-8">
           {["Programs", "Mentors", "Testimonials", "Methodology", "Tuition"].map((item) => (
@@ -2919,7 +2919,7 @@ function Footer() {
           {/* Brand & Mission (Col span 4) */}
           <div className="md:col-span-12 lg:col-span-4">
             <div className="mb-6 md:mb-8 bg-white/5 inline-block p-3 rounded-2xl border border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]">
-              <img loading="lazy" src="/logo-side-white.svg" alt="ChessWize" className="h-8 md:h-10 object-contain drop-shadow-md" />
+              <img loading="lazy" src="/logo-side-white-v2.svg" alt="ChessWize" className="h-8 md:h-10 object-contain drop-shadow-md" />
             </div>
             <p className="font-medium text-sm leading-relaxed text-slate-400 max-w-sm mb-8 drop-shadow-sm">
               India's premier online chess academy for children. FIDE-certified coaches, structured curriculum, and measurable results — trusted by 1,500+ parents nationwide.
@@ -3315,7 +3315,7 @@ function LegalLayout({ title, children }: { title: string, children: React.React
       <header className="gs-glass py-4 border-b border-slate-200/50 sticky top-0 z-50">
         <div className="max-w-[1000px] mx-auto px-4 md:px-8 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-            <img src="/logo-side-black.svg" alt="ChessWize Logo" className="h-8 object-contain" />
+            <img src="/logo-side-black-v2.svg" alt="ChessWize Logo" className="h-8 object-contain" />
           </Link>
           <Link to="/">
             <Button variant="outline" className="gs-btn gs-btn-white text-xs font-bold rounded-xl h-9 px-4">
@@ -3341,7 +3341,7 @@ function LegalLayout({ title, children }: { title: string, children: React.React
       {/* Simplified Footer */}
       <footer className="bg-slate-950 text-slate-400 py-12 border-t border-slate-800">
         <div className="max-w-[1000px] mx-auto px-4 md:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
-          <img src="/logo-side-white.svg" alt="ChessWize" className="h-8 object-contain opacity-80" />
+          <img src="/logo-side-white-v2.svg" alt="ChessWize" className="h-8 object-contain opacity-80" />
           <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm font-bold tracking-tight-gs">
             <Link to="/privacy-policy" className="hover:text-white transition-colors">Privacy</Link>
             <Link to="/terms" className="hover:text-white transition-colors">Terms</Link>
