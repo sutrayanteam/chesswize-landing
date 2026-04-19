@@ -184,7 +184,7 @@ function Hero() {
               </h3>
               <div className="flex flex-col sm:flex-row gap-3">
                 <div className="relative flex-1">
-                  <select className="w-full px-4 py-3.5 text-sm md:text-base border border-slate-200 rounded-xl bg-slate-50 text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all appearance-none cursor-pointer hover:border-blue-300 shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]">
+                  <select className="w-full px-4 py-3.5 text-sm md:text-base border-2 border-slate-200 rounded-xl bg-white text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all appearance-none cursor-pointer hover:border-slate-300 shadow-sm">
                     <option value="">Select Child&apos;s Age</option>
                     <option value="4-6">4 - 6 Years</option>
                     <option value="7-9">7 - 9 Years</option>
@@ -197,16 +197,56 @@ function Hero() {
                   Book Free Demo <ArrowRight className="ml-2 size-4" />
                 </Button>
               </div>
-              <div className="flex items-center flex-wrap gap-x-4 gap-y-1.5 mt-3.5 pt-3.5 border-t border-slate-100">
+              {/* Secondary WhatsApp CTA */}
+              <a
+                href="https://wa.me/917007578072?text=Hi%2C%20I%27d%20like%20to%20book%20a%20free%20demo%20for%20my%20child."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 flex items-center justify-center gap-2 h-11 md:h-12 w-full rounded-xl border-2 border-emerald-500 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 font-bold text-xs md:text-sm transition-all"
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" className="size-4">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                </svg>
+                Or ask us on WhatsApp
+              </a>
+              {/* Counselor strip — human face at CTA moment */}
+              <div className="flex items-center gap-3 mt-3.5 pt-3.5 border-t border-slate-100">
+                <img src="/counselor-avatar.jpg" alt="Priya Sharma — Academic Counsellor" className="size-10 rounded-full object-cover ring-2 ring-white shadow-md shrink-0" loading="lazy" decoding="async" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-[11px] md:text-xs font-extrabold text-slate-800">You&apos;ll talk to <span className="text-blue-700">Priya Sharma</span>, Academic Counsellor</p>
+                  <p className="text-[10px] md:text-[11px] text-slate-500 font-medium">Replies on WhatsApp in &lt;10 min · 10 AM–8 PM IST</p>
+                </div>
+              </div>
+              {/* What happens next — 4-step preview */}
+              <ul className="mt-3 grid grid-cols-4 gap-1.5 text-center">
+                {[
+                  { n: "1", t: "Book", s: "30-sec form" },
+                  { n: "2", t: "Match", s: "WhatsApp in <10 min" },
+                  { n: "3", t: "Demo", s: "50-min live class" },
+                  { n: "4", t: "Observe", s: "Parent welcome" },
+                ].map((s) => (
+                  <li key={s.n} className="flex flex-col items-center gap-0.5 rounded-md px-1 py-1.5 bg-slate-50 border border-slate-100">
+                    <span className="size-5 rounded-full bg-blue-600 text-white text-[9px] font-extrabold flex items-center justify-center">{s.n}</span>
+                    <span className="text-[10px] font-extrabold text-slate-900 leading-tight">{s.t}</span>
+                    <span className="text-[9px] text-slate-500 leading-tight">{s.s}</span>
+                  </li>
+                ))}
+              </ul>
+              {/* Trust strip */}
+              <div className="flex items-center flex-wrap gap-x-4 gap-y-1.5 mt-3">
                 <span className="flex items-center gap-1.5 text-[11px] md:text-xs font-bold text-slate-600">
                   <div className="flex items-center gap-0.5">
                     {[1,2,3,4,5].map((s)=><Star key={s} className="size-3 fill-emerald-500 text-emerald-500" />)}
                   </div>
-                  <span>Trusted by 1,500+ parents</span>
+                  <span>1,500+ parents</span>
                 </span>
                 <span className="flex items-center gap-1.5 text-[11px] md:text-xs font-bold text-slate-500">
                   <CalendarCheck className="size-3.5 text-amber-600" />
-                  Next batch starts {getNextCohortDate()}
+                  Next batch {getNextCohortDate()}
+                </span>
+                <span className="flex items-center gap-1.5 text-[11px] md:text-xs font-bold text-emerald-700">
+                  <Shield className="size-3.5" />
+                  Refund on unused sessions
                 </span>
               </div>
             </motion.div>
@@ -1385,10 +1425,18 @@ function WhoIsThisFor() {
                     <CheckCircle className="shrink-0 size-4 text-emerald-600 mt-0.5" />
                     <span className="leading-snug">Best for: {p.bestFor}</span>
                   </div>
-                  <div className="bg-red-50 text-red-800 p-3.5 rounded-2xl text-xs font-bold border border-red-100 flex gap-3 items-start mt-auto">
+                  <div className="bg-red-50 text-red-800 p-3.5 rounded-2xl text-xs font-bold border border-red-100 flex gap-3 items-start">
                     <AlertTriangle className="shrink-0 size-4 text-red-500 mt-0.5" />
                     <span className="leading-snug">Solves: {p.pain}</span>
                   </div>
+                  {/* Persona-specific CTA that prepopulates the form */}
+                  <Button
+                    onClick={scrollToForm}
+                    variant="outline"
+                    className="mt-3 w-full h-11 md:h-12 rounded-xl border-2 border-slate-200 hover:border-blue-600 hover:bg-blue-50 text-slate-800 hover:text-blue-700 font-extrabold text-xs md:text-sm transition-all"
+                  >
+                    Book a demo for {p.title.replace(/^The /, "")} <ArrowRight className="ml-2 size-3.5" />
+                  </Button>
                 </div>
               </div>
             );
@@ -2069,6 +2117,19 @@ function ValueStack() {
           })}
         </div>
 
+        {/* 30-day refund guarantee banner — the most-agreed missing element */}
+        <div className="mb-6 md:mb-8 rounded-2xl bg-gradient-to-br from-emerald-50 via-white to-emerald-50 border-2 border-emerald-200 p-5 md:p-6 flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-6 shadow-sm">
+          <div className="size-12 md:size-14 rounded-2xl bg-emerald-100 flex items-center justify-center shrink-0 ring-4 ring-emerald-50">
+            <Shield className="size-6 md:size-7 text-emerald-700" />
+          </div>
+          <div className="flex-1">
+            <h4 className="text-base md:text-lg font-extrabold tracking-tight-gs text-slate-900 mb-1">100% refund on unused sessions. Cancel any time.</h4>
+            <p className="text-xs md:text-sm text-slate-600 font-medium leading-snug">
+              If your child loses interest or the fit isn&apos;t right, email or WhatsApp us and we refund every un-attended session. Pause your plan for exam month without losing your coach. No awkward calls. No fine print.
+            </p>
+          </div>
+        </div>
+
         {/* Inclusions strip */}
         <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 md:p-8">
           <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6 mb-5 md:mb-6">
@@ -2085,15 +2146,30 @@ function ValueStack() {
           </ul>
         </div>
 
-        {/* Footer note */}
-        <div className="mt-6 md:mt-8 flex flex-col md:flex-row items-center justify-between gap-3 text-xs md:text-sm text-slate-500 font-medium">
-          <div className="flex items-center gap-2">
-            <Lock className="size-4 text-slate-400" />
-            <span>Secure payments via Razorpay · GST included where applicable</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Phone className="size-4 text-slate-400" />
-            <span>Questions? Call <a href="tel:+917007578072" className="text-blue-600 font-bold">+91-70075-78072</a></span>
+        {/* Payment trust row */}
+        <div className="mt-6 md:mt-8 rounded-2xl bg-white border border-slate-200 p-5 md:p-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 text-sm">
+            <div className="flex items-start gap-3">
+              <Lock className="size-5 text-blue-600 shrink-0 mt-0.5" />
+              <div>
+                <p className="font-extrabold text-slate-900 text-xs md:text-sm">Secure payments</p>
+                <p className="text-[11px] md:text-xs text-slate-500 font-medium">Razorpay-secured · UPI / Cards / Netbanking</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <TrendingUp className="size-5 text-blue-600 shrink-0 mt-0.5" />
+              <div>
+                <p className="font-extrabold text-slate-900 text-xs md:text-sm">No-cost EMI available</p>
+                <p className="text-[11px] md:text-xs text-slate-500 font-medium">Pay in 3 / 6 / 12 monthly instalments on 48+ session plans</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <Phone className="size-5 text-blue-600 shrink-0 mt-0.5" />
+              <div>
+                <p className="font-extrabold text-slate-900 text-xs md:text-sm">Human counsellor</p>
+                <p className="text-[11px] md:text-xs text-slate-500 font-medium">Call <a href="tel:+917007578072" className="text-blue-600 font-bold">+91 70075 78072</a> or WhatsApp in &lt;10 min</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -3027,14 +3103,24 @@ function MobileStickyCTA() {
           exit={{ y: 100 }}
           className="fixed bottom-0 left-0 right-0 z-[100] glass-panel border-t border-white/40 p-4 shadow-[0_-10px_40px_rgba(0,0,0,0.15)] flex items-center justify-between lg:hidden"
         >
-          <div className="absolute inset-0 bg-gradient-to-t from-white/90 to-white/50 pointer-events-none" />
-          <div className="flex flex-col relative z-10">
-            <span className="text-[10px] font-extrabold text-blue-600 uppercase tracking-widest-gs drop-shadow-sm">Free Demo &amp; Counseling</span>
-            <span className="text-xs font-bold text-slate-900 drop-shadow-sm">30 min · No obligation</span>
+          <div className="absolute inset-0 bg-gradient-to-t from-white/95 to-white/75 pointer-events-none" />
+          <div className="relative z-10 w-full flex gap-2">
+            <Button onClick={scrollToForm} size="default" className="gs-btn gs-btn-primary rounded-xl font-extrabold tracking-tight-gs flex-1 h-12 text-sm shadow-[0_8px_16px_rgba(37,99,235,0.25)]">
+              Book Free Demo
+            </Button>
+            <a
+              href="https://wa.me/917007578072?text=Hi%2C%20I%27d%20like%20to%20book%20a%20free%20demo%20for%20my%20child."
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Chat on WhatsApp"
+              className="flex items-center justify-center gap-1.5 h-12 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-sm shadow-[0_8px_16px_rgba(16,185,129,0.25)]"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" className="size-4">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+              </svg>
+              WhatsApp
+            </a>
           </div>
-          <Button onClick={scrollToForm} size="default" className="gs-btn gs-btn-primary relative z-10 rounded-xl font-bold tracking-tight-gs px-6 h-12 text-sm shadow-[0_8px_16px_rgba(37,99,235,0.2)]">
-            Book Now
-          </Button>
         </motion.div>
       )}
     </AnimatePresence>
