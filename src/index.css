@@ -71,6 +71,22 @@ h1, h2, h3 {
   }
 }
 
+/* Universal press feedback on interactive elements (Zerodha/CRED pattern).
+   Overrides gs-btn's existing scale, applied globally to any enabled button or link. */
+button:not(:disabled):active,
+a:active,
+[role="button"]:not([aria-disabled="true"]):active {
+  transform: translateY(1px) scale(0.99);
+  transition: transform 100ms ease-out;
+}
+
+/* Bump micro text for mobile legibility — Apple HIG: ≥12px minimum */
+@media (max-width: 640px) {
+  .text-\[9px\] { font-size: 11px !important; }
+  .text-\[10px\] { font-size: 12px !important; }
+  .text-\[11px\] { font-size: 12.5px !important; }
+}
+
 body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
