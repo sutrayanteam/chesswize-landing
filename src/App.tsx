@@ -593,7 +593,7 @@ function TheProblem() {
                 <div className="absolute top-2 left-2 bg-red-600 text-slate-50 text-[10px] font-extrabold uppercase tracking-widest-gs px-2 py-1 rounded shadow">Passive Scrolling</div>
               </div>
               <div className="rounded-2xl overflow-hidden shadow-lg border border-slate-200 aspect-square relative group">
-                 <img loading="lazy" src="/2026-04-15-10-00-00-focused-child-chess.webp" alt="A child focused on a chess board during a live online class" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                 <img loading="lazy" src="/kid-chess-online-class-1200.jpg" alt="A child analysing a chess position on a real board while his FIDE coach explains the move over a laptop video call — a ChessWize live class" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                  <div className="absolute top-2 left-2 bg-blue-600 text-slate-50 text-[10px] font-extrabold uppercase tracking-widest-gs px-2 py-1 rounded shadow">Purposeful Training</div>
               </div>
             </div>
@@ -1593,18 +1593,16 @@ function VideoCard({ v }: { v: VideoItem }) {
       </div>
       <div className="relative w-full aspect-[9/16] bg-slate-900 video-card-contain">
         {activated ? (
-          <MediaPlayer
-            title={v.title}
+          /* Native <video> is instant on click — no framework init, no control theming. */
+          <video
             src={v.src}
             poster={poster}
             autoPlay
             playsInline
-            className="absolute inset-0 w-full h-full"
-            crossOrigin=""
-          >
-            <MediaProvider />
-            <DefaultVideoLayout icons={defaultLayoutIcons} />
-          </MediaPlayer>
+            controls
+            preload="auto"
+            className="absolute inset-0 w-full h-full object-cover bg-black"
+          />
         ) : (
           <button
             type="button"
