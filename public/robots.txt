@@ -1,0 +1,10 @@
+# ChessWize — robots.txt
+User-agent: *
+Allow: /
+
+# Disallow internal legal subpaths (they exist at /terms, /privacy etc but are not primary)
+# Disallow: /terms
+# Disallow: /privacy
+# (Re-enable above lines if SEO team wants to de-emphasize the legal pages.)
+
+Sitemap: https://chesswize.in/sitemap.xml
