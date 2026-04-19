@@ -2615,10 +2615,10 @@ function BottomForm() {
                       </div>
                       
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5">
-                        <div className="flex flex-col gap-1.5 md:gap-2">
+                        <div className="flex flex-col gap-1.5 md:gap-2 min-w-0">
                           <label htmlFor="bottom_child_age_range" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">Child's Age <span className="text-red-500">*</span></label>
                           <div className="relative">
-                            <select id="bottom_child_age_range" {...register("child_age_range")} className={inputCls(!!errors.child_age_range) + " appearance-none cursor-pointer pr-10"}>
+                            <select id="bottom_child_age_range" {...register("child_age_range")} className={inputCls(!!errors.child_age_range) + " appearance-none cursor-pointer pr-10 truncate"}>
                               <option value="">Select age group</option>
                               <option value="4-6">4 - 6 Years</option>
                               <option value="7-9">7 - 9 Years</option>
@@ -2629,16 +2629,16 @@ function BottomForm() {
                           </div>
                           {errors.child_age_range && <p className="text-[10px] text-red-500 font-bold mt-1">{errors.child_age_range.message}</p>}
                         </div>
-                        <div className="flex flex-col gap-1.5 md:gap-2">
+                        <div className="flex flex-col gap-1.5 md:gap-2 min-w-0">
                           <label htmlFor="bottom_child_level" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">Current Chess Level <span className="text-red-500">*</span></label>
                           <div className="relative">
-                            <select id="bottom_child_level" {...register("child_level")} className={inputCls(!!errors.child_level) + " appearance-none cursor-pointer pr-10"}>
-                              <option value="">Select estimated level</option>
-                              <option value="never-played">Never played chess before</option>
-                              <option value="knows-rules">Knows the rules but no formal training</option>
-                              <option value="beginner">Beginner (under 800 Elo / plays casually)</option>
-                              <option value="intermediate">Intermediate (800-1200 Elo / plays online)</option>
-                              <option value="advanced">Advanced (1200+ Elo / tournament experience)</option>
+                            <select id="bottom_child_level" {...register("child_level")} className={inputCls(!!errors.child_level) + " appearance-none cursor-pointer pr-10 truncate"}>
+                              <option value="">Select level</option>
+                              <option value="never-played">Never played</option>
+                              <option value="knows-rules">Knows the rules</option>
+                              <option value="beginner">Beginner (&lt;800 Elo)</option>
+                              <option value="intermediate">Intermediate (800–1200)</option>
+                              <option value="advanced">Advanced (1200+)</option>
                             </select>
                             <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-slate-400 pointer-events-none" />
                           </div>
