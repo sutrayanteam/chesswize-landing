@@ -1,0 +1,26 @@
+# Build + environment
+node_modules/
+dist/
+.git/
+.vercel/
+.claude/
+
+# Local backups (kept in repo but not needed in prod image)
+src/backups/
+
+# Local dev artefacts
+localhost-*.png
+tablet-*.png
+full-page-*.png
+01-*.png
+02-*.png
+chesswize-mobile.jpeg
+chesswize-full-page.jpeg
+screenrecorder.mp4
+HANDOFF.md
+
+# Playwright/Claude tool artefacts
+.playwright-mcp/
+
+# macOS
+.DS_Store

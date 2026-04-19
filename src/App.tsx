@@ -1528,29 +1528,59 @@ function Curriculum() {
 }
 
 /* ════════════════════════════════════════════════
-   VIDEO TESTIMONIALS
+   VIDEO TESTIMONIALS — lazy, poster-first, click-to-play
    ════════════════════════════════════════════════ */
-type VideoItem = { src: string; title: string; label: string; badge: string };
+type VideoItem = { src: string; title: string; label: string; badge: string; poster?: string };
 
 function VideoCard({ v }: { v: VideoItem }) {
+  const [activated, setActivated] = useState(false);
+  // derive poster path from src unless provided: `/foo.mp4` → `/foo-poster.jpg`
+  const poster = v.poster ?? v.src.replace(/\.mp4$/i, "-poster.jpg");
   return (
     <div className="rounded-2xl overflow-hidden hover-lift group relative flex-shrink-0 w-[180px] md:w-full bg-white border border-slate-200 shadow-md">
-      <div className="absolute top-3 left-3 z-20">
+      <div className="absolute top-3 left-3 z-20 pointer-events-none">
         <Badge className="bg-amber-500 text-white border-0 text-[10px] font-bold shadow-lg">
           <PlayCircle className="size-3 mr-1" /> {v.badge}
         </Badge>
       </div>
-      <div className="relative w-full aspect-[9/16] bg-black video-card-contain">
-        <MediaPlayer
-          title={v.title}
-          src={v.src}
-          className="absolute inset-0 w-full h-full"
-          crossOrigin=""
-          playsInline
-        >
-          <MediaProvider />
-          <DefaultVideoLayout icons={defaultLayoutIcons} />
-        </MediaPlayer>
+      <div className="relative w-full aspect-[9/16] bg-slate-900 video-card-contain">
+        {activated ? (
+          <MediaPlayer
+            title={v.title}
+            src={v.src}
+            poster={poster}
+            autoPlay
+            playsInline
+            className="absolute inset-0 w-full h-full"
+            crossOrigin=""
+          >
+            <MediaProvider />
+            <DefaultVideoLayout icons={defaultLayoutIcons} />
+          </MediaPlayer>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setActivated(true)}
+            aria-label={`Play video: ${v.title}`}
+            className="absolute inset-0 w-full h-full group cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-500"
+          >
+            <img
+              src={poster}
+              alt={v.title}
+              loading="lazy"
+              decoding="async"
+              className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-slate-900/10 to-transparent pointer-events-none" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="size-14 md:size-16 rounded-full bg-white/95 backdrop-blur-sm flex items-center justify-center shadow-xl ring-4 ring-white/30 group-hover:scale-110 group-hover:bg-white transition-all">
+                <svg viewBox="0 0 24 24" className="size-6 md:size-7 text-blue-600 translate-x-[1px]" fill="currentColor" aria-hidden="true">
+                  <path d="M8 5.14v13.72L19 12 8 5.14z" />
+                </svg>
+              </div>
+            </div>
+          </button>
+        )}
       </div>
       <div className="p-3 bg-white border-t border-slate-100">
         <p className="font-extrabold text-slate-900 tracking-tight-gs text-xs">{v.label}</p>
