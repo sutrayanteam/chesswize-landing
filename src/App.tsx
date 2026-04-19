@@ -2531,7 +2531,7 @@ function BottomForm() {
     }
   };
 
-  const inputCls = (hasError: boolean) => `px-4 py-3 text-sm md:text-base border rounded-xl bg-slate-50 text-slate-900 font-bold placeholder:text-slate-400 placeholder:font-medium focus:outline-none focus:ring-2 focus:bg-white transition-all ${hasError ? 'border-red-500 focus:ring-red-500' : 'border-slate-200 focus:ring-blue-600 hover:border-blue-300'}`;
+  const inputCls = (hasError: boolean) => `px-4 py-3 text-sm md:text-base border-2 rounded-xl bg-white text-slate-900 font-bold placeholder:text-slate-400 placeholder:font-medium focus:outline-none focus:ring-2 focus:ring-offset-0 transition-all shadow-sm ${hasError ? 'border-red-500 focus:ring-red-500' : 'border-slate-300 focus:border-blue-600 focus:ring-blue-600/20 hover:border-slate-400'}`;
 
   const stepVariants = {
     hidden: { opacity: 0, x: 20 },
