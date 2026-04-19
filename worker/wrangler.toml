@@ -36,6 +36,14 @@ enabled = true
 
 # Public non-secret defaults — safe to commit
 [vars]
-FROM_EMAIL = "ChessWize <noreply@chesswize.in>"
-NOTIFY_EMAIL = "chesswize79@gmail.com"
+# Current Resend key is send-only + account in sandbox mode: from onboarding@resend.dev
+# can ONLY deliver to the Resend account's own email (support@chesswize.com).
+# To unlock sending to any address:
+#   1) Create a new Resend API key with full access (not "send-only")
+#   2) Visit https://resend.com/domains, add chesswize.in, copy the DNS records
+#   3) Share DNS records with me → I'll wire them via Cloudflare API
+#   4) Once verified, switch FROM_EMAIL → "ChessWize <noreply@chesswize.in>"
+#      and NOTIFY_EMAIL → whatever inbox you want lead emails at
+FROM_EMAIL = "ChessWize <onboarding@resend.dev>"
+NOTIFY_EMAIL = "support@chesswize.com"
 ALLOWED_ORIGINS = "chesswize.in,www.chesswize.in,localhost"
