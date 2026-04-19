@@ -160,62 +160,32 @@ function Hero() {
           
           {/* Left Copy Side */}
           <motion.div initial="hidden" animate="visible" variants={stagger} className="w-full xl:w-[55%] flex flex-col gap-5 md:gap-6">
-            <motion.div variants={fadeUp} className="flex flex-wrap items-center gap-3 md:gap-4">
-              <div className="trust-badge-container">
-                <div className="flex items-center gap-0.5">
-                  {[1,2,3,4,5].map((s)=><Star key={s} className="size-3 md:size-3.5 fill-emerald-500 text-emerald-500" />)}
-                </div>
-                <span className="text-[10px] md:text-[11px] font-bold text-slate-700">Trusted by 1,500+ Parents</span>
-              </div>
-              <div className="trust-badge-container bg-blue-50/50 border-blue-100">
+            <motion.div variants={fadeUp}>
+              <div className="trust-badge-container bg-blue-50/80 border-blue-200 inline-flex">
                 <div className="size-2 rounded-full bg-blue-500 animate-pulse" />
                 <span className="text-[10px] md:text-[11px] font-extrabold text-blue-800 uppercase tracking-widest-gs">Strictly Max 6 Kids Per Batch</span>
-              </div>
-              <div className="trust-badge-container bg-amber-50/60 border-amber-200">
-                <CalendarCheck className="size-3 text-amber-700" />
-                <span className="text-[10px] md:text-[11px] font-extrabold text-amber-800 uppercase tracking-widest-gs">Next Batch: {getNextCohortDate()}</span>
               </div>
             </motion.div>
 
             <motion.h1 variants={fadeUp} className="text-3xl sm:text-4xl md:text-[2.75rem] lg:text-[3.25rem] font-extrabold tracking-tighter-gs text-slate-900 leading-[1.12] drop-shadow-sm">
-              Turn passive screen time into{' '}
-              <span className="text-gradient-primary">strategic intelligence.</span>
+              Help your child{' '}
+              <span className="text-gradient-primary">think deeper,</span>{' '}
+              not scroll longer.
             </motion.h1>
 
-            <motion.p variants={fadeUp} className="text-base md:text-lg lg:text-xl text-slate-600 font-medium leading-[1.6] max-w-2xl tracking-tight-gs mt-1 md:mt-2">
-              Stop wasting hours on unstructured play. Our rigorous, level-based chess curriculum transforms impulsive kids into focused, patient, and analytical thinkers—guided by elite FIDE-certified masters.
+            <motion.p variants={fadeUp} className="text-base md:text-lg lg:text-xl text-slate-600 font-medium leading-[1.6] max-w-2xl tracking-tight-gs">
+              Structured online chess coaching by FIDE-rated masters. Small batches of six, same coach every session, real improvement you can see on the dashboard.
             </motion.p>
 
-            <motion.div variants={fadeUp} className="flex flex-wrap items-center gap-2 max-w-xl">
-              {[
-                { label: "Focus", Icon: FocusIcon, color: "text-blue-600" },
-                { label: "Logic", Icon: LogicIcon, color: "text-indigo-600" },
-                { label: "Math", Icon: MathIcon, color: "text-emerald-600" },
-                { label: "Patience", Icon: PatienceIcon, color: "text-amber-600" },
-                { label: "Confidence", Icon: ConfidenceIcon, color: "text-rose-600" },
-              ].map(({ label, Icon, color }) => (
-                <span key={label} className="inline-flex items-center gap-1.5 text-[11px] md:text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-full px-3 py-1.5 shadow-sm">
-                  <Icon className={`size-3.5 ${color}`} /> {label}
-                </span>
-              ))}
-            </motion.div>
-
-            <motion.div variants={fadeUp} className="flex items-start gap-3 bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 max-w-xl">
-              <BookOpen className="size-4 text-blue-600 shrink-0 mt-0.5" />
-              <p className="text-xs md:text-sm text-blue-800 font-medium leading-relaxed">
-                <span className="font-extrabold">Backed by research:</span> A 2019 University of Trier meta-analysis (24 studies) confirmed chess instruction measurably improves children's math, logic, and concentration in school.
-              </p>
-            </motion.div>
-
-            <motion.div variants={fadeUp} className="bg-white p-5 md:p-6 rounded-2xl depth-panel mt-2 md:mt-4 max-w-xl relative overflow-hidden hover-lift">
+            <motion.div variants={fadeUp} className="bg-white p-5 md:p-6 rounded-2xl depth-panel mt-1 md:mt-2 max-w-xl relative overflow-hidden hover-lift">
               <div className="absolute top-0 left-0 w-1 h-full bg-blue-600" />
               <h3 className="text-sm font-extrabold text-slate-900 uppercase tracking-widest-gs mb-4 flex items-center gap-2">
-                <Target className="size-4 text-blue-600" /> Book Free Demo &amp; Counseling
+                <Target className="size-4 text-blue-600" /> Book My Child&apos;s Free Demo
               </h3>
               <div className="flex flex-col sm:flex-row gap-3">
                 <div className="relative flex-1">
                   <select className="w-full px-4 py-3.5 text-sm md:text-base border border-slate-200 rounded-xl bg-slate-50 text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all appearance-none cursor-pointer hover:border-blue-300 shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]">
-                    <option value="">Select Child's Age</option>
+                    <option value="">Select Child&apos;s Age</option>
                     <option value="4-6">4 - 6 Years</option>
                     <option value="7-9">7 - 9 Years</option>
                     <option value="10-12">10 - 12 Years</option>
@@ -227,13 +197,16 @@ function Hero() {
                   Book Free Demo <ArrowRight className="ml-2 size-4" />
                 </Button>
               </div>
-              <p className="text-[10px] md:text-[11px] text-slate-500 font-medium mt-2">50-min demo class + parent counseling session. We match your child to the right coach &amp; batch on the call.</p>
-              <div className="flex items-center gap-4 mt-4 pt-4 border-t border-slate-100">
-                <span className="flex items-center gap-1.5 text-[10px] md:text-xs font-bold text-slate-500">
-                  <CheckCircle className="size-3.5 text-emerald-500 drop-shadow-sm" /> Zero Financial Risk
+              <div className="flex items-center flex-wrap gap-x-4 gap-y-1.5 mt-3.5 pt-3.5 border-t border-slate-100">
+                <span className="flex items-center gap-1.5 text-[11px] md:text-xs font-bold text-slate-600">
+                  <div className="flex items-center gap-0.5">
+                    {[1,2,3,4,5].map((s)=><Star key={s} className="size-3 fill-emerald-500 text-emerald-500" />)}
+                  </div>
+                  <span>Trusted by 1,500+ parents</span>
                 </span>
-                <span className="flex items-center gap-1.5 text-[10px] md:text-xs font-bold text-slate-500">
-                  <CheckCircle className="size-3.5 text-emerald-500 drop-shadow-sm" /> Parents can observe class
+                <span className="flex items-center gap-1.5 text-[11px] md:text-xs font-bold text-slate-500">
+                  <CalendarCheck className="size-3.5 text-amber-600" />
+                  Next batch starts {getNextCohortDate()}
                 </span>
               </div>
             </motion.div>
@@ -272,24 +245,6 @@ function Hero() {
                 </div>
               </div>
               
-              {/* Trust Indicators below video */}
-              <div className="mt-3 md:mt-4 grid grid-cols-3 gap-2 md:gap-3">
-                <div className="pill-badge rounded-lg md:rounded-xl p-2 md:p-3 flex flex-col items-center justify-center text-center hover:bg-white hover:border-slate-200 hover:shadow-sm transition-all cursor-default">
-                  <img src="/calendar-appointment.webp" className="size-5 md:size-7 object-contain mb-1 md:mb-2 drop-shadow-sm" alt="Calendar" />
-                  <span className="text-[8px] md:text-[9px] font-bold text-slate-500 uppercase tracking-widest-gs">Diagnostic</span>
-                  <span className="text-xs md:text-sm font-extrabold text-slate-900 tracking-tight-gs">Evaluation</span>
-                </div>
-                <div className="pill-badge rounded-lg md:rounded-xl p-2 md:p-3 flex flex-col items-center justify-center text-center hover:bg-white hover:border-slate-200 hover:shadow-sm transition-all cursor-default">
-                  <TrophyGold className="size-5 md:size-7 mb-1 md:mb-2 drop-shadow-sm" />
-                  <span className="text-[8px] md:text-[9px] font-bold text-slate-500 uppercase tracking-widest-gs">Expert</span>
-                  <span className="text-xs md:text-sm font-extrabold text-slate-900 tracking-tight-gs">FIDE Masters</span>
-                </div>
-                <div className="pill-badge rounded-lg md:rounded-xl p-2 md:p-3 flex flex-col items-center justify-center text-center hover:bg-white hover:border-slate-200 hover:shadow-sm transition-all cursor-default">
-                  <Activity className="size-5 md:size-7 text-blue-600 mb-1 md:mb-2 drop-shadow-sm" />
-                  <span className="text-[8px] md:text-[9px] font-bold text-slate-500 uppercase tracking-widest-gs">Analytics</span>
-                  <span className="text-xs md:text-sm font-extrabold text-slate-900 tracking-tight-gs">Data-Driven</span>
-                </div>
-              </div>
             </div>
           </motion.div>
         </div>
