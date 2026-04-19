@@ -45,5 +45,7 @@ enabled = true
 #   4) Once verified, switch FROM_EMAIL → "ChessWize <noreply@chesswize.in>"
 #      and NOTIFY_EMAIL → whatever inbox you want lead emails at
 FROM_EMAIL = "ChessWize <onboarding@resend.dev>"
-NOTIFY_EMAIL = "support@chesswize.com"
+# Comma-separated list — each recipient is sent in parallel as an independent
+# email. A failure for one (e.g. sandbox restriction) won't block the others.
+NOTIFY_EMAIL = "support@chesswize.com,chesswize79@gmail.com"
 ALLOWED_ORIGINS = "chesswize.in,www.chesswize.in,localhost"

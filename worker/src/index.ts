@@ -146,7 +146,7 @@ async function pushLeadToZoho(env: Env, body: LeadBody): Promise<{ ok: boolean; 
 
 const resendConfigured = (env: Env) => !!(env.RESEND_API_KEY && env.FROM_EMAIL && env.NOTIFY_EMAIL);
 
-async function sendLeadEmail(env: Env, body: LeadBody): Promise<{ ok: boolean; error?: string }> {
+async function sendLeadEmail(env: Env, body: LeadBody): Promise<{ ok: boolean; recipients?: Array<{ to: string; ok: boolean; error?: string }>; error?: string }> {
   if (!resendConfigured(env)) return { ok: false, error: "resend_not_configured" };
 
   const goals = Array.isArray(body.parent_concern) ? body.parent_concern.join(", ") : body.parent_concern ?? "";
@@ -167,22 +167,45 @@ async function sendLeadEmail(env: Env, body: LeadBody): Promise<{ ok: boolean; e
 <p style="margin-top:24px;color:#64748b;font-size:12px;">Lead captured via chesswize.in worker @ ${new Date().toISOString()}</p>
 </body></html>`;
 
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      authorization: `Bearer ${env.RESEND_API_KEY}`,
-      "content-type": "application/json",
-    },
-    body: JSON.stringify({
-      from: env.FROM_EMAIL,
-      to: [env.NOTIFY_EMAIL],
-      subject,
-      html,
-      reply_to: body.parent_email,
+  // Support comma-separated NOTIFY_EMAIL: send ONE email per recipient so a
+  // single failing address (e.g. sandbox-restricted) doesn't block the rest.
+  const recipients = (env.NOTIFY_EMAIL ?? "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  if (recipients.length === 0) return { ok: false, error: "no_recipients" };
+
+  const results = await Promise.all(
+    recipients.map(async (to) => {
+      try {
+        const res = await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: {
+            authorization: `Bearer ${env.RESEND_API_KEY}`,
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({
+            from: env.FROM_EMAIL,
+            to: [to],
+            subject,
+            html,
+            reply_to: body.parent_email,
+          }),
+        });
+        if (!res.ok) {
+          const detail = await res.text().catch(() => "");
+          return { to, ok: false, error: `resend_${res.status}${detail ? ": " + detail.slice(0, 120) : ""}` };
+        }
+        return { to, ok: true };
+      } catch (e: any) {
+        return { to, ok: false, error: e?.message ?? "fetch_error" };
+      }
     }),
-  });
-  if (!res.ok) return { ok: false, error: `resend_${res.status}` };
-  return { ok: true };
+  );
+
+  const anyOk = results.some((r) => r.ok);
+  return { ok: anyOk, recipients: results };
 }
 
 function escapeHtml(s: string): string {
