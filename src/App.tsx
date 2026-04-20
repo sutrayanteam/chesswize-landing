@@ -154,6 +154,7 @@ function TopNav() {
    HERO — High Density, Conversion Optimized
    ════════════════════════════════════════════════ */
 function Hero() {
+  const [showVideoModal, setShowVideoModal] = useState(false);
   return (
     <section className="relative pt-28 pb-16 md:pt-40 md:pb-24 bg-slate-50 gs-grid-pattern overflow-hidden border-b border-slate-200">
       <div className="absolute top-0 right-0 w-[600px] md:w-[1000px] h-[600px] md:h-[1000px] bg-blue-600/5 rounded-full blur-[100px] md:blur-[150px] pointer-events-none" />
@@ -226,11 +227,16 @@ function Hero() {
             </div>
           </div>
 
-          {/* Right Media Side - VSL / Masterclass Snippet */}
+          {/* Right Media Side - Student Testimonial (click to open playable modal) */}
           <div className="w-full xl:w-[45%] mt-6 lg:mt-0">
-            <div className="glass-panel p-2.5 md:p-3 rounded-2xl md:rounded-3xl gs-shadow-xl gs-border relative hover-lift">
-              <div className="absolute -top-4 -right-4 md:-top-6 md:-right-6 w-24 md:w-32 h-24 md:h-32 bg-blue-400/20 blur-2xl md:blur-3xl rounded-full" />
-              <div className="relative rounded-xl md:rounded-2xl overflow-hidden bg-slate-50 border border-slate-200 group shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)]">
+            <button
+              type="button"
+              onClick={() => setShowVideoModal(true)}
+              aria-label="Play student testimonial"
+              className="w-full glass-panel p-2.5 md:p-3 rounded-2xl md:rounded-3xl gs-shadow-xl gs-border relative hover-lift focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 cursor-pointer"
+            >
+              <div className="absolute -top-4 -right-4 md:-top-6 md:-right-6 w-24 md:w-32 h-24 md:h-32 bg-blue-400/20 blur-2xl md:blur-3xl rounded-full pointer-events-none" />
+              <div className="relative rounded-xl md:rounded-2xl overflow-hidden bg-slate-50 border border-slate-200 group shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] aspect-square">
                 <div className="absolute top-3 left-3 md:top-4 md:left-4 z-20 flex flex-col gap-2">
                   <Badge className="bg-blue-600/90 text-white border-0 font-bold px-2 py-0.5 rounded uppercase tracking-widest-gs text-[9px]">Student Testimonial</Badge>
                 </div>
@@ -243,26 +249,70 @@ function Hero() {
                   playsInline
                   preload="metadata"
                   poster="/testimonial-kid-1-poster.webp"
-                  className="w-full aspect-[4/3] object-cover opacity-80 group-hover:opacity-100 transition-opacity"
-                />                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-slate-900/20 to-transparent opacity-90 pointer-events-none" />
-                
-                <div className="absolute bottom-0 left-0 w-full p-4 md:p-6 z-20 pointer-events-none">
-                  <div className="flex items-center justify-between">
-                    <div>
+                  className="absolute inset-0 w-full h-full object-cover opacity-85 group-hover:opacity-100 transition-opacity"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-slate-900/20 to-transparent opacity-90 pointer-events-none" />
+
+                <div className="absolute bottom-0 left-0 w-full p-4 md:p-6 z-20 pointer-events-none text-left">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="min-w-0">
                       <h3 className="text-white font-extrabold text-lg md:text-xl tracking-tight-gs drop-shadow-md">Meet a ChessWize student</h3>
-                      <p className="text-slate-200 text-xs md:text-sm font-medium drop-shadow-sm">Real parent-recorded testimonial</p>
+                      <p className="text-slate-200 text-xs md:text-sm font-medium drop-shadow-sm">Tap to play · with sound</p>
                     </div>
-                    <div className="size-10 md:size-14 rounded-full bg-blue-600/90 backdrop-blur-md flex items-center justify-center border border-white/20 gs-shadow-lg group-hover:scale-110 transition-transform ring-4 ring-blue-500/30">
-                      <PlayCircle className="size-5 md:size-6 text-white" />
+                    <div className="size-12 md:size-14 rounded-full bg-blue-600/90 backdrop-blur-md flex items-center justify-center border border-white/20 gs-shadow-lg group-hover:scale-110 transition-transform ring-4 ring-blue-500/30 shrink-0">
+                      <PlayCircle className="size-6 md:size-6 text-white" />
                     </div>
                   </div>
                 </div>
               </div>
-
-            </div>
+            </button>
           </div>
         </div>
       </div>
+
+      {/* Playable video modal */}
+      <AnimatePresence>
+        {showVideoModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => setShowVideoModal(false)}
+            className="fixed inset-0 z-[100] bg-slate-900/85 backdrop-blur-sm flex items-center justify-center p-4"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Student testimonial video"
+          >
+            <motion.div
+              initial={{ scale: 0.94, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.94, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative w-full max-w-[min(92vw,420px)] md:max-w-[min(90vw,480px)] bg-black rounded-2xl overflow-hidden shadow-2xl"
+            >
+              <button
+                type="button"
+                onClick={() => setShowVideoModal(false)}
+                aria-label="Close video"
+                className="absolute top-3 right-3 z-10 size-9 rounded-full bg-slate-900/70 hover:bg-slate-900/90 backdrop-blur-sm flex items-center justify-center text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              >
+                <XCircle className="size-5" />
+              </button>
+              <video
+                src="/testimonial-kid-1.mp4"
+                controls
+                autoPlay
+                playsInline
+                preload="auto"
+                poster="/testimonial-kid-1-poster.webp"
+                className="w-full h-auto max-h-[80vh] bg-black"
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }
