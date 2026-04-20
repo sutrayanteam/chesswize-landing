@@ -65,7 +65,7 @@ import {
   PatienceIcon,
   ConfidenceIcon,
 } from "./components/Icons";
-import { motion, AnimatePresence, useInView } from "motion/react";
+import { motion, AnimatePresence, useInView, useReducedMotion } from "motion/react";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
 import CountUp from "react-countup";
@@ -174,6 +174,7 @@ function Hero() {
   const [heroAge, setHeroAge] = useState("");
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const modalRef = useRef<VideoModalHandle | null>(null);
+  const prefersReducedMotion = useReducedMotion();
 
   // Belt-and-suspenders Safari kick: once the element mounts, force autoplay.
   // Safari/WebKit occasionally drops muted autoplay if the tab wasn't visible
@@ -326,11 +327,13 @@ function Hero() {
                   loading="lazy"
                 />
                 <span className="absolute bottom-0 right-0 size-3 rounded-full bg-emerald-500 ring-2 ring-white" aria-hidden="true">
-                  <motion.span
-                    className="absolute inset-0 rounded-full bg-emerald-500"
-                    animate={{ scale: [1, 1.6, 1], opacity: [0.6, 0, 0.6] }}
-                    transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
-                  />
+                  {!prefersReducedMotion && (
+                    <motion.span
+                      className="absolute inset-0 rounded-full bg-emerald-500"
+                      animate={{ scale: [1, 1.6, 1], opacity: [0.6, 0, 0.6] }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
+                    />
+                  )}
                 </span>
               </div>
               <div className="text-[11px] md:text-xs leading-snug">
@@ -405,8 +408,8 @@ function Hero() {
                       className="absolute top-14 md:top-16 right-3 md:right-4 z-20 pointer-events-none"
                     >
                       <motion.div
-                        animate={{ y: [0, -2, 0] }}
-                        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                        animate={prefersReducedMotion ? undefined : { y: [0, -2, 0] }}
+                        transition={prefersReducedMotion ? undefined : { duration: 2, repeat: Infinity, ease: "easeInOut" }}
                         className="bg-slate-950/60 backdrop-blur-md border border-white/15 rounded-md px-2 py-1 text-[10px] font-bold text-white shadow-lg whitespace-nowrap"
                       >
                         Tap for sound
@@ -431,12 +434,14 @@ function Hero() {
                       transition={{ type: "spring", stiffness: 400, damping: 22 }}
                       className="relative size-12 md:size-14 rounded-full bg-blue-600 backdrop-blur-md flex items-center justify-center border border-white/20 gs-shadow-lg ring-4 ring-blue-500/30 shrink-0 focus:outline-none focus-visible:ring-4 focus-visible:ring-white"
                     >
-                      <motion.span
-                        className="absolute inset-0 rounded-full ring-2 ring-white/40"
-                        animate={{ scale: [1, 1.25, 1], opacity: [0.5, 0, 0.5] }}
-                        transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
-                        aria-hidden="true"
-                      />
+                      {!prefersReducedMotion && (
+                        <motion.span
+                          className="absolute inset-0 rounded-full ring-2 ring-white/40"
+                          animate={{ scale: [1, 1.25, 1], opacity: [0.5, 0, 0.5] }}
+                          transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
+                          aria-hidden="true"
+                        />
+                      )}
                       <PlayCircle className="size-6 md:size-6 text-white relative z-10" />
                     </motion.button>
                   </div>
@@ -757,11 +762,11 @@ function TheProblem() {
             
             <div className="mt-8 grid grid-cols-2 gap-4">
               <div className="rounded-2xl overflow-hidden shadow-lg border border-slate-200 aspect-square relative group">
-                <img loading="lazy" src="/2026-04-15-10-30-00-distracted-child-screen.webp" alt="A distracted child scrolling on an iPad" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 grayscale sepia-[0.3]" />
+                <img loading="lazy" decoding="async" width={2816} height={1536} src="/2026-04-15-10-30-00-distracted-child-screen.webp" alt="A distracted child scrolling on an iPad" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 grayscale sepia-[0.3]" />
                 <div className="absolute top-2 left-2 bg-red-600 text-slate-50 text-[10px] font-extrabold uppercase tracking-widest-gs px-2 py-1 rounded shadow">Passive Scrolling</div>
               </div>
               <div className="rounded-2xl overflow-hidden shadow-lg border border-slate-200 aspect-square relative group">
-                 <img loading="lazy" src="/kid-chess-online-class-1200.webp" alt="A child analysing a chess position on a real board while his FIDE coach explains the move over a laptop video call — a ChessWize live class" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                 <img loading="lazy" decoding="async" width={1200} height={806} src="/kid-chess-online-class-1200.webp" alt="A child analysing a chess position on a real board while his FIDE coach explains the move over a laptop video call — a ChessWize live class" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                  <div className="absolute top-2 left-2 bg-blue-600 text-slate-50 text-[10px] font-extrabold uppercase tracking-widest-gs px-2 py-1 rounded shadow">Purposeful Training</div>
               </div>
             </div>
@@ -902,7 +907,7 @@ function Transformation() {
         </div>
         
         <div className="mt-12 max-w-4xl mx-auto rounded-3xl overflow-hidden shadow-2xl border border-slate-200 relative aspect-video group">
-           <img loading="lazy" src="/2026-04-15-10-01-00-resilience-chess-close.webp" alt="A child deeply focusing on a chess piece, demonstrating a cognitive paradigm shift" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+           <img loading="lazy" decoding="async" width={2816} height={1536} src="/2026-04-15-10-01-00-resilience-chess-close.webp" alt="A child deeply focusing on a chess piece, demonstrating a cognitive paradigm shift" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
            <div className="absolute inset-0 bg-gradient-to-t from-slate-100/60 to-transparent pointer-events-none" />
            <div className="absolute bottom-6 left-6 right-6">
              <p className="text-slate-800 text-lg md:text-xl font-extrabold drop-shadow-md">"From screen-addicted to strategically obsessed."</p>
@@ -1571,7 +1576,7 @@ function WhoIsThisFor() {
             return (
               <div key={i} className="bg-slate-50 rounded-3xl gs-border gs-shadow-md hover:border-blue-300 hover:shadow-xl transition-all flex flex-col h-full cursor-default group overflow-hidden">
                 <div className="h-48 md:h-56 w-full relative overflow-hidden">
-                  <img loading="lazy" src={p.img} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                  <img loading="lazy" decoding="async" width={2816} height={1536} src={p.img} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-100/60 to-transparent" />
                   <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between gap-2">
                     <div className="size-10 rounded-xl bg-white/20 backdrop-blur-md border border-slate-300 flex items-center justify-center shrink-0">
@@ -1645,7 +1650,7 @@ function LearningModes() {
             return (
               <div key={i} className="bg-white rounded-3xl border border-slate-200 shadow-md hover:border-blue-400 hover:shadow-xl transition-all flex flex-col h-full overflow-hidden group">
                 <div className="h-48 w-full relative overflow-hidden">
-                  <img loading="lazy" src={p.img} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                  <img loading="lazy" decoding="async" width={2816} height={1536} src={p.img} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-100/60 to-transparent" />
                   <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
                     <div className="size-10 rounded-xl bg-white/20 backdrop-blur-md border border-slate-300 flex items-center justify-center">
@@ -1706,7 +1711,7 @@ function Curriculum() {
               
               <div className="w-full lg:w-[45%] shrink-0 relative z-10">
                 <div className="aspect-[4/3] rounded-2xl overflow-hidden border border-slate-200 gs-shadow">
-                  <img loading="lazy" src={mod.img} alt={mod.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                  <img loading="lazy" decoding="async" width={2816} height={1536} src={mod.img} alt={mod.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                 </div>
               </div>
 
@@ -1966,6 +1971,7 @@ function VideoCard({ v }: { v: VideoItem }) {
   const [activated, setActivated] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const poster = v.poster ?? v.src.replace(/\.mp4$/i, "-poster.webp");
+  const prefersReducedMotion = useReducedMotion();
 
   // Activate on click; call play() synchronously from the click handler so
   // Safari accepts it as a user-initiated gesture. Then swap poster for the
@@ -2026,12 +2032,14 @@ function VideoCard({ v }: { v: VideoItem }) {
                 <svg viewBox="0 0 24 24" className="size-5 md:size-6 text-blue-600 translate-x-[1px]" fill="currentColor" aria-hidden="true">
                   <path d="M8 5.14v13.72L19 12 8 5.14z" />
                 </svg>
-                <motion.span
-                  className="absolute inset-0 rounded-full ring-2 ring-white/40"
-                  animate={{ scale: [1, 1.3, 1], opacity: [0.4, 0, 0.4] }}
-                  transition={{ duration: 2.4, repeat: Infinity, ease: "easeOut" }}
-                  aria-hidden="true"
-                />
+                {!prefersReducedMotion && (
+                  <motion.span
+                    className="absolute inset-0 rounded-full ring-2 ring-white/40"
+                    animate={{ scale: [1, 1.3, 1], opacity: [0.4, 0, 0.4] }}
+                    transition={{ duration: 2.4, repeat: Infinity, ease: "easeOut" }}
+                    aria-hidden="true"
+                  />
+                )}
               </motion.div>
             </div>
 
@@ -2199,7 +2207,7 @@ function Mentors() {
                 {/* Top: Image + Name side by side */}
                 <div className="flex items-center gap-5 md:gap-6">
                   <div className="relative shrink-0">
-                    <img loading="lazy" src="/young-man-deep-in-thought-while-playing-game-of-ch-2026-01-09-00-57-38-utc.webp" alt="Tarun R., Head Coach & Founder" className="size-40 md:size-48 rounded-2xl object-cover border-2 border-slate-200 gs-shadow-lg relative z-10" />
+                    <img loading="lazy" decoding="async" width={1920} height={1280} src="/young-man-deep-in-thought-while-playing-game-of-ch-2026-01-09-00-57-38-utc.webp" alt="Tarun R., Head Coach & Founder" className="size-40 md:size-48 rounded-2xl object-cover border-2 border-slate-200 gs-shadow-lg relative z-10" />
                   </div>
                   <div>
                     <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-200 border-0 rounded text-[9px] md:text-[10px] font-bold uppercase tracking-widest-gs mb-1.5 px-2 py-0.5">Head Coach & Founder</Badge>
@@ -2264,7 +2272,7 @@ function FounderStory() {
         <div className="bg-white/80 gs-shadow-xl backdrop-blur-xl rounded-3xl p-8 md:p-12 border border-slate-200 shadow-2xl flex flex-col md:flex-row gap-8 md:gap-12 items-center">
           <div className="w-full md:w-1/3 shrink-0 relative">
             <div className="absolute inset-0 bg-blue-500/20 blur-2xl rounded-full" />
-           <img loading="lazy" src="/2026-04-15-10-34-00-founder-tarun-portrait.webp" alt="Tarun R., Founder and Head Coach" className="w-full aspect-square object-cover rounded-2xl border border-slate-200 relative z-10 shadow-lg grayscale hover:grayscale-0 transition-all duration-700" />
+           <img loading="lazy" decoding="async" width={2816} height={1536} src="/2026-04-15-10-34-00-founder-tarun-portrait.webp" alt="Tarun R., Founder and Head Coach" className="w-full aspect-square object-cover rounded-2xl border border-slate-200 relative z-10 shadow-lg grayscale hover:grayscale-0 transition-all duration-700" />
           </div>
           <div className="w-full md:w-2/3 flex flex-col">
             <h2 className="text-[10px] font-bold text-blue-600 uppercase tracking-widest-gs mb-3">A Note From The Founder</h2>
@@ -2650,7 +2658,7 @@ function StarPerformers() {
 
                 <div className="relative mb-6">
                   <div className="aspect-[4/3] rounded-2xl overflow-hidden border border-slate-200 shadow-lg">
-                    <img loading="lazy" src={p.img} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                    <img loading="lazy" decoding="async" width={640} height={480} src={p.img} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                   </div>
                   <div className="absolute -bottom-4 right-4 bg-blue-600 text-white font-extrabold text-[10px] uppercase tracking-widest-gs px-3 py-1 rounded-md shadow-lg border border-blue-500">
                     {p.tag}
@@ -2697,7 +2705,11 @@ function Stars({ count = 5 }: { count?: number }) {
 }
 
 function WallOfLove() {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "start" }, [Autoplay({ delay: 5000, stopOnInteraction: true })]);
+  const prefersReducedMotion = useReducedMotion();
+  const [emblaRef, emblaApi] = useEmblaCarousel(
+    { loop: true, align: "start" },
+    prefersReducedMotion ? [] : [Autoplay({ delay: 5000, stopOnInteraction: true })]
+  );
   const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
@@ -3382,33 +3394,32 @@ function BottomForm() {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-1">
                           {[
                             { value: "focus", label: "Improve focus & attention span" },
-                            { value: "math", label: "Boost math, logic &amp; school performance" },
+                            { value: "math", label: "Boost math, logic & school performance" },
                             { value: "screen_time", label: "Replace passive screen time" },
                             { value: "tournament", label: "Train for tournaments / FIDE rating" },
-                            { value: "confidence", label: "Build confidence &amp; emotional resilience" },
+                            { value: "confidence", label: "Build confidence & emotional resilience" },
                             { value: "exploring", label: "Just exploring — not sure yet" },
                           ].map((opt) => {
                             const selected = (watch("parent_concern") ?? []).includes(opt.value);
                             return (
-                            <label
-                              key={opt.value}
-                              className={`flex items-start gap-2.5 p-3 rounded-xl border transition-all cursor-pointer ${
-                                selected
-                                  ? "border-blue-600 bg-blue-50 shadow-sm"
-                                  : "border-slate-200 bg-slate-50 hover:bg-white hover:border-blue-300"
-                              }`}
-                            >
-                              <input
-                                type="checkbox"
-                                value={opt.value}
-                                {...register("parent_concern")}
-                                className="mt-0.5 size-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer shrink-0"
-                              />
-                              <span
-                                className="text-xs md:text-[13px] font-bold text-slate-800 leading-snug"
-                                dangerouslySetInnerHTML={{ __html: opt.label }}
-                              />
-                            </label>
+                              <label
+                                key={opt.value}
+                                className={`flex items-start gap-2.5 p-3 rounded-xl border transition-all cursor-pointer ${
+                                  selected
+                                    ? "border-blue-600 bg-blue-50 shadow-sm"
+                                    : "border-slate-200 bg-slate-50 hover:bg-white hover:border-blue-300"
+                                }`}
+                              >
+                                <input
+                                  type="checkbox"
+                                  value={opt.value}
+                                  {...register("parent_concern")}
+                                  className="mt-0.5 size-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer shrink-0"
+                                />
+                                <span className="text-xs md:text-[13px] font-bold text-slate-800 leading-snug">
+                                  {opt.label}
+                                </span>
+                              </label>
                             );
                           })}
                         </div>
@@ -3701,7 +3712,7 @@ function Footer() {
 
         <div className="w-full px-4">
           <svg
-            viewBox="0 0 900 180"
+            viewBox="0 0 1200 200"
             preserveAspectRatio="xMidYMid meet"
             className="block w-full h-auto max-w-[1400px] mx-auto"
           >
@@ -3713,8 +3724,8 @@ function Footer() {
               </linearGradient>
             </defs>
             <text
-              x="450"
-              y="140"
+              x="600"
+              y="155"
               textAnchor="middle"
               fontFamily="'Plus Jakarta Sans', system-ui, sans-serif"
               fontWeight="900"
@@ -4062,7 +4073,7 @@ function SyllabusExplorer() {
             </div>
             
             <div className="mt-2 rounded-2xl overflow-hidden shadow-lg border border-slate-200 aspect-[16/9] relative hidden lg:block">
-              <img loading="lazy" src="/2026-04-15-10-40-00-12-week-syllabus-planner.webp" alt="A high-end academic planner showing a 12-week cognitive chess curriculum" className="w-full h-full object-cover" />
+              <img loading="lazy" decoding="async" width={2816} height={1536} src="/2026-04-15-10-40-00-12-week-syllabus-planner.webp" alt="A high-end academic planner showing a 12-week cognitive chess curriculum" className="w-full h-full object-cover" />
             </div>
           </div>
 
