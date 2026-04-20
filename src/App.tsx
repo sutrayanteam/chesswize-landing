@@ -3236,90 +3236,123 @@ function WhatsAppWidget() {
 
 function Footer() {
   return (
-    <footer className="bg-gradient-to-b from-slate-900 to-slate-950 text-slate-400 pt-20 md:pt-32 pb-24 lg:pb-12 border-t border-slate-800 relative overflow-hidden">
-      {/* Background Textures */}
-      <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_rgba(15,23,42,0.8),_transparent)] pointer-events-none" />
-      
-      <div className="max-w-[1400px] mx-auto px-4 md:px-8 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-8 mb-16 md:mb-24">
-          
-          {/* Brand & Mission (Col span 4) */}
-          <div className="md:col-span-12 lg:col-span-4">
-            <div className="mb-6 md:mb-8 bg-white/5 inline-block p-3 rounded-2xl border border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]">
-              <img loading="lazy" src="/logo-side-white-v2.svg" alt="ChessWize" className="h-8 md:h-10 object-contain drop-shadow-md" />
+    <footer className="relative overflow-hidden bg-slate-950 text-slate-400 border-t border-white/5 pt-20 md:pt-24 pb-28 lg:pb-10">
+      {/* Ambient aurora */}
+      <div aria-hidden="true" className="absolute inset-0 pointer-events-none">
+        <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-blue-600/15 blur-[120px] rounded-full" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(37,99,235,0.06),_transparent_60%)]" />
+      </div>
+
+      <div className="relative z-10 max-w-[1200px] mx-auto px-6 md:px-8">
+        {/* ────────── Bento CTA ────────── */}
+        <div className="relative rounded-[1.75rem] border border-white/10 bg-gradient-to-br from-slate-900/80 to-slate-950/80 backdrop-blur-sm p-8 md:p-12 shadow-[0_20px_80px_-20px_rgba(37,99,235,0.25)] overflow-hidden">
+          <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(37,99,235,0.18),_transparent_55%)] pointer-events-none" />
+          <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 md:gap-10">
+            <div className="max-w-xl">
+              <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest-gs mb-3">Still have questions?</p>
+              <h3 className="text-2xl md:text-3xl lg:text-4xl font-extrabold tracking-tighter-gs text-white leading-[1.15]">
+                Your child&rsquo;s next great move starts with a <span className="text-blue-400">50-minute conversation</span>.
+              </h3>
+              <p className="mt-3 text-sm md:text-base text-slate-400 font-medium leading-relaxed">
+                Book a free demo or message our counsellor on WhatsApp — she replies in under ten minutes.
+              </p>
             </div>
-            <p className="font-medium text-sm leading-relaxed text-slate-400 max-w-sm mb-8 drop-shadow-sm">
-              India's premier online chess academy for children. FIDE-certified coaches, structured curriculum, and measurable results — trusted by 1,500+ parents nationwide.
+            <div className="flex flex-col sm:flex-row gap-3 shrink-0 w-full md:w-auto">
+              <Button onClick={scrollToForm} className="h-12 md:h-13 px-6 gs-btn gs-btn-primary rounded-xl font-extrabold text-sm md:text-base shadow-[0_8px_32px_-8px_rgba(37,99,235,0.6)]">
+                Book Free Demo <ArrowRight className="ml-2 size-4" />
+              </Button>
+              <a
+                href="https://wa.me/917007578072?text=Hi%2C%20I%27d%20like%20to%20book%20a%20free%20demo%20for%20my%20child."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="h-12 md:h-13 inline-flex items-center justify-center gap-2 px-6 rounded-xl border border-emerald-500/40 text-emerald-400 hover:text-white hover:bg-emerald-500 hover:border-emerald-500 font-extrabold text-sm md:text-base transition-all"
+              >
+                <MessageCircle className="size-4" /> WhatsApp
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* ────────── Main Footer Grid ────────── */}
+        <div className="mt-16 md:mt-20 grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-8 pb-12 md:pb-16">
+          {/* Brand column */}
+          <div className="md:col-span-6 lg:col-span-5">
+            <img loading="lazy" src="/logo-side-white-v3.svg" alt="ChessWize" className="h-8 md:h-9 w-auto object-contain" />
+            <p className="mt-5 text-sm leading-relaxed text-slate-400 font-medium max-w-md">
+              Structured online chess coaching for children aged 5–14. Small cohorts, FIDE-titled coaches, and a parent dashboard that tells you exactly what your child practised each week.
             </p>
-          </div>
 
-          {/* Quick Links (Col span 2) */}
-          <div className="md:col-span-4 lg:col-span-2 lg:col-start-6">
-            <h4 className="text-[11px] font-extrabold text-slate-200 uppercase tracking-widest-gs mb-6 drop-shadow-sm">Quick Links</h4>
-            <ul className="space-y-4 text-sm font-medium text-slate-400">
-              <li><a href="https://chesswize.com/about-us" className="hover:text-blue-400 hover:translate-x-1 inline-block transition-all">About Us</a></li>
-              <li><a href="https://chesswize.com/courses" className="hover:text-blue-400 hover:translate-x-1 inline-block transition-all">Courses</a></li>
-              <li><a href="https://chesswize.com/blog" className="hover:text-blue-400 hover:translate-x-1 inline-block transition-all">Blog</a></li>
-            </ul>
-          </div>
-
-          {/* Contact (Col span 3) */}
-          <div className="md:col-span-4 lg:col-span-3">
-            <h4 className="text-[11px] font-extrabold text-slate-200 uppercase tracking-widest-gs mb-6 drop-shadow-sm">Contact Us</h4>
-            <ul className="space-y-5 text-sm font-medium text-slate-400">
-              <li className="flex items-start gap-3 group">
-                <div className="p-2 rounded-lg bg-slate-800 border border-slate-700 group-hover:border-blue-500/50 group-hover:bg-blue-500/10 transition-colors shadow-inner">
-                  <Phone className="size-4 text-slate-300 group-hover:text-blue-400 transition-colors" />
-                </div>
-                <a href="tel:+917007578072" className="hover:text-blue-400 transition-colors mt-1.5 drop-shadow-sm">+91-70075-78072</a>
+            {/* Contact line */}
+            <ul className="mt-6 space-y-2.5 text-sm font-medium">
+              <li className="flex items-center gap-3 text-slate-400">
+                <Phone className="size-3.5 text-slate-500 shrink-0" />
+                <a href="tel:+917007578072" className="hover:text-white transition-colors">+91&nbsp;70075&nbsp;78072</a>
+                <span className="text-slate-600">·</span>
+                <span className="text-slate-500 text-xs">10&nbsp;AM – 8&nbsp;PM IST</span>
               </li>
-              <li className="flex items-start gap-3 group">
-                <div className="p-2 rounded-lg bg-slate-800 border border-slate-700 group-hover:border-blue-500/50 group-hover:bg-blue-500/10 transition-colors shadow-inner">
-                  <Mail className="size-4 text-slate-300 group-hover:text-blue-400 transition-colors" />
-                </div>
-                <a href="mailto:hello@chesswize.in" className="hover:text-blue-400 transition-colors mt-1.5 drop-shadow-sm">hello@chesswize.in</a>
+              <li className="flex items-center gap-3 text-slate-400">
+                <Mail className="size-3.5 text-slate-500 shrink-0" />
+                <a href="mailto:hello@chesswize.in" className="hover:text-white transition-colors">hello@chesswize.in</a>
               </li>
-              <li className="flex items-start gap-3 group">
-                <div className="p-2 rounded-lg bg-slate-800 border border-slate-700 shadow-inner">
-                  <MapPin className="size-4 text-slate-300" />
-                </div>
-                <span className="leading-relaxed mt-1 drop-shadow-sm">Kanpur, Uttar Pradesh, India</span>
+              <li className="flex items-center gap-3 text-slate-400">
+                <MapPin className="size-3.5 text-slate-500 shrink-0" />
+                <span>Kanpur, Uttar Pradesh, India</span>
               </li>
             </ul>
-          </div>
 
-          {/* Legal & Social (Col span 2) */}
-          <div className="md:col-span-4 lg:col-span-2">
-            <h4 className="text-[11px] font-extrabold text-slate-200 uppercase tracking-widest-gs mb-6 drop-shadow-sm">Legal</h4>
-            <ul className="space-y-4 text-sm font-medium text-slate-400 mb-10">
-              <li><Link to="/terms" className="hover:text-blue-400 hover:translate-x-1 inline-block transition-all">Terms of Service</Link></li>
-              <li><Link to="/privacy-policy" className="hover:text-blue-400 hover:translate-x-1 inline-block transition-all">Privacy Policy</Link></li>
-              <li><Link to="/refund-policy" className="hover:text-blue-400 hover:translate-x-1 inline-block transition-all">Refund Policy</Link></li>
-              <li><Link to="/cookie-policy" className="hover:text-blue-400 hover:translate-x-1 inline-block transition-all">Cookie Policy</Link></li>
-              <li><Link to="/disclaimer" className="hover:text-blue-400 hover:translate-x-1 inline-block transition-all">Disclaimer</Link></li>
-            </ul>
-
-            <h4 className="text-[11px] font-extrabold text-slate-200 uppercase tracking-widest-gs mb-6 drop-shadow-sm">Follow Us</h4>
-            <div className="flex gap-4">
-              <a href="https://www.linkedin.com/company/chesswize/" target="_blank" rel="noreferrer" aria-label="ChessWize on LinkedIn" className="size-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 hover:bg-blue-600 hover:text-white hover:border-blue-500 transition-all">
+            {/* Social */}
+            <div className="mt-6 flex items-center gap-2">
+              <a href="https://www.linkedin.com/company/chesswize/" target="_blank" rel="noreferrer" aria-label="ChessWize on LinkedIn" className="size-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all">
                 <Linkedin className="size-4" />
               </a>
-              <a href="https://wa.me/917007578072" target="_blank" rel="noreferrer" aria-label="ChessWize on WhatsApp" className="size-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 hover:bg-emerald-600 hover:text-white hover:border-emerald-500 transition-all">
+              <a href="https://wa.me/917007578072" target="_blank" rel="noreferrer" aria-label="ChessWize on WhatsApp" className="size-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-emerald-300 hover:bg-white/10 hover:border-white/20 transition-all">
                 <MessageCircle className="size-4" />
               </a>
             </div>
           </div>
-          
+
+          {/* Explore links */}
+          <div className="md:col-span-3 lg:col-span-3 lg:col-start-7">
+            <h4 className="text-[11px] font-bold text-white uppercase tracking-widest-gs mb-5">Explore</h4>
+            <ul className="space-y-3 text-sm font-medium">
+              <li><button onClick={() => scrollToSection("programs")} className="text-slate-400 hover:text-white transition-colors">Programs</button></li>
+              <li><button onClick={() => scrollToSection("mentors")} className="text-slate-400 hover:text-white transition-colors">Mentors</button></li>
+              <li><button onClick={() => scrollToSection("testimonials")} className="text-slate-400 hover:text-white transition-colors">Testimonials</button></li>
+              <li><button onClick={() => scrollToSection("methodology")} className="text-slate-400 hover:text-white transition-colors">Methodology</button></li>
+              <li><button onClick={() => scrollToSection("tuition")} className="text-slate-400 hover:text-white transition-colors">Tuition</button></li>
+              <li><button onClick={() => scrollToSection("faq")} className="text-slate-400 hover:text-white transition-colors">FAQ</button></li>
+            </ul>
+          </div>
+
+          {/* Legal links */}
+          <div className="md:col-span-3 lg:col-span-3">
+            <h4 className="text-[11px] font-bold text-white uppercase tracking-widest-gs mb-5">Legal</h4>
+            <ul className="space-y-3 text-sm font-medium">
+              <li><Link to="/terms" className="text-slate-400 hover:text-white transition-colors">Terms of Service</Link></li>
+              <li><Link to="/privacy-policy" className="text-slate-400 hover:text-white transition-colors">Privacy Policy</Link></li>
+              <li><Link to="/refund-policy" className="text-slate-400 hover:text-white transition-colors">Refund Policy</Link></li>
+              <li><Link to="/cookie-policy" className="text-slate-400 hover:text-white transition-colors">Cookie Policy</Link></li>
+              <li><Link to="/disclaimer" className="text-slate-400 hover:text-white transition-colors">Disclaimer</Link></li>
+            </ul>
+          </div>
         </div>
-        
-        {/* Bottom Bar */}
-        <Separator className="bg-slate-800 mb-8 shadow-inner" />
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4 relative z-10">
-          <p className="text-[10px] font-bold uppercase tracking-widest-gs text-slate-500 drop-shadow-sm">
-            © 2026 by Chesswize. All rights reserved.
+
+        {/* ────────── Bottom bar ────────── */}
+        <div className="border-t border-white/5 pt-6 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <p className="text-xs font-medium text-slate-500">
+            © {new Date().getFullYear()} Chesswize Education&nbsp;LLP · Building sharper minds, one move at a time.
+          </p>
+          <p className="text-xs font-medium text-slate-600">
+            Made in <span className="text-slate-400">Kanpur</span> · For parents everywhere.
           </p>
         </div>
+      </div>
+
+      {/* ────────── Giant typographic watermark ────────── */}
+      <div aria-hidden="true" className="relative z-0 mt-8 overflow-hidden select-none pointer-events-none">
+        <p className="text-center font-black tracking-[-0.06em] leading-[0.8] text-transparent bg-clip-text bg-gradient-to-b from-white/[0.04] to-transparent text-[20vw] md:text-[16vw]">
+          CHESSWIZE
+        </p>
       </div>
     </footer>
   );
