@@ -164,7 +164,7 @@ function Hero() {
           
           {/* Left Copy Side */}
           <div className="w-full xl:w-[55%] flex flex-col gap-5 md:gap-6">
-            <h1 className="text-3xl sm:text-4xl md:text-[2.75rem] lg:text-[3.25rem] font-extrabold tracking-tighter-gs text-slate-900 leading-[1.12] drop-shadow-sm">
+            <h1 className="text-3xl sm:text-4xl md:text-[2.75rem] lg:text-[3.25rem] font-extrabold tracking-tighter-gs text-slate-900 leading-[1.12]">
               Help your child{' '}
               <span className="text-gradient-primary">think deeper,</span>{' '}
               not scroll longer.
@@ -420,7 +420,7 @@ function ParentAssessmentQuiz() {
           <Badge className="bg-blue-500/20 text-blue-600 border border-blue-500/30 rounded-full font-bold mb-4 px-3 py-1 text-[9px] md:text-[10px] uppercase tracking-widest-gs">
             <BrainCircuit className="size-3 mr-1.5 inline" /> Quick Assessment
           </Badge>
-          <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tighter-gs mb-4 leading-tight text-slate-900 drop-shadow-sm">
+          <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tighter-gs mb-4 leading-tight text-slate-900">
             Is your child ready for <span className="text-blue-600">serious growth?</span>
           </h3>
           <p className="text-base md:text-lg text-slate-600 font-medium max-w-2xl mx-auto">
@@ -638,7 +638,7 @@ function Transformation() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 lg:gap-12 max-w-5xl mx-auto">
           {/* Before */}
-          <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 md:p-8 lg:p-10 gs-shadow-sm hover-lift">
+          <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 md:p-8 lg:p-10 gs-shadow-sm">
             <div className="flex items-center gap-3 mb-6 md:mb-8">
               <div className="size-8 md:size-10 rounded-lg bg-red-100 text-red-600 flex items-center justify-center font-extrabold text-lg md:text-xl border border-red-200">X</div>
               <h4 className="text-xl md:text-2xl font-extrabold tracking-tight-gs text-slate-900">Before ChessWize</h4>
@@ -669,7 +669,7 @@ function Transformation() {
           </div>
 
           {/* After */}
-          <div className="bg-white/60 backdrop-blur-xl border border-white/40 rounded-3xl p-6 md:p-8 lg:p-10 shadow-[0_8px_60px_-12px_rgba(37,99,235,0.18)] relative overflow-hidden hover-lift ring-1 ring-blue-100/60">
+          <div className="bg-white/60 backdrop-blur-xl border border-white/40 rounded-3xl p-6 md:p-8 lg:p-10 shadow-[0_8px_60px_-12px_rgba(37,99,235,0.18)] relative overflow-hidden ring-1 ring-blue-100/60">
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-100/80 via-blue-50/30 to-transparent pointer-events-none" />
             <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-400/10 rounded-full blur-3xl pointer-events-none" />
             <div className="absolute -bottom-16 -left-16 w-40 h-40 bg-indigo-400/10 rounded-full blur-3xl pointer-events-none" />
@@ -1374,7 +1374,7 @@ function WhoIsThisFor() {
           {personas.map((p, i) => {
             const Icon = p.icon;
             return (
-              <div key={i} className="bg-slate-50 rounded-3xl gs-border gs-shadow-md hover:border-blue-300 hover:shadow-xl transition-all flex flex-col h-full hover-lift cursor-default group overflow-hidden">
+              <div key={i} className="bg-slate-50 rounded-3xl gs-border gs-shadow-md hover:border-blue-300 hover:shadow-xl transition-all flex flex-col h-full cursor-default group overflow-hidden">
                 <div className="h-48 md:h-56 w-full relative overflow-hidden">
                   <img loading="lazy" src={p.img} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-100/60 to-transparent" />
@@ -1448,7 +1448,7 @@ function LearningModes() {
           {modes.map((p, i) => {
             const Icon = p.icon;
             return (
-              <div key={i} className="bg-white rounded-3xl border border-slate-200 shadow-md hover:border-blue-400 hover:shadow-xl transition-all flex flex-col h-full hover-lift overflow-hidden group">
+              <div key={i} className="bg-white rounded-3xl border border-slate-200 shadow-md hover:border-blue-400 hover:shadow-xl transition-all flex flex-col h-full overflow-hidden group">
                 <div className="h-48 w-full relative overflow-hidden">
                   <img loading="lazy" src={p.img} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-100/60 to-transparent" />
@@ -1504,7 +1504,7 @@ function Curriculum() {
           <div className="hidden lg:block absolute left-[3.5rem] top-20 bottom-20 w-1 bg-blue-200 z-0" />
           
           {modules.map((mod, i) => (
-            <div key={i} className="bg-white gs-border rounded-3xl p-6 md:p-8 lg:p-12 gs-shadow-xl flex flex-col lg:flex-row gap-8 lg:gap-16 relative overflow-hidden group hover:border-blue-300 transition-all duration-300 hover-lift z-10">
+            <div key={i} className="bg-white gs-border rounded-3xl p-6 md:p-8 lg:p-12 gs-shadow-xl flex flex-col lg:flex-row gap-8 lg:gap-16 relative overflow-hidden group hover:border-blue-300 transition-all duration-300 z-10">
               <div className="hidden md:block absolute -right-8 -top-12 text-[150px] lg:text-[200px] font-extrabold text-slate-50 pointer-events-none select-none z-0 group-hover:text-blue-50 transition-colors">
                 0{i+1}
               </div>
@@ -1749,7 +1749,7 @@ function Mentors() {
           </div>
 
           <div className="w-full lg:w-1/2">
-            <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 md:p-8 lg:p-10 gs-shadow-xl relative overflow-hidden hover-lift">
+            <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 md:p-8 lg:p-10 gs-shadow-xl relative overflow-hidden">
               <div className="absolute top-0 right-0 w-40 md:w-64 h-40 md:h-64 bg-amber-100/50 rounded-full blur-[40px] md:blur-[60px] pointer-events-none" />
               <div className="flex flex-col gap-6 relative z-10">
                 {/* Top: Image + Name side by side */}
@@ -1817,7 +1817,7 @@ function FounderStory() {
   return (
     <section className="py-16 md:py-24 bg-slate-50 text-slate-900 border-b border-slate-200 relative overflow-hidden">
       <div className="max-w-[1000px] mx-auto px-4 md:px-8 relative z-10">
-        <div className="bg-white/80 gs-shadow-xl backdrop-blur-xl rounded-3xl p-8 md:p-12 border border-slate-200 shadow-2xl flex flex-col md:flex-row gap-8 md:gap-12 items-center hover-lift">
+        <div className="bg-white/80 gs-shadow-xl backdrop-blur-xl rounded-3xl p-8 md:p-12 border border-slate-200 shadow-2xl flex flex-col md:flex-row gap-8 md:gap-12 items-center">
           <div className="w-full md:w-1/3 shrink-0 relative">
             <div className="absolute inset-0 bg-blue-500/20 blur-2xl rounded-full" />
            <img loading="lazy" src="/2026-04-15-10-34-00-founder-tarun-portrait.webp" alt="Tarun R., Founder and Head Coach" className="w-full aspect-square object-cover rounded-2xl border border-slate-200 relative z-10 shadow-lg grayscale hover:grayscale-0 transition-all duration-700" />
@@ -2153,25 +2153,25 @@ function StarPerformers() {
   const performers = [
     {
       name: "Saanvika",
-      achievement: "Joined at 800 Elo with weak endgame technique. Coach identified recurring rook endgame errors and built a targeted 6-week module. She broke 1000 in month two, won her first rated tournament in month four, and hit 1340 by month six. Five tournament victories and counting — her tactical accuracy on the dashboard sits at 94%.",
-      schoolImpact: "Parents report visibly sharper math problem-solving at school.",
-      img: "https://chesswize.com/wp-content/uploads/2025/03/Untitled-design-28.png",
+      hook: "Won her first rated tournament in month four.",
+      context: "Coach fixed a recurring rook-endgame leak with a targeted 6-week module. Broke 1000 Elo in month two, hit 1340 by month six.",
+      img: "/saanvika-tournament.webp",
       tag: "800 → 1340 Elo",
       duration: "6 Months"
     },
     {
       name: "Mikaeel",
-      achievement: "Started as a complete beginner who couldn't sit still for 10 minutes. The Foundation Programme stretched his focus from 5-minute bursts to full 45-minute sessions. His puzzle solve rate went from 30% to 76% in 8 weeks. He now plays rated games with calm composure and crossed 1100 Elo in just four months — without a single tantrum.",
-      schoolImpact: "His class teacher noted improved sitting tolerance and homework focus.",
-      img: "https://chesswize.com/wp-content/uploads/2025/03/Untitled-design-30.png",
+      hook: "Stretched his focus from 5 minutes to 45 — without a single tantrum.",
+      context: "Joined as an absolute beginner who couldn't sit still. Puzzle solve rate went 30% → 76% in 8 weeks; crossed 1100 Elo in four months.",
+      img: "/mikaeel-portrait.webp",
       tag: "0 → 1100 Elo",
       duration: "4 Months"
     },
     {
       name: "Avyukt",
-      achievement: "Entered the Foundation cohort but advanced to Tournament Masterclass in record time. His coach noted exceptional pattern recognition — he was spotting knight forks 3 moves ahead by week six. Promoted through two cohort levels in 10 weeks. Currently preparing for his first FIDE-rated tournament with a puzzle accuracy of 91%.",
-      schoolImpact: "Earned the school's logic olympiad selection in his grade.",
-      img: "https://chesswize.com/wp-content/uploads/2025/03/Untitled-design-29.png",
+      hook: "Promoted through two cohort levels in 10 weeks.",
+      context: "Coach flagged exceptional pattern recognition — spotting knight forks three moves ahead by week six. Puzzle accuracy now 91%.",
+      img: "/avyukt-portrait.webp",
       tag: "Fast-Track Promotion",
       duration: "10 Weeks"
     }
@@ -2194,7 +2194,7 @@ function StarPerformers() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
           {performers.map((p, i) => (
             <Tilt key={i} tiltMaxAngleX={5} tiltMaxAngleY={5} glareEnable={true} glareMaxOpacity={0.1} glareColor="white" glarePosition="all" className="rounded-3xl">
-              <div className="bg-white/80 gs-shadow-xl backdrop-blur-md rounded-3xl border border-slate-200 p-6 md:p-8 flex flex-col hover-lift h-full relative overflow-hidden group">
+              <div className="bg-white/80 gs-shadow-xl backdrop-blur-md rounded-3xl border border-slate-200 p-6 md:p-8 flex flex-col h-full relative overflow-hidden group">
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-amber-500 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
 
                 <div className="relative mb-6">
@@ -2209,14 +2209,13 @@ function StarPerformers() {
                   </div>
                 </div>
 
-                <h4 className="text-xl md:text-2xl font-extrabold text-slate-900 tracking-tight-gs mb-3">{p.name}</h4>
-                <p className="text-sm md:text-base text-slate-600 font-medium leading-relaxed mb-4">
-                  {p.achievement}
+                <h4 className="text-xl md:text-2xl font-extrabold text-slate-900 tracking-tight-gs mb-2">{p.name}</h4>
+                <p className="text-sm md:text-base text-blue-700 font-bold leading-snug mb-2">
+                  {p.hook}
                 </p>
-                <div className="mt-auto pt-4 border-t border-slate-100 flex items-start gap-2.5 text-xs font-bold text-blue-800 bg-blue-50 border border-blue-100 rounded-xl p-3">
-                  <BookOpen className="size-4 text-blue-600 shrink-0 mt-0.5" />
-                  <span className="leading-snug">School impact: {p.schoolImpact}</span>
-                </div>
+                <p className="text-sm text-slate-600 font-medium leading-relaxed">
+                  {p.context}
+                </p>
               </div>
             </Tilt>
           ))}
@@ -2256,7 +2255,7 @@ function WallOfLove() {
       author: "Rupali",
       city: "Lucknow",
       date: "Mar 2026",
-      img: "https://chesswize.com/wp-content/uploads/2025/03/Untitled-design-20.png",
+      img: "/review-rupali.webp",
     },
     {
       headline: "Anika stopped hanging pieces — finally.",
@@ -2265,7 +2264,7 @@ function WallOfLove() {
       author: "Monika",
       city: "Kanpur",
       date: "Feb 2026",
-      img: "https://chesswize.com/wp-content/uploads/2025/03/Untitled-design-21.png",
+      img: "/review-monika.webp",
     },
     {
       headline: "Ishita now reviews her own losses — calmly.",
@@ -2274,7 +2273,7 @@ function WallOfLove() {
       author: "Anjana",
       city: "Mumbai",
       date: "Jan 2026",
-      img: "https://chesswize.com/wp-content/uploads/2025/03/Untitled-design-26.png",
+      img: "/review-anjana.webp",
     },
   ];
   return (
@@ -2290,7 +2289,7 @@ function WallOfLove() {
           <div className="flex -ml-4 md:-ml-8">
             {reviews.map((r, i) => (
               <div key={i} className="pl-4 md:pl-8 flex-[0_0_100%] md:flex-[0_0_50%] lg:flex-[0_0_33.333%]">
-                <div className="bg-white p-6 md:p-8 lg:p-10 rounded-3xl border border-slate-200 shadow-lg hover:shadow-xl flex flex-col h-full hover-lift cursor-default transition-all">
+                <div className="bg-white p-6 md:p-8 lg:p-10 rounded-3xl border border-slate-200 shadow-lg hover:shadow-xl flex flex-col h-full cursor-default transition-all">
                   <div className="mb-4">
                     <Stars count={5} />
                   </div>
@@ -2388,7 +2387,7 @@ function HowItWorks() {
           {steps.map((step, i) => {
             const c = colorMap[step.color];
             return (
-              <div key={i} className={`flex flex-col ${c.bg} border ${c.border} p-6 md:p-8 rounded-3xl transition-all hover-lift relative overflow-hidden`}>
+              <div key={i} className={`flex flex-col ${c.bg} border ${c.border} p-6 md:p-8 rounded-3xl transition-all relative overflow-hidden`}>
                 {/* Step number */}
                 <div className={`${c.numBg} ${c.numText} text-xs font-extrabold w-8 h-8 rounded-lg flex items-center justify-center mb-5 shadow-sm`}>
                   {step.num}
