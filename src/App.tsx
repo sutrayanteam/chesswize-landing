@@ -232,7 +232,7 @@ function Hero() {
               <div className="absolute -top-4 -right-4 md:-top-6 md:-right-6 w-24 md:w-32 h-24 md:h-32 bg-blue-400/20 blur-2xl md:blur-3xl rounded-full" />
               <div className="relative rounded-xl md:rounded-2xl overflow-hidden bg-slate-50 border border-slate-200 group shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)]">
                 <div className="absolute top-3 left-3 md:top-4 md:left-4 z-20 flex flex-col gap-2">
-                  <Badge className="bg-red-500/85 text-white border-0 font-bold px-2 py-0.5 rounded uppercase tracking-widest-gs text-[9px]">Inside Live Training</Badge>
+                  <Badge className="bg-blue-600/90 text-white border-0 font-bold px-2 py-0.5 rounded uppercase tracking-widest-gs text-[9px]">Student Testimonial</Badge>
                 </div>
 
                 <video
@@ -249,8 +249,8 @@ function Hero() {
                 <div className="absolute bottom-0 left-0 w-full p-4 md:p-6 z-20 pointer-events-none">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="text-white font-extrabold text-lg md:text-xl tracking-tight-gs drop-shadow-md">Positional Masterclass</h3>
-                      <p className="text-slate-200 text-xs md:text-sm font-medium drop-shadow-sm">Real tournament simulation training</p>
+                      <h3 className="text-white font-extrabold text-lg md:text-xl tracking-tight-gs drop-shadow-md">Meet a ChessWize student</h3>
+                      <p className="text-slate-200 text-xs md:text-sm font-medium drop-shadow-sm">Real parent-recorded testimonial</p>
                     </div>
                     <div className="size-10 md:size-14 rounded-full bg-blue-600/90 backdrop-blur-md flex items-center justify-center border border-white/20 gs-shadow-lg group-hover:scale-110 transition-transform ring-4 ring-blue-500/30">
                       <PlayCircle className="size-5 md:size-6 text-white" />
@@ -542,22 +542,22 @@ function TheProblem() {
       <div className="max-w-[1400px] mx-auto px-4 md:px-8 relative z-10">
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 items-start">
           <div className="w-full lg:w-1/2 sticky top-24">
-            <h2 className="text-[10px] font-bold text-red-600 uppercase tracking-widest-gs mb-3 flex items-center gap-2">
-              <AlertTriangle className="size-3" /> The Attention Crisis
+            <h2 className="text-[10px] font-bold text-blue-700 uppercase tracking-widest-gs mb-3 flex items-center gap-2">
+              <AlertTriangle className="size-3" /> How We're Different
             </h2>
             <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tighter-gs text-slate-900 mb-4 md:mb-6 leading-tight">
-              Casual hobby classes are <span className="text-red-600">wasting your child's potential.</span>
+              Most chess classes teach moves. <span className="text-blue-600">We teach how to think.</span>
             </h3>
             <div className="space-y-4 md:space-y-6 text-base md:text-lg text-slate-600 font-medium leading-relaxed">
               <p>
                 Most children's screen time trains distraction, not focus. ChessWize flips that — live online classes with FIDE-certified coaches on a platform built for deep attention, so sitting still and thinking deeply become automatic skills that carry straight into school.
               </p>
             </div>
-            <div className="mt-8 p-4 bg-red-50 border border-red-100 rounded-xl flex items-start gap-4">
-              <AlertTriangle className="size-6 text-red-500 shrink-0 mt-0.5" />
+            <div className="mt-8 p-4 bg-blue-50 border border-blue-100 rounded-xl flex items-start gap-4">
+              <AlertTriangle className="size-6 text-blue-600 shrink-0 mt-0.5" />
               <div>
-                <p className="text-sm font-extrabold text-red-900 mb-1">The Danger of Plateauing</p>
-                <p className="text-xs text-red-700 font-medium">Without structured evaluation, children hit a rating ceiling, lose confidence, and quit. We mathematically prevent this.</p>
+                <p className="text-sm font-extrabold text-slate-900 mb-1">Why Structured Evaluation Matters</p>
+                <p className="text-xs text-slate-600 font-medium">Without structured evaluation, children plateau and lose confidence. We track five cognitive dimensions every week and adjust the plan when any metric stalls.</p>
               </div>
             </div>
             
@@ -576,13 +576,13 @@ function TheProblem() {
           <div className="w-full lg:w-1/2 mt-4 lg:mt-0">
             <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 md:p-8 gs-shadow-xl relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-white/50 blur-[40px] rounded-full pointer-events-none" />
-              <h4 className="text-xl font-extrabold tracking-tight-gs text-slate-900 mb-6 text-center">How We Compare</h4>
+              <h4 className="text-xl font-extrabold tracking-tight-gs text-slate-900 mb-6 text-center">Why parents switch to ChessWize</h4>
               
               <div className="flex flex-col gap-3">
                 {/* Header Row */}
                 <div className="grid grid-cols-[1fr_100px_100px] md:grid-cols-[1fr_120px_120px] gap-2 mb-2 pb-2 border-b border-slate-200 text-[9px] md:text-[10px] font-extrabold uppercase tracking-widest-gs text-slate-600">
                   <div>Feature</div>
-                  <div className="text-center text-red-500">Hobby Clubs</div>
+                  <div className="text-center text-slate-500">Typical Class</div>
                   <div className="text-center text-blue-600">ChessWize Programme</div>
                 </div>
 
@@ -1660,7 +1660,7 @@ function VideoShowcase() {
           <h2 className="text-[10px] font-bold text-blue-600 uppercase tracking-widest-gs mb-2 md:mb-3 flex items-center justify-center gap-2">
             <PlayCircle className="size-3" /> Video Testimonials
           </h2>
-          <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tighter-gs mb-3 md:mb-4 leading-tight drop-shadow-sm">
+          <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tighter-gs mb-3 md:mb-4 leading-tight">
             Hear it from <span className="text-blue-600">real families.</span>
           </h3>
           <p className="text-base md:text-lg text-slate-600 font-medium">
@@ -3396,7 +3396,7 @@ function LegalLayout({ title, children }: { title: string, children: React.React
         <div className="max-w-[800px] mx-auto px-4 md:px-8">
           <div className="glass-panel p-8 md:p-12 lg:p-16 rounded-3xl shadow-xl mb-12 border border-slate-200/60 relative overflow-hidden">
             <div className="absolute top-0 left-0 w-1 h-full bg-blue-600" />
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tighter-gs text-slate-900 mb-8 drop-shadow-sm">{title}</h1>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tighter-gs text-slate-900 mb-8">{title}</h1>
             <div className="prose prose-slate prose-blue max-w-none prose-headings:font-extrabold prose-headings:tracking-tight-gs prose-p:font-medium prose-p:leading-relaxed prose-a:font-bold prose-a:text-blue-600 hover:prose-a:text-blue-700">
               {children}
             </div>
