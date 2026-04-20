@@ -3464,7 +3464,15 @@ function Footer() {
         <div className="mt-16 md:mt-20 grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-8 pb-12 md:pb-16">
           {/* Brand column */}
           <div className="md:col-span-6 lg:col-span-5">
-            <img loading="lazy" src="/logo-side-white-v3.svg" alt="ChessWize" className="h-8 md:h-9 w-auto object-contain" />
+            {/* Larger + guaranteed visible — drop-shadow gives the wordmark
+                a subtle halo so it reads even if a caching edge delivered
+                the older square-viewBox version. */}
+            <img
+              loading="lazy"
+              src="/logo-side-white-v3.svg"
+              alt="ChessWize"
+              className="h-10 md:h-11 w-auto object-contain drop-shadow-[0_2px_8px_rgba(255,255,255,0.08)]"
+            />
             <p className="mt-5 text-sm leading-relaxed text-slate-400 font-medium max-w-md">
               Structured online chess coaching for children aged 5–14. Small cohorts, FIDE-titled coaches, and a parent dashboard that tells you exactly what your child practised each week.
             </p>
@@ -3535,16 +3543,44 @@ function Footer() {
         </div>
       </div>
 
-      {/* ────────── Giant typographic watermark — architectural brand moment ────────── */}
-      <div aria-hidden="true" className="relative z-0 mt-10 overflow-hidden select-none pointer-events-none">
-        {/* Thin hairline separator */}
+      {/* ────────── Giant typographic watermark — architectural brand moment.
+           Built as SVG so it scales proportionally at every viewport
+           (preserveAspectRatio does the heavy lifting — no awkward clipping
+           on narrow screens, no overflow on wide ones). ────────── */}
+      <div aria-hidden="true" className="relative z-0 mt-10 md:mt-14 overflow-hidden select-none pointer-events-none">
+        {/* Thin hairline separator spanning most of the width */}
         <div className="absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-        {/* Main wordmark — gradient from readable white at top to transparent at bottom */}
-        <p className="text-center font-black tracking-[-0.06em] leading-[0.8] text-transparent bg-clip-text bg-gradient-to-b from-white/[0.18] via-white/[0.08] to-white/[0.02] text-[22vw] md:text-[17vw]">
-          CHESSWIZE
-        </p>
-        {/* Subtle underscore line + tagline reinforces the mark */}
-        <p className="text-center text-[11px] md:text-xs uppercase tracking-[0.4em] font-bold text-slate-500 mt-2 md:mt-4">
+
+        <div className="w-full px-4">
+          <svg
+            viewBox="0 0 900 180"
+            preserveAspectRatio="xMidYMid meet"
+            className="block w-full h-auto max-w-[1400px] mx-auto"
+          >
+            <defs>
+              <linearGradient id="wmark-grad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#ffffff" stopOpacity="0.22" />
+                <stop offset="65%" stopColor="#ffffff" stopOpacity="0.08" />
+                <stop offset="100%" stopColor="#ffffff" stopOpacity="0.015" />
+              </linearGradient>
+            </defs>
+            <text
+              x="450"
+              y="140"
+              textAnchor="middle"
+              fontFamily="'Plus Jakarta Sans', system-ui, sans-serif"
+              fontWeight="900"
+              fontSize="180"
+              letterSpacing="-8"
+              fill="url(#wmark-grad)"
+            >
+              CHESSWIZE
+            </text>
+          </svg>
+        </div>
+
+        {/* Tagline underneath reinforces the mark and closes the moment */}
+        <p className="text-center text-[10px] md:text-xs uppercase tracking-[0.35em] md:tracking-[0.4em] font-bold text-slate-500 mt-2 md:mt-4 px-4">
           Think smart · Play wise
         </p>
       </div>
