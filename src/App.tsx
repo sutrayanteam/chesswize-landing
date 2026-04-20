@@ -38,6 +38,7 @@ import {
   ListChecks,
   Linkedin,
   MessageCircle,
+  ArrowUp,
   MapPin,
   Mail,
   Phone,
@@ -350,7 +351,8 @@ function Hero() {
                   src="/testimonial-kid-1.mp4"
                   className="absolute inset-0 w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/55 via-slate-950/10 to-slate-950/30 pointer-events-none" />
+                {/* Bottom-only gradient — just enough to keep the caption legible, no darkening of the face */}
+                <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-slate-950/60 to-transparent pointer-events-none" />
 
                 {/* Top-left: badge */}
                 <div className="absolute top-3 left-3 md:top-4 md:left-4 z-20 pointer-events-none">
@@ -3533,10 +3535,17 @@ function Footer() {
         </div>
       </div>
 
-      {/* ────────── Giant typographic watermark ────────── */}
-      <div aria-hidden="true" className="relative z-0 mt-8 overflow-hidden select-none pointer-events-none">
-        <p className="text-center font-black tracking-[-0.06em] leading-[0.8] text-transparent bg-clip-text bg-gradient-to-b from-white/[0.04] to-transparent text-[20vw] md:text-[16vw]">
+      {/* ────────── Giant typographic watermark — architectural brand moment ────────── */}
+      <div aria-hidden="true" className="relative z-0 mt-10 overflow-hidden select-none pointer-events-none">
+        {/* Thin hairline separator */}
+        <div className="absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+        {/* Main wordmark — gradient from readable white at top to transparent at bottom */}
+        <p className="text-center font-black tracking-[-0.06em] leading-[0.8] text-transparent bg-clip-text bg-gradient-to-b from-white/[0.18] via-white/[0.08] to-white/[0.02] text-[22vw] md:text-[17vw]">
           CHESSWIZE
+        </p>
+        {/* Subtle underscore line + tagline reinforces the mark */}
+        <p className="text-center text-[11px] md:text-xs uppercase tracking-[0.4em] font-bold text-slate-500 mt-2 md:mt-4">
+          Think smart · Play wise
         </p>
       </div>
     </footer>
@@ -3593,6 +3602,62 @@ function MobileStickyCTA() {
             </a>
           </div>
         </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+/* ════════════════════════════════════════════════
+   SCROLL TO TOP — floats above the mobile sticky CTA and the
+   desktop WhatsApp widget. Appears after 600px scroll.
+   ════════════════════════════════════════════════ */
+function ScrollToTop() {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsVisible(window.scrollY > 600);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollTop = () => {
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.scrollTo({ top: 0, behavior: prefersReduced ? "auto" : "smooth" });
+  };
+
+  return (
+    <AnimatePresence>
+      {isVisible && (
+        <motion.button
+          type="button"
+          onClick={scrollTop}
+          aria-label="Scroll to top of page"
+          initial={{ opacity: 0, y: 20, scale: 0.8 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 20, scale: 0.8 }}
+          whileHover={{ scale: 1.08, y: -2 }}
+          whileTap={{ scale: 0.92 }}
+          transition={{ type: "spring", stiffness: 400, damping: 22 }}
+          className="group fixed right-4 lg:right-8 z-[120] bottom-24 lg:bottom-28 size-11 md:size-12 rounded-full bg-white/95 backdrop-blur-md border border-slate-200 shadow-[0_8px_24px_-6px_rgba(15,23,42,0.2)] hover:shadow-[0_12px_32px_-6px_rgba(37,99,235,0.3)] flex items-center justify-center text-slate-700 hover:text-blue-600 hover:border-blue-300 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+        >
+          {/* Subtle halo ring on hover — uses Framer so it doesn't layout-shift */}
+          <motion.span
+            className="absolute inset-0 rounded-full ring-2 ring-blue-500/30"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0 }}
+            whileHover={{ opacity: 1 }}
+            transition={{ duration: 0.2 }}
+            aria-hidden="true"
+          />
+          <ArrowUp className="size-5 relative z-10" strokeWidth={2.5} />
+          {/* Desktop-only tooltip */}
+          <span className="hidden lg:block absolute right-full mr-3 top-1/2 -translate-y-1/2 whitespace-nowrap bg-slate-900 text-white text-[11px] font-bold px-2.5 py-1 rounded-md opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity shadow-lg">
+            Back to top
+          </span>
+        </motion.button>
       )}
     </AnimatePresence>
   );
@@ -3882,6 +3947,7 @@ function LandingPage() {
           InteractivePuzzle — all hurt conversion or duplicated content ── */}
       <WhatsAppWidget />
       <MobileStickyCTA />
+      <ScrollToTop />
     </div>
   );
 }
