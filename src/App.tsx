@@ -1,4 +1,12 @@
-import React, { useState, useEffect, useRef, lazy, Suspense } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  lazy,
+  Suspense,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
 import {
   Calendar,
   TrendingUp,
@@ -167,24 +175,46 @@ function Hero() {
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [muted, setMuted] = useState(true);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const modalRef = useRef<VideoModalHandle | null>(null);
 
   // Belt-and-suspenders Safari kick: once the element mounts, force autoplay.
   // Safari/WebKit occasionally drops muted autoplay if the tab wasn't visible
   // during initial paint or if the element mounts inside a hidden container.
   useEffect(() => {
     const v = videoRef.current;
-    if (!v) return;
+    if (!v) {
+      return;
+    }
     v.muted = true;
-    const tryPlay = () => v.play().catch(() => {});
+    const tryPlay = () => {
+      v.play().catch(() => {});
+    };
     tryPlay();
+
     // Retry once on the next frame — Safari sometimes rejects the first call.
     const id = requestAnimationFrame(tryPlay);
-    return () => cancelAnimationFrame(id);
+
+    // Also retry when the browser confirms media readiness. Safari is more
+    // reliable when play() is tied to `loadedmetadata` / `canplay` than to an
+    // arbitrary frame after hydration.
+    const onReady = () => {
+      tryPlay();
+    };
+    v.addEventListener("loadedmetadata", onReady);
+    v.addEventListener("canplay", onReady);
+
+    return () => {
+      cancelAnimationFrame(id);
+      v.removeEventListener("loadedmetadata", onReady);
+      v.removeEventListener("canplay", onReady);
+    };
   }, []);
 
   const toggleMute = async () => {
     const v = videoRef.current;
-    if (!v) return;
+    if (!v) {
+      return;
+    }
     // DOM state is source of truth on Safari — reading v.muted rather than
     // the React state flag avoids drift if the browser pauses the video
     // outside our control (autoplay policy intervention, tab-visibility, etc).
@@ -193,10 +223,16 @@ function Hero() {
     try {
       await v.play();
     } catch {
-      /* Safari rejected — surface will remain paused; user can re-click */
+      // Safari rejected — surface will remain paused; user can re-click.
     }
+
     // Sync React UI from whatever the DOM actually settled on.
     setMuted(v.muted);
+  };
+
+  const openHeroVideoModal = () => {
+    modalRef.current?.primeAndPlay();
+    setShowVideoModal(true);
   };
 
   return (
@@ -314,10 +350,9 @@ function Hero() {
                   webkit-playsinline="true"
                   preload="metadata"
                   poster="/testimonial-kid-1-poster.webp"
+                  src="/testimonial-kid-1.mp4"
                   className="absolute inset-0 w-full h-full object-cover"
-                >
-                  <source src="/testimonial-kid-1.mp4" type="video/mp4" />
-                </video>
+                />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/55 via-slate-950/10 to-slate-950/30 pointer-events-none" />
 
                 {/* Top-left: badge */}
@@ -380,7 +415,7 @@ function Hero() {
                     </div>
                     <motion.button
                       type="button"
-                      onClick={() => setShowVideoModal(true)}
+                      onClick={openHeroVideoModal}
                       aria-label="Open student testimonial in fullscreen"
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
@@ -404,6 +439,7 @@ function Hero() {
       </div>
 
       <VideoModal
+        ref={modalRef}
         open={showVideoModal}
         onClose={() => setShowVideoModal(false)}
         src="/testimonial-kid-1.mp4"
@@ -1711,11 +1747,27 @@ type VideoModalProps = {
   portrait?: boolean;
 };
 
-function VideoModal({ open, onClose, src, poster, label, portrait = false }: VideoModalProps) {
+type VideoModalHandle = {
+  primeAndPlay: () => void;
+};
+
+const VideoModal = forwardRef<VideoModalHandle, VideoModalProps>(function VideoModal(
+  {
+    open,
+    onClose,
+    src,
+    poster,
+    label,
+    portrait = false,
+  }: VideoModalProps,
+  ref,
+) {
   const modalVideoRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      return;
+    }
 
     // Pause any OTHER video on the page so we never have two videos playing at once.
     // Only track ones that were MUTED when paused — resuming an unmuted
@@ -1726,11 +1778,27 @@ function VideoModal({ open, onClose, src, poster, label, portrait = false }: Vid
       if (v !== modalVideoRef.current && !v.paused && !v.ended) {
         const wasMuted = v.muted;
         v.pause();
-        if (wasMuted) wasPlaying.push(v);
+        if (wasMuted) {
+          wasPlaying.push(v);
+        }
       }
     });
 
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    const mv = modalVideoRef.current;
+    const tryPlay = () => {
+      mv?.play().catch(() => {});
+    };
+    if (mv) {
+      tryPlay();
+      mv.addEventListener("loadedmetadata", tryPlay);
+      mv.addEventListener("canplay", tryPlay);
+    }
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
     document.addEventListener("keydown", onKey);
     // Safari iOS fix: set `position:fixed` on body to prevent the rubber-band
     // scroll leaking through the modal. Plain `overflow:hidden` is not enough
@@ -1745,15 +1813,6 @@ function VideoModal({ open, onClose, src, poster, label, portrait = false }: Vid
     document.body.style.top = `-${scrollY}px`;
     document.body.style.width = "100%";
 
-    // Kick the modal video — user gesture chain should let it auto-play,
-    // but Safari sometimes still blocks. Retry on next frame.
-    const kick = () => {
-      const mv = modalVideoRef.current;
-      if (mv) mv.play().catch(() => {});
-    };
-    kick();
-    const rafId = requestAnimationFrame(kick);
-
     return () => {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = prevOverflow;
@@ -1761,63 +1820,94 @@ function VideoModal({ open, onClose, src, poster, label, portrait = false }: Vid
       document.body.style.top = prevTop;
       document.body.style.width = prevWidth;
       window.scrollTo(0, scrollY);
-      cancelAnimationFrame(rafId);
+      if (mv) {
+        mv.pause();
+        mv.removeEventListener("loadedmetadata", tryPlay);
+        mv.removeEventListener("canplay", tryPlay);
+      }
       // Resume background videos that were auto-playing before we opened.
-      wasPlaying.forEach((v) => { v.play().catch(() => {}); });
+      wasPlaying.forEach((v) => {
+        v.play().catch(() => {});
+      });
     };
   }, [open, onClose]);
 
+  const primeAndPlay = () => {
+    const mv = modalVideoRef.current;
+    if (!mv) {
+      return;
+    }
+    if (mv.currentTime > 0 && !mv.paused && !mv.ended) {
+      return;
+    }
+    mv.load();
+    mv.play().catch(() => {
+      // Safari low-power mode may still reject autoplay, but preserving the
+      // click-time play call gives WebKit its best chance to honor playback.
+    });
+  };
+
+  useImperativeHandle(ref, () => {
+    return {
+      primeAndPlay,
+    };
+  }, []);
+
   return (
-    <AnimatePresence>
-      {open && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
+    <motion.div
+      initial={false}
+      animate={{ opacity: open ? 1 : 0 }}
+      transition={{ duration: 0.2 }}
+      onClick={() => {
+        if (open) {
+          onClose();
+        }
+      }}
+      className={`fixed inset-0 z-[100] bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 ${
+        open ? "pointer-events-auto" : "pointer-events-none"
+      }`}
+      role="dialog"
+      aria-modal="true"
+      aria-hidden={!open}
+      aria-label={label ?? "Video"}
+    >
+      <motion.div
+        initial={false}
+        animate={{
+          opacity: open ? 1 : 0,
+          scale: open ? 1 : 0.94,
+        }}
+        transition={{ duration: 0.2 }}
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+        className={`relative w-full ${portrait ? "max-w-[min(92vw,420px)]" : "max-w-[min(92vw,480px)] md:max-w-[min(90vw,540px)]"} bg-black rounded-2xl overflow-hidden shadow-[0_20px_80px_-10px_rgba(0,0,0,0.6)] ring-1 ring-white/10`}
+      >
+        <motion.button
+          type="button"
           onClick={onClose}
-          className="fixed inset-0 z-[100] bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4"
-          role="dialog"
-          aria-modal="true"
-          aria-label={label ?? "Video"}
+          aria-label="Close video"
+          whileHover={{ scale: 1.1, rotate: 90 }}
+          whileTap={{ scale: 0.9 }}
+          transition={{ type: "spring", stiffness: 400, damping: 25 }}
+          className="absolute top-3 right-3 z-10 size-10 rounded-full bg-slate-950/70 hover:bg-slate-950/90 backdrop-blur-sm flex items-center justify-center text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
         >
-          <motion.div
-            initial={{ scale: 0.94, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.94, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            onClick={(e) => e.stopPropagation()}
-            className={`relative w-full ${portrait ? "max-w-[min(92vw,420px)]" : "max-w-[min(92vw,480px)] md:max-w-[min(90vw,540px)]"} bg-black rounded-2xl overflow-hidden shadow-[0_20px_80px_-10px_rgba(0,0,0,0.6)] ring-1 ring-white/10`}
-          >
-            <motion.button
-              type="button"
-              onClick={onClose}
-              aria-label="Close video"
-              whileHover={{ scale: 1.1, rotate: 90 }}
-              whileTap={{ scale: 0.9 }}
-              transition={{ type: "spring", stiffness: 400, damping: 25 }}
-              className="absolute top-3 right-3 z-10 size-10 rounded-full bg-slate-950/70 hover:bg-slate-950/90 backdrop-blur-sm flex items-center justify-center text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
-            >
-              <XCircle className="size-5" />
-            </motion.button>
-            <video
-              ref={modalVideoRef}
-              key={src}
-              controls
-              playsInline
-              webkit-playsinline="true"
-              preload="metadata"
-              poster={poster}
-              className="w-full h-auto max-h-[85vh] bg-black"
-            >
-              <source src={src} type="video/mp4" />
-            </video>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+          <XCircle className="size-5" />
+        </motion.button>
+        <video
+          ref={modalVideoRef}
+          controls
+          playsInline
+          webkit-playsinline="true"
+          preload="metadata"
+          poster={poster}
+          src={src}
+          className="w-full h-auto max-h-[85vh] bg-black"
+        />
+      </motion.div>
+    </motion.div>
   );
-}
+});
 
 /* ════════════════════════════════════════════════
    VIDEO TESTIMONIALS — lazy, poster-first, opens modal on click
@@ -1827,12 +1917,19 @@ type VideoItem = { src: string; title: string; label: string; badge: string; pos
 function VideoCard({ v }: { v: VideoItem }) {
   const [open, setOpen] = useState(false);
   const poster = v.poster ?? v.src.replace(/\.mp4$/i, "-poster.webp");
+  const modalRef = useRef<VideoModalHandle | null>(null);
+
+  const handleOpen = () => {
+    modalRef.current?.primeAndPlay();
+    setOpen(true);
+  };
+
   return (
     <>
       <div className="rounded-2xl overflow-hidden group relative flex-shrink-0 w-[180px] md:w-full bg-white border border-slate-200 shadow-[0_4px_20px_-4px_rgba(15,23,42,0.12)] hover:shadow-[0_20px_40px_-10px_rgba(37,99,235,0.25)] hover:border-blue-300/60 transition-all duration-300">
         <button
           type="button"
-          onClick={() => setOpen(true)}
+          onClick={handleOpen}
           aria-label={`Play video: ${v.title}`}
           className="block w-full cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-500/60"
         >
@@ -1883,7 +1980,15 @@ function VideoCard({ v }: { v: VideoItem }) {
         </button>
       </div>
 
-      <VideoModal open={open} onClose={() => setOpen(false)} src={v.src} poster={poster} label={v.title} portrait />
+      <VideoModal
+        ref={modalRef}
+        open={open}
+        onClose={() => setOpen(false)}
+        src={v.src}
+        poster={poster}
+        label={v.title}
+        portrait
+      />
     </>
   );
 }

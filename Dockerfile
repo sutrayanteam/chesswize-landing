@@ -1,6 +1,8 @@
 # ChessWize landing page — multi-stage static build
 # Build with bun (handles optional native deps correctly on arm64),
-# serve final dist/ with a minimal static server.
+# serve final dist/ with Caddy (native HTTP Range support — required for
+# Safari video playback; Vercel's `serve` drops Range headers through
+# some proxy chains, causing Safari to refuse to play <video> elements).
 
 FROM oven/bun:1 AS build
 WORKDIR /app
@@ -13,10 +15,13 @@ RUN bun install --frozen-lockfile || bun install
 COPY . .
 RUN bun run build
 
-# --- runtime ---
-FROM node:22-alpine AS runtime
-WORKDIR /app
-RUN npm i -g serve@14
-COPY --from=build /app/dist ./dist
+# --- runtime: Caddy file-server, always returns 206 Partial Content
+#     for Range requests on static assets (media, large images, etc.) ---
+FROM caddy:2-alpine AS runtime
+WORKDIR /srv
+COPY --from=build /app/dist ./
+COPY Caddyfile /etc/caddy/Caddyfile
 EXPOSE 80
-CMD ["serve", "-s", "dist", "-l", "80"]
+# Caddy's default process honors the Caddyfile; file_server + try_files
+# behavior + Range support are built-in.
+CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]
