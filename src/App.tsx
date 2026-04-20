@@ -210,24 +210,21 @@ function Hero() {
     };
   }, []);
 
-  const toggleMute = async () => {
+  const toggleMute = () => {
     const v = videoRef.current;
-    if (!v) {
-      return;
-    }
-    // DOM state is source of truth on Safari — reading v.muted rather than
-    // the React state flag avoids drift if the browser pauses the video
-    // outside our control (autoplay policy intervention, tab-visibility, etc).
-    const next = !v.muted;
-    v.muted = next;
-    try {
-      await v.play();
-    } catch {
-      // Safari rejected — surface will remain paused; user can re-click.
-    }
-
-    // Sync React UI from whatever the DOM actually settled on.
+    if (!v) return;
+    // Flip mute SYNCHRONOUSLY inside the click handler so Safari stays
+    // inside the user-gesture window. If the video happens to be paused
+    // (autoplay intervention, tab-change, etc.), also kick play().
+    v.muted = !v.muted;
     setMuted(v.muted);
+    const playPromise = v.play();
+    if (playPromise && typeof playPromise.catch === "function") {
+      playPromise.catch(() => {
+        // Safari still rejected — surface stays paused; user can re-click
+        // which will come in as a fresh gesture.
+      });
+    }
   };
 
   const openHeroVideoModal = () => {
@@ -1915,25 +1912,42 @@ const VideoModal = forwardRef<VideoModalHandle, VideoModalProps>(function VideoM
 type VideoItem = { src: string; title: string; label: string; badge: string; poster?: string };
 
 function VideoCard({ v }: { v: VideoItem }) {
-  const [open, setOpen] = useState(false);
+  const [activated, setActivated] = useState(false);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
   const poster = v.poster ?? v.src.replace(/\.mp4$/i, "-poster.webp");
-  const modalRef = useRef<VideoModalHandle | null>(null);
 
-  const handleOpen = () => {
-    modalRef.current?.primeAndPlay();
-    setOpen(true);
+  // Activate on click; call play() synchronously from the click handler so
+  // Safari accepts it as a user-initiated gesture. Then swap poster for the
+  // real <video> element with native controls.
+  const activate = () => {
+    setActivated(true);
+    // next frame: video element is now mounted, kick play()
+    requestAnimationFrame(() => {
+      videoRef.current?.play().catch(() => {});
+    });
   };
 
   return (
-    <>
-      <div className="rounded-2xl overflow-hidden group relative flex-shrink-0 w-[180px] md:w-full bg-white border border-slate-200 shadow-[0_4px_20px_-4px_rgba(15,23,42,0.12)] hover:shadow-[0_20px_40px_-10px_rgba(37,99,235,0.25)] hover:border-blue-300/60 transition-all duration-300">
-        <button
-          type="button"
-          onClick={handleOpen}
-          aria-label={`Play video: ${v.title}`}
-          className="block w-full cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-500/60"
-        >
-          <div className="relative w-full aspect-[9/16] bg-slate-900 overflow-hidden">
+    <div className="rounded-2xl overflow-hidden group relative flex-shrink-0 w-[180px] md:w-full bg-white border border-slate-200 shadow-[0_4px_20px_-4px_rgba(15,23,42,0.12)] hover:shadow-[0_20px_40px_-10px_rgba(37,99,235,0.25)] hover:border-blue-300/60 transition-all duration-300">
+      <div className="relative w-full aspect-[9/16] bg-slate-900 overflow-hidden">
+        {activated ? (
+          <video
+            ref={videoRef}
+            src={v.src}
+            poster={poster}
+            controls
+            playsInline
+            webkit-playsinline="true"
+            preload="auto"
+            className="absolute inset-0 w-full h-full object-cover bg-black"
+          />
+        ) : (
+          <button
+            type="button"
+            onClick={activate}
+            aria-label={`Play video: ${v.title}`}
+            className="absolute inset-0 w-full h-full cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-500/60"
+          >
             <img
               src={poster}
               alt={v.title}
@@ -1941,7 +1955,6 @@ function VideoCard({ v }: { v: VideoItem }) {
               decoding="async"
               className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
             />
-            {/* Depth gradient overlay (top for badge, bottom for play button visibility) */}
             <div className="absolute inset-0 bg-gradient-to-b from-slate-950/30 via-transparent to-slate-950/60 pointer-events-none" />
 
             {/* Badge */}
@@ -1976,20 +1989,10 @@ function VideoCard({ v }: { v: VideoItem }) {
               <p className="font-extrabold text-white text-xs md:text-sm tracking-tight-gs drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">{v.label}</p>
               <p className="text-[10px] md:text-[11px] text-slate-200 font-medium mt-0.5 truncate drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">{v.title}</p>
             </div>
-          </div>
-        </button>
+          </button>
+        )}
       </div>
-
-      <VideoModal
-        ref={modalRef}
-        open={open}
-        onClose={() => setOpen(false)}
-        src={v.src}
-        poster={poster}
-        label={v.title}
-        portrait
-      />
-    </>
+    </div>
   );
 }
 
