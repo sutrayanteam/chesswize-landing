@@ -227,7 +227,7 @@ function Hero() {
           </div>
 
           {/* Right Media Side - VSL / Masterclass Snippet */}
-          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }} className="w-full xl:w-[45%] mt-6 lg:mt-0">
+          <div className="w-full xl:w-[45%] mt-6 lg:mt-0">
             <div className="glass-panel p-2.5 md:p-3 rounded-2xl md:rounded-3xl gs-shadow-xl gs-border relative hover-lift">
               <div className="absolute -top-4 -right-4 md:-top-6 md:-right-6 w-24 md:w-32 h-24 md:h-32 bg-blue-400/20 blur-2xl md:blur-3xl rounded-full" />
               <div className="relative rounded-xl md:rounded-2xl overflow-hidden bg-slate-50 border border-slate-200 group shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)]">
@@ -242,7 +242,7 @@ function Hero() {
                   muted
                   playsInline
                   preload="metadata"
-                  poster="/hero-poster.webp"
+                  poster="/testimonial-kid-1-poster.webp"
                   className="w-full aspect-[4/3] object-cover opacity-80 group-hover:opacity-100 transition-opacity"
                 />                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-slate-900/20 to-transparent opacity-90 pointer-events-none" />
                 
@@ -258,9 +258,9 @@ function Hero() {
                   </div>
                 </div>
               </div>
-              
+
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>
@@ -609,7 +609,7 @@ function TheProblem() {
               </div>
 
               <Button onClick={scrollToForm} className="w-full mt-8 h-14 gs-btn gs-btn-primary rounded-xl font-bold shadow-lg">
-                Book Free Demo &amp; Counseling <ArrowRight className="ml-2 size-4" />
+                Book Free Demo & Counseling <ArrowRight className="ml-2 size-4" />
               </Button>
             </div>
           </div>
@@ -1734,7 +1734,7 @@ function Mentors() {
                     <span className="text-blue-700 font-extrabold text-xs">2</span>
                  </div>
                  <div>
-                   <h4 className="font-extrabold text-slate-900 text-sm md:text-base">Teaching &amp; Child-Safety Training</h4>
+                   <h4 className="font-extrabold text-slate-900 text-sm md:text-base">Teaching & Child-Safety Training</h4>
                    <p className="text-xs md:text-sm text-slate-600 font-medium mt-1">Every coach is background-verified and trained to teach patience, calculation, and emotional resilience — not just piece movements.</p>
                  </div>
                </div>
@@ -2326,7 +2326,7 @@ function HowItWorks() {
   const steps = [
     {
       num: "01",
-      title: "Free Demo &amp; Counseling",
+      title: "Free Demo & Counseling",
       desc: "A 50-minute 1-on-1 virtual session where our coach maps your child's calculation depth, attention span, emotional response to losing, and opening knowledge — and you get a personalised plan from a counselor.",
       bullets: [
         "Personalised diagnostic — not a generic quiz",
@@ -2348,7 +2348,7 @@ function HowItWorks() {
       ],
       icon: Users,
       detail: "Max 6 students · Matched by skill, not age",
-      color: "emerald",
+      color: "blue",
     },
     {
       num: "03",
@@ -2361,25 +2361,23 @@ function HowItWorks() {
       ],
       icon: Activity,
       detail: "Live sessions · Recorded replays · Weekly parent reports",
-      color: "amber",
+      color: "blue",
     },
   ];
 
   const colorMap: Record<string, { bg: string; border: string; text: string; numBg: string; numText: string; bulletDot: string }> = {
     blue: { bg: "bg-blue-50", border: "border-blue-200 hover:border-blue-400", text: "text-blue-600", numBg: "bg-blue-600", numText: "text-white", bulletDot: "bg-blue-400" },
-    emerald: { bg: "bg-emerald-50", border: "border-emerald-200 hover:border-emerald-400", text: "text-emerald-600", numBg: "bg-emerald-600", numText: "text-white", bulletDot: "bg-emerald-400" },
-    amber: { bg: "bg-amber-50", border: "border-amber-200 hover:border-amber-400", text: "text-amber-600", numBg: "bg-amber-600", numText: "text-white", bulletDot: "bg-amber-400" },
   };
 
   return (
     <section className="py-16 md:py-24 bg-white border-t border-slate-200 relative overflow-hidden">
       <div className="max-w-[1200px] mx-auto px-4 md:px-8 relative z-10">
         <div className="text-center mb-12 md:mb-16">
-          <Badge className="bg-emerald-100 text-emerald-800 border-0 rounded-full font-bold mb-4 md:mb-6 px-3 py-1 text-[9px] md:text-[10px] uppercase tracking-widest-gs">
+          <Badge className="bg-blue-50 text-blue-700 border-0 rounded-full font-bold mb-4 md:mb-6 px-3 py-1 text-[9px] md:text-[10px] uppercase tracking-widest-gs">
             The Process
           </Badge>
           <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tighter-gs mb-4 md:mb-6 text-slate-900 leading-tight">
-            How our <span className="text-emerald-600">training process</span> works.
+            How our <span className="text-blue-600">training process</span> works.
           </h3>
           <p className="text-base md:text-lg text-slate-600 font-medium max-w-2xl mx-auto leading-relaxed">
             Three clear steps from first contact to measurable results. No guesswork, no wasted time.
@@ -2425,15 +2423,15 @@ function HowItWorks() {
         {/* Connector arrows (desktop only) */}
         <div className="hidden md:flex items-center justify-center gap-4 mt-10">
           <div className="flex items-center gap-2 text-xs font-bold text-slate-400">
-            <span className="size-2 rounded-full bg-blue-400" /> Evaluate
+            <span className="size-2 rounded-full bg-blue-500" /> Evaluate
           </div>
           <ArrowRight className="size-4 text-slate-300" />
           <div className="flex items-center gap-2 text-xs font-bold text-slate-400">
-            <span className="size-2 rounded-full bg-emerald-400" /> Place
+            <span className="size-2 rounded-full bg-blue-500" /> Place
           </div>
           <ArrowRight className="size-4 text-slate-300" />
           <div className="flex items-center gap-2 text-xs font-bold text-slate-400">
-            <span className="size-2 rounded-full bg-amber-400" /> Train
+            <span className="size-2 rounded-full bg-blue-500" /> Train
           </div>
         </div>
       </div>
@@ -2679,7 +2677,7 @@ function BottomForm() {
         <div className="text-center mb-10 md:mb-12">
           <h2 className="text-[10px] font-bold text-blue-600 uppercase tracking-widest-gs mb-2 md:mb-3">Take the next step</h2>
           <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tighter-gs text-slate-900 mb-3 md:mb-4 leading-tight">
-            Book Your Child's Free Demo &amp; Counseling
+            Book Your Child's Free Demo & Counseling
           </h3>
           <p className="text-base md:text-lg text-slate-600 font-medium max-w-2xl mx-auto leading-relaxed">
             This isn't a generic sign-up form. We ask a few extra questions so our coach can prepare a personalised evaluation — not a cookie-cutter demo. Our academic counsellor uses these answers to match the right coach and batch.
