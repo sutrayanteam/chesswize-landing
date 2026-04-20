@@ -2254,14 +2254,59 @@ function StarPerformers() {
   );
 }
 
+function Stars({ count = 5 }: { count?: number }) {
+  return (
+    <div className="inline-flex items-center gap-[2px]" aria-label={`${count} out of 5 stars`} role="img">
+      {Array.from({ length: count }).map((_, i) => (
+        <svg
+          key={i}
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="#D97706"
+          className="text-amber-500"
+          aria-hidden="true"
+        >
+          <path d="M12 2.5l2.95 6.36 7.05.64-5.33 4.74 1.6 6.86L12 17.77l-6.27 3.33 1.6-6.86L2 9.5l7.05-.64L12 2.5z" />
+        </svg>
+      ))}
+    </div>
+  );
+}
+
 function WallOfLove() {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "start" }, [Autoplay({ delay: 4000, stopOnInteraction: true })]);
 
   const reviews = [
-    { text: "Aadvik joined as a complete beginner at age 7. Within six weeks his coach had him solving two-move tactical puzzles independently. The weekly WhatsApp report showed his puzzle accuracy climbing from 25% to 61%. He now wakes up asking to do his daily puzzles before school. His class teacher told us his attention span in maths has noticeably improved.", author: "Rupali", desc: "Lucknow", img: "https://chesswize.com/wp-content/uploads/2025/03/Untitled-design-20.png" },
-    { text: "Anika was playing chess casually on an app but never improving. Her coach diagnosed that she was losing material in the opening because she wasn’t checking for threats before moving. After 8 weeks of the Checks-Captures-Threats drill, she stopped hanging pieces entirely. Her online rating jumped from 500 to 780. What I love most is the parent dashboard — I can see exactly which topics she covered each week without needing to understand chess myself.", author: "Monika", desc: "Kanpur", img: "https://chesswize.com/wp-content/uploads/2025/03/Untitled-design-21.png" },
-    { text: "Ishita used to cry when she lost a game. Her coach spent the first month purely on emotional resilience — teaching her to analyse losses calmly instead of reacting. By week five she was reviewing her own games and finding her mistakes before the coach pointed them out. Her Elo went from 650 to 920 in four months, but honestly the biggest win is that she now handles failure with composure. That skill transfers way beyond chess.", author: "Anjana", desc: "Mumbai", img: "https://chesswize.com/wp-content/uploads/2025/03/Untitled-design-26.png" },
-  ];  return (
+    {
+      headline: "Aadvik actually asks to do his puzzles now.",
+      quote: "Six weeks in, his coach rebuilt his focus routine. His maths teacher flagged the improvement before we did.",
+      metric: "Puzzle accuracy: 25% → 61%",
+      author: "Rupali",
+      city: "Lucknow",
+      date: "Mar 2026",
+      img: "https://chesswize.com/wp-content/uploads/2025/03/Untitled-design-20.png",
+    },
+    {
+      headline: "Anika stopped hanging pieces — finally.",
+      quote: "The Checks-Captures-Threats drill fixed it in 8 weeks. The parent dashboard shows me what she's learning without me needing to know chess.",
+      metric: "Online rating: 500 → 780",
+      author: "Monika",
+      city: "Kanpur",
+      date: "Feb 2026",
+      img: "https://chesswize.com/wp-content/uploads/2025/03/Untitled-design-21.png",
+    },
+    {
+      headline: "Ishita now reviews her own losses — calmly.",
+      quote: "Month one was pure emotional resilience. By week five she was spotting her own mistakes before the coach did.",
+      metric: "Elo: 650 → 920 in 4 months",
+      author: "Anjana",
+      city: "Mumbai",
+      date: "Jan 2026",
+      img: "https://chesswize.com/wp-content/uploads/2025/03/Untitled-design-26.png",
+    },
+  ];
+  return (
     <section className="py-16 md:py-24 bg-slate-50 border-b border-slate-200 gs-grid-pattern">
       <div className="max-w-[1400px] mx-auto px-4 md:px-8">
         <div className="text-center mb-12 md:mb-16">
@@ -2275,16 +2320,23 @@ function WallOfLove() {
             {reviews.map((r, i) => (
               <div key={i} className="pl-4 md:pl-8 flex-[0_0_100%] md:flex-[0_0_50%] lg:flex-[0_0_33.333%]">
                 <div className="bg-white p-6 md:p-8 lg:p-10 rounded-3xl border border-slate-200 shadow-lg hover:shadow-xl flex flex-col h-full hover-lift cursor-default transition-all">
-                  <div className="flex gap-1 mb-4 md:mb-6">
-                    {[1,2,3,4,5].map(s=><Star key={s} className="size-4 md:size-5 fill-amber-400 text-amber-600" />)}
+                  <div className="mb-4">
+                    <Stars count={5} />
                   </div>
-                  <p className="text-slate-800 font-medium text-base md:text-lg leading-relaxed mb-6 md:mb-8 flex-1 italic">"{r.text}"</p>
-                  <div className="flex items-center gap-4 md:gap-5 border-t border-slate-100 pt-5 md:pt-6 mt-auto">
-                    <img loading="lazy" src={r.img} alt={r.author} className="size-12 md:size-14 rounded-full border-2 border-slate-100 gs-shadow shrink-0 object-cover" />
-                    <div>
-                      <p className="font-extrabold text-slate-900 text-sm md:text-base tracking-tight-gs">{r.author}</p>
-                      <p className="text-xs md:text-sm font-bold text-slate-500 uppercase tracking-widest-gs mt-0.5">{r.desc}</p>
-                    </div>
+                  <p className="text-slate-900 font-extrabold text-lg md:text-xl leading-snug tracking-tight-gs mb-3">
+                    {r.headline}
+                  </p>
+                  <p className="text-slate-700 italic text-sm md:text-base leading-relaxed mb-5">
+                    "{r.quote}"
+                  </p>
+                  <div className="inline-flex self-start items-center rounded-full bg-amber-50 border border-amber-200 px-3 py-1 text-[11px] md:text-xs font-bold text-amber-800 tracking-tight mb-6">
+                    {r.metric}
+                  </div>
+                  <div className="flex items-center gap-4 border-t border-slate-100 pt-5 mt-auto">
+                    <img loading="lazy" src={r.img} alt={r.author} className="size-11 md:size-12 rounded-full border-2 border-slate-100 gs-shadow shrink-0 object-cover" />
+                    <p className="text-sm font-bold text-slate-700">
+                      — {r.author}, {r.city} <span className="text-slate-400">·</span> {r.date}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -2659,7 +2711,7 @@ function BottomForm() {
             Book Your Child's Free Demo &amp; Counseling
           </h3>
           <p className="text-base md:text-lg text-slate-600 font-medium max-w-2xl mx-auto leading-relaxed">
-            This isn't a generic sign-up form. We ask a few extra questions so our coach can prepare a personalised evaluation — not a cookie-cutter demo. Fill this in carefully; we review every application by hand.
+            This isn't a generic sign-up form. We ask a few extra questions so our coach can prepare a personalised evaluation — not a cookie-cutter demo. Our academic counsellor uses these answers to match the right coach and batch.
           </p>
           <div className="mt-5 md:mt-6 flex flex-wrap justify-center gap-2 md:gap-3">
             <span className="inline-flex items-center gap-1.5 text-[11px] md:text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-full px-3 py-1.5 shadow-sm">
@@ -2877,8 +2929,8 @@ function BottomForm() {
                       <div className="mt-2 p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-3">
                         <AlertTriangle className="size-5 text-amber-600 shrink-0 mt-0.5" />
                         <div>
-                          <p className="text-xs font-extrabold text-amber-900 uppercase tracking-widest-gs mb-1">Strict Cohort Capacity</p>
-                          <p className="text-xs text-amber-800 font-medium">To maintain our elite academic standards, we cap cohorts at 6 students. We are currently accepting only <span className="font-extrabold underline decoration-amber-300 underline-offset-2">12 new evaluations</span> this week.</p>
+                          <p className="text-xs font-extrabold text-amber-900 uppercase tracking-widest-gs mb-1">Limited Cohort Slots</p>
+                          <p className="text-xs text-amber-800 font-medium">We cap cohorts at 6 students so each child gets real attention — limited slots, first come, first served.</p>
                         </div>
                       </div>
 
@@ -2901,7 +2953,7 @@ function BottomForm() {
                       </div>
 
                       <p className="text-[10px] text-slate-400 font-medium text-center mt-2 leading-relaxed">
-                        We manually review every application. Incomplete or vague submissions are discarded. By submitting, you agree to our <Link to="/privacy-policy" className="underline hover:text-blue-600">Privacy Policy</Link>.
+                        By submitting, you agree to our <Link to="/privacy-policy" className="underline hover:text-blue-600">Privacy Policy</Link>.
                       </p>
                     </motion.div>
                   )}
