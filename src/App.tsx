@@ -3732,6 +3732,8 @@ function Footer() {
               fontSize="180"
               letterSpacing="-8"
               fill="url(#wmark-grad)"
+              textLength="1080"
+              lengthAdjust="spacingAndGlyphs"
             >
               CHESSWIZE
             </text>
