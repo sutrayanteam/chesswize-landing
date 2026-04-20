@@ -34,6 +34,8 @@ import {
   Mail,
   Phone,
   ArrowLeft,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
 import {
   CheckMark as CheckCircle,
@@ -155,6 +157,21 @@ function TopNav() {
    ════════════════════════════════════════════════ */
 function Hero() {
   const [showVideoModal, setShowVideoModal] = useState(false);
+  const [muted, setMuted] = useState(true);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  const toggleMute = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    const next = !muted;
+    v.muted = next;
+    if (!next) {
+      // Unmuted — make sure the video is playing
+      v.play().catch(() => {});
+    }
+    setMuted(next);
+  };
+
   return (
     <section className="relative pt-28 pb-16 md:pt-40 md:pb-24 bg-slate-50 gs-grid-pattern overflow-hidden border-b border-slate-200">
       <div className="absolute top-0 right-0 w-[600px] md:w-[1000px] h-[600px] md:h-[1000px] bg-blue-600/5 rounded-full blur-[100px] md:blur-[150px] pointer-events-none" />
@@ -225,94 +242,146 @@ function Hero() {
                 </span>
               </div>
             </div>
+
+            {/* Counselor strip — live human handler for the demo booking */}
+            <div className="mt-4 flex items-center gap-3 max-w-xl">
+              <div className="relative shrink-0">
+                <img
+                  src="/counselor-avatar.webp"
+                  alt="Priya Sharma, Academic Counsellor"
+                  width={40}
+                  height={40}
+                  className="size-10 rounded-full object-cover ring-2 ring-white shadow-md"
+                  loading="lazy"
+                />
+                <span className="absolute bottom-0 right-0 size-3 rounded-full bg-emerald-500 ring-2 ring-white" aria-hidden="true">
+                  <motion.span
+                    className="absolute inset-0 rounded-full bg-emerald-500"
+                    animate={{ scale: [1, 1.6, 1], opacity: [0.6, 0, 0.6] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
+                  />
+                </span>
+              </div>
+              <div className="text-[11px] md:text-xs leading-snug">
+                <p className="font-extrabold text-slate-900">
+                  You&apos;ll talk to <span className="text-blue-600">Priya Sharma</span>, Academic Counsellor
+                </p>
+                <p className="text-slate-500 font-medium">
+                  Replies on WhatsApp in &lt;10&nbsp;min · 10&nbsp;AM–8&nbsp;PM IST
+                </p>
+              </div>
+            </div>
           </div>
 
-          {/* Right Media Side - Student Testimonial (click to open playable modal) */}
+          {/* Right Media Side - Student Testimonial (inline + modal) */}
           <div className="w-full xl:w-[45%] mt-6 lg:mt-0">
-            <button
-              type="button"
-              onClick={() => setShowVideoModal(true)}
-              aria-label="Play student testimonial"
-              className="w-full glass-panel p-2.5 md:p-3 rounded-2xl md:rounded-3xl gs-shadow-xl gs-border relative hover-lift focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 cursor-pointer"
-            >
+            <div className="glass-panel p-2.5 md:p-3 rounded-2xl md:rounded-3xl gs-shadow-xl gs-border relative hover-lift">
               <div className="absolute -top-4 -right-4 md:-top-6 md:-right-6 w-24 md:w-32 h-24 md:h-32 bg-blue-400/20 blur-2xl md:blur-3xl rounded-full pointer-events-none" />
               <div className="relative rounded-xl md:rounded-2xl overflow-hidden bg-slate-50 border border-slate-200 group shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] aspect-square">
-                <div className="absolute top-3 left-3 md:top-4 md:left-4 z-20 flex flex-col gap-2">
-                  <Badge className="bg-blue-600/90 text-white border-0 font-bold px-2 py-0.5 rounded uppercase tracking-widest-gs text-[9px]">Student Testimonial</Badge>
-                </div>
-
                 <video
+                  ref={videoRef}
                   src="/testimonial-kid-1.mp4"
                   autoPlay
                   loop
-                  muted
+                  muted={muted}
                   playsInline
                   preload="metadata"
                   poster="/testimonial-kid-1-poster.webp"
-                  className="absolute inset-0 w-full h-full object-cover opacity-85 group-hover:opacity-100 transition-opacity"
+                  className="absolute inset-0 w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-slate-900/20 to-transparent opacity-90 pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/55 via-slate-950/10 to-slate-950/30 pointer-events-none" />
 
-                <div className="absolute bottom-0 left-0 w-full p-4 md:p-6 z-20 pointer-events-none text-left">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="min-w-0">
-                      <h3 className="text-white font-extrabold text-lg md:text-xl tracking-tight-gs drop-shadow-md">Meet a ChessWize student</h3>
-                      <p className="text-slate-200 text-xs md:text-sm font-medium drop-shadow-sm">Tap to play · with sound</p>
+                {/* Top-left: badge */}
+                <div className="absolute top-3 left-3 md:top-4 md:left-4 z-20 pointer-events-none">
+                  <Badge className="bg-slate-950/60 backdrop-blur-md text-white border border-white/15 font-bold px-2 py-1 rounded-md uppercase tracking-widest-gs text-[9px]">Student Testimonial</Badge>
+                </div>
+
+                {/* Top-right: Mute/Unmute toggle — plays inline with sound */}
+                <motion.button
+                  type="button"
+                  onClick={toggleMute}
+                  aria-label={muted ? "Unmute and play inline" : "Mute video"}
+                  aria-pressed={!muted}
+                  whileHover={{ scale: 1.08 }}
+                  whileTap={{ scale: 0.92 }}
+                  transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                  className="absolute top-3 right-3 md:top-4 md:right-4 z-20 size-10 md:size-11 rounded-full bg-slate-950/60 hover:bg-slate-950/80 backdrop-blur-md border border-white/20 flex items-center justify-center text-white shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                >
+                  <AnimatePresence mode="wait" initial={false}>
+                    <motion.span
+                      key={muted ? "muted" : "unmuted"}
+                      initial={{ scale: 0.5, opacity: 0, rotate: -30 }}
+                      animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                      exit={{ scale: 0.5, opacity: 0, rotate: 30 }}
+                      transition={{ duration: 0.18 }}
+                      className="flex items-center justify-center"
+                    >
+                      {muted ? <VolumeX className="size-5" /> : <Volume2 className="size-5" />}
+                    </motion.span>
+                  </AnimatePresence>
+                </motion.button>
+
+                {/* Hint when muted — "Tap for sound", breathing animation */}
+                <AnimatePresence>
+                  {muted && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -4, scale: 0.9 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -4, scale: 0.9 }}
+                      transition={{ duration: 0.2, delay: 0.4 }}
+                      className="absolute top-14 md:top-16 right-3 md:right-4 z-20 pointer-events-none"
+                    >
+                      <motion.div
+                        animate={{ y: [0, -2, 0] }}
+                        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                        className="bg-slate-950/60 backdrop-blur-md border border-white/15 rounded-md px-2 py-1 text-[10px] font-bold text-white shadow-lg whitespace-nowrap"
+                      >
+                        Tap for sound
+                      </motion.div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Bottom caption + big play → opens modal */}
+                <div className="absolute bottom-0 left-0 w-full p-4 md:p-6 z-20 text-left">
+                  <div className="flex items-end justify-between gap-3">
+                    <div className="min-w-0 pointer-events-none">
+                      <h3 className="text-white font-extrabold text-lg md:text-xl tracking-tight-gs drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">Meet a ChessWize student</h3>
+                      <p className="text-slate-200 text-xs md:text-sm font-medium drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">Tap ▶ for fullscreen · 🔊 for sound</p>
                     </div>
-                    <div className="size-12 md:size-14 rounded-full bg-blue-600/90 backdrop-blur-md flex items-center justify-center border border-white/20 gs-shadow-lg group-hover:scale-110 transition-transform ring-4 ring-blue-500/30 shrink-0">
-                      <PlayCircle className="size-6 md:size-6 text-white" />
-                    </div>
+                    <motion.button
+                      type="button"
+                      onClick={() => setShowVideoModal(true)}
+                      aria-label="Open student testimonial in fullscreen"
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 22 }}
+                      className="relative size-12 md:size-14 rounded-full bg-blue-600 backdrop-blur-md flex items-center justify-center border border-white/20 gs-shadow-lg ring-4 ring-blue-500/30 shrink-0 focus:outline-none focus-visible:ring-4 focus-visible:ring-white"
+                    >
+                      <motion.span
+                        className="absolute inset-0 rounded-full ring-2 ring-white/40"
+                        animate={{ scale: [1, 1.25, 1], opacity: [0.5, 0, 0.5] }}
+                        transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
+                        aria-hidden="true"
+                      />
+                      <PlayCircle className="size-6 md:size-6 text-white relative z-10" />
+                    </motion.button>
                   </div>
                 </div>
               </div>
-            </button>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Playable video modal */}
-      <AnimatePresence>
-        {showVideoModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            onClick={() => setShowVideoModal(false)}
-            className="fixed inset-0 z-[100] bg-slate-900/85 backdrop-blur-sm flex items-center justify-center p-4"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Student testimonial video"
-          >
-            <motion.div
-              initial={{ scale: 0.94, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.94, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              onClick={(e) => e.stopPropagation()}
-              className="relative w-full max-w-[min(92vw,420px)] md:max-w-[min(90vw,480px)] bg-black rounded-2xl overflow-hidden shadow-2xl"
-            >
-              <button
-                type="button"
-                onClick={() => setShowVideoModal(false)}
-                aria-label="Close video"
-                className="absolute top-3 right-3 z-10 size-9 rounded-full bg-slate-900/70 hover:bg-slate-900/90 backdrop-blur-sm flex items-center justify-center text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
-              >
-                <XCircle className="size-5" />
-              </button>
-              <video
-                src="/testimonial-kid-1.mp4"
-                controls
-                autoPlay
-                playsInline
-                preload="auto"
-                poster="/testimonial-kid-1-poster.webp"
-                className="w-full h-auto max-h-[80vh] bg-black"
-              />
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <VideoModal
+        open={showVideoModal}
+        onClose={() => setShowVideoModal(false)}
+        src="/testimonial-kid-1.mp4"
+        poster="/testimonial-kid-1-poster.webp"
+        label="Student testimonial"
+        portrait
+      />
     </section>
   );
 }
@@ -1600,63 +1669,163 @@ function Curriculum() {
 }
 
 /* ════════════════════════════════════════════════
-   VIDEO TESTIMONIALS — lazy, poster-first, click-to-play
+   VIDEO MODAL — shared playable modal for hero + testimonials
+   ════════════════════════════════════════════════ */
+type VideoModalProps = {
+  open: boolean;
+  onClose: () => void;
+  src: string;
+  poster?: string;
+  label?: string;
+  portrait?: boolean;
+};
+
+function VideoModal({ open, onClose, src, poster, label, portrait = false }: VideoModalProps) {
+  const modalVideoRef = useRef<HTMLVideoElement | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+
+    // Pause any OTHER video on the page so we never have two videos playing at once.
+    // Track which ones were playing so we can resume them when the modal closes.
+    const wasPlaying: HTMLVideoElement[] = [];
+    document.querySelectorAll<HTMLVideoElement>("video").forEach((v) => {
+      if (v !== modalVideoRef.current && !v.paused && !v.ended) {
+        v.pause();
+        wasPlaying.push(v);
+      }
+    });
+
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prevOverflow;
+      // Resume background videos that were auto-playing before we opened.
+      wasPlaying.forEach((v) => { v.play().catch(() => {}); });
+    };
+  }, [open, onClose]);
+
+  return (
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          onClick={onClose}
+          className="fixed inset-0 z-[100] bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-label={label ?? "Video"}
+        >
+          <motion.div
+            initial={{ scale: 0.94, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.94, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={(e) => e.stopPropagation()}
+            className={`relative w-full ${portrait ? "max-w-[min(92vw,420px)]" : "max-w-[min(92vw,480px)] md:max-w-[min(90vw,540px)]"} bg-black rounded-2xl overflow-hidden shadow-[0_20px_80px_-10px_rgba(0,0,0,0.6)] ring-1 ring-white/10`}
+          >
+            <motion.button
+              type="button"
+              onClick={onClose}
+              aria-label="Close video"
+              whileHover={{ scale: 1.1, rotate: 90 }}
+              whileTap={{ scale: 0.9 }}
+              transition={{ type: "spring", stiffness: 400, damping: 25 }}
+              className="absolute top-3 right-3 z-10 size-10 rounded-full bg-slate-950/70 hover:bg-slate-950/90 backdrop-blur-sm flex items-center justify-center text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+            >
+              <XCircle className="size-5" />
+            </motion.button>
+            <video
+              ref={modalVideoRef}
+              key={src}
+              src={src}
+              controls
+              autoPlay
+              playsInline
+              preload="auto"
+              poster={poster}
+              className="w-full h-auto max-h-[85vh] bg-black"
+            />
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+/* ════════════════════════════════════════════════
+   VIDEO TESTIMONIALS — lazy, poster-first, opens modal on click
    ════════════════════════════════════════════════ */
 type VideoItem = { src: string; title: string; label: string; badge: string; poster?: string };
 
 function VideoCard({ v }: { v: VideoItem }) {
-  const [activated, setActivated] = useState(false);
-  // derive poster path from src unless provided: `/foo.mp4` → `/foo-poster.jpg`
+  const [open, setOpen] = useState(false);
   const poster = v.poster ?? v.src.replace(/\.mp4$/i, "-poster.webp");
   return (
-    <div className="rounded-2xl overflow-hidden hover-lift group relative flex-shrink-0 w-[180px] md:w-full bg-white border border-slate-200 shadow-md">
-      <div className="absolute top-3 left-3 z-20 pointer-events-none">
-        <Badge className="bg-blue-600 text-white border-0 text-[10px] font-bold shadow-lg">
-          <PlayCircle className="size-3 mr-1" /> {v.badge}
-        </Badge>
-      </div>
-      <div className="relative w-full aspect-[9/16] bg-slate-900 video-card-contain">
-        {activated ? (
-          /* Native <video> is instant on click — no framework init, no control theming. */
-          <video
-            src={v.src}
-            poster={poster}
-            autoPlay
-            playsInline
-            controls
-            preload="auto"
-            className="absolute inset-0 w-full h-full object-cover bg-black"
-          />
-        ) : (
-          <button
-            type="button"
-            onClick={() => setActivated(true)}
-            aria-label={`Play video: ${v.title}`}
-            className="absolute inset-0 w-full h-full group cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-500"
-          >
+    <>
+      <div className="rounded-2xl overflow-hidden group relative flex-shrink-0 w-[180px] md:w-full bg-white border border-slate-200 shadow-[0_4px_20px_-4px_rgba(15,23,42,0.12)] hover:shadow-[0_20px_40px_-10px_rgba(37,99,235,0.25)] hover:border-blue-300/60 transition-all duration-300">
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          aria-label={`Play video: ${v.title}`}
+          className="block w-full cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-500/60"
+        >
+          <div className="relative w-full aspect-[9/16] bg-slate-900 overflow-hidden">
             <img
               src={poster}
               alt={v.title}
               loading="lazy"
               decoding="async"
-              className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-slate-900/10 to-transparent pointer-events-none" />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="size-14 md:size-16 rounded-full bg-white/95 backdrop-blur-sm flex items-center justify-center shadow-xl ring-4 ring-white/30 group-hover:scale-110 group-hover:bg-white transition-all">
-                <svg viewBox="0 0 24 24" className="size-6 md:size-7 text-blue-600 translate-x-[1px]" fill="currentColor" aria-hidden="true">
+            {/* Depth gradient overlay (top for badge, bottom for play button visibility) */}
+            <div className="absolute inset-0 bg-gradient-to-b from-slate-950/30 via-transparent to-slate-950/60 pointer-events-none" />
+
+            {/* Badge */}
+            <div className="absolute top-3 left-3 z-10 pointer-events-none">
+              <Badge className="bg-slate-950/60 backdrop-blur-md text-white border border-white/15 text-[10px] font-bold px-2 py-1 rounded-md shadow-lg">
+                <PlayCircle className="size-3 mr-1" /> {v.badge}
+              </Badge>
+            </div>
+
+            {/* Play button — glass morph, ring accent, spring on hover */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <motion.div
+                whileHover={{ scale: 1.12 }}
+                whileTap={{ scale: 0.94 }}
+                transition={{ type: "spring", stiffness: 400, damping: 22 }}
+                className="relative size-14 md:size-16 rounded-full bg-white/95 backdrop-blur-sm flex items-center justify-center shadow-[0_8px_32px_-4px_rgba(0,0,0,0.4)] ring-4 ring-white/20 group-hover:ring-white/50 group-hover:bg-white"
+              >
+                <svg viewBox="0 0 24 24" className="size-5 md:size-6 text-blue-600 translate-x-[1px]" fill="currentColor" aria-hidden="true">
                   <path d="M8 5.14v13.72L19 12 8 5.14z" />
                 </svg>
-              </div>
+                <motion.span
+                  className="absolute inset-0 rounded-full ring-2 ring-white/40"
+                  animate={{ scale: [1, 1.3, 1], opacity: [0.4, 0, 0.4] }}
+                  transition={{ duration: 2.4, repeat: Infinity, ease: "easeOut" }}
+                  aria-hidden="true"
+                />
+              </motion.div>
             </div>
-          </button>
-        )}
+
+            {/* Bottom caption strip */}
+            <div className="absolute bottom-0 left-0 right-0 p-3 md:p-4 z-10 pointer-events-none">
+              <p className="font-extrabold text-white text-xs md:text-sm tracking-tight-gs drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">{v.label}</p>
+              <p className="text-[10px] md:text-[11px] text-slate-200 font-medium mt-0.5 truncate drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">{v.title}</p>
+            </div>
+          </div>
+        </button>
       </div>
-      <div className="p-3 bg-white border-t border-slate-100">
-        <p className="font-extrabold text-slate-900 tracking-tight-gs text-xs">{v.label}</p>
-        <p className="text-[10px] text-slate-500 font-medium mt-0.5 truncate">{v.title}</p>
-      </div>
-    </div>
+
+      <VideoModal open={open} onClose={() => setOpen(false)} src={v.src} poster={poster} label={v.title} portrait />
+    </>
   );
 }
 
@@ -2295,34 +2464,46 @@ function Stars({ count = 5 }: { count?: number }) {
 }
 
 function WallOfLove() {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "start" }, [Autoplay({ delay: 4000, stopOnInteraction: true })]);
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "start" }, [Autoplay({ delay: 5000, stopOnInteraction: true })]);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    const onSelect = () => setActiveIndex(emblaApi.selectedScrollSnap());
+    emblaApi.on("select", onSelect);
+    onSelect();
+    return () => { emblaApi.off("select", onSelect); };
+  }, [emblaApi]);
 
   const reviews = [
     {
-      headline: "Aadvik actually asks to do his puzzles now.",
-      quote: "Six weeks in, his coach rebuilt his focus routine. His maths teacher flagged the improvement before we did.",
-      metric: "Puzzle accuracy: 25% → 61%",
-      author: "Rupali",
+      headline: "Honestly, I was skeptical about online chess coaching.",
+      quote: "Aadvik hated sitting still for anything, and I thought a Zoom class would last two weeks max. It's been six months. Last Sunday his class teacher called just to ask what changed — his attention in maths has jumped. He now does his puzzles before I'm up. Coach Arjun has the patience I don't.",
+      metric: "Puzzle accuracy 25% → 61%",
+      author: "Rupali Sharma",
+      role: "Mother of Aadvik (9)",
       city: "Lucknow",
-      date: "Mar 2026",
+      date: "March 2026",
       img: "/review-rupali.webp",
     },
     {
-      headline: "Anika stopped hanging pieces — finally.",
-      quote: "The Checks-Captures-Threats drill fixed it in 8 weeks. The parent dashboard shows me what she's learning without me needing to know chess.",
-      metric: "Online rating: 500 → 780",
-      author: "Monika",
+      headline: "She used to cry after every loss. Not anymore.",
+      quote: "Anika was playing 'casually' on chess.com and hanging pieces every game. First month the coach didn't even push ratings — just drilled Checks-Captures-Threats. The dashboard is what sold me though. I don't know chess, but I can see exactly what she covered each week. Her rating climbed on its own by week eight.",
+      metric: "Online rating 500 → 780",
+      author: "Monika Iyer",
+      role: "Mother of Anika (11)",
       city: "Kanpur",
-      date: "Feb 2026",
+      date: "February 2026",
       img: "/review-monika.webp",
     },
     {
-      headline: "Ishita now reviews her own losses — calmly.",
-      quote: "Month one was pure emotional resilience. By week five she was spotting her own mistakes before the coach did.",
-      metric: "Elo: 650 → 920 in 4 months",
-      author: "Anjana",
+      headline: "The resilience piece was unexpected — and the real win.",
+      quote: "We signed up for chess. What Ishita got was emotional self-regulation. Month one was all about learning to lose without falling apart. By month three she was analysing her own games after tournaments, pointing out where she'd blundered, calmly. Her Elo followed. But honestly, the composure is what I'll remember.",
+      metric: "Elo 650 → 920 in 4 months",
+      author: "Anjana Rao",
+      role: "Mother of Ishita (10)",
       city: "Mumbai",
-      date: "Jan 2026",
+      date: "January 2026",
       img: "/review-anjana.webp",
     },
   ];
@@ -2335,34 +2516,75 @@ function WallOfLove() {
             Verified by parents worldwide.
           </h3>
         </div>
-        <div className="overflow-hidden" ref={emblaRef}>
-          <div className="flex -ml-4 md:-ml-8">
-            {reviews.map((r, i) => (
-              <div key={i} className="pl-4 md:pl-8 flex-[0_0_100%] md:flex-[0_0_50%] lg:flex-[0_0_33.333%]">
-                <div className="bg-white p-6 md:p-8 lg:p-10 rounded-3xl border border-slate-200 shadow-lg hover:shadow-xl flex flex-col h-full cursor-default transition-all">
-                  <div className="mb-4">
-                    <Stars count={5} />
-                  </div>
-                  <p className="text-slate-900 font-extrabold text-lg md:text-xl leading-snug tracking-tight-gs mb-3">
-                    {r.headline}
-                  </p>
-                  <p className="text-slate-700 italic text-sm md:text-base leading-relaxed mb-5">
-                    "{r.quote}"
-                  </p>
-                  <div className="inline-flex self-start items-center rounded-full bg-amber-50 border border-amber-200 px-3 py-1 text-[11px] md:text-xs font-bold text-amber-800 tracking-tight mb-6">
-                    {r.metric}
-                  </div>
-                  <div className="flex items-center gap-4 border-t border-slate-100 pt-5 mt-auto">
-                    <img loading="lazy" src={r.img} alt={r.author} className="size-11 md:size-12 rounded-full border-2 border-slate-100 gs-shadow shrink-0 object-cover" />
-                    <p className="text-sm font-bold text-slate-700">
-                      — {r.author}, {r.city} <span className="text-slate-400">·</span> {r.date}
+        <div className="relative">
+          <div className="overflow-hidden" ref={emblaRef}>
+            <div className="flex -ml-4 md:-ml-8">
+              {reviews.map((r, i) => (
+                <div key={i} className="pl-4 md:pl-8 flex-[0_0_100%] md:flex-[0_0_50%] lg:flex-[0_0_33.333%]">
+                  <div className="bg-white p-6 md:p-8 lg:p-10 rounded-3xl border border-slate-200 shadow-lg hover:shadow-xl flex flex-col h-full cursor-default transition-all">
+                    <div className="mb-4">
+                      <Stars count={5} />
+                    </div>
+                    <p className="text-slate-900 font-extrabold text-lg md:text-xl leading-snug tracking-tight-gs mb-3">
+                      {r.headline}
                     </p>
+                    <p className="text-slate-700 italic text-sm md:text-base leading-relaxed mb-5">
+                      &ldquo;{r.quote}&rdquo;
+                    </p>
+                    <div className="inline-flex self-start items-center rounded-full bg-amber-50 border border-amber-200 px-3 py-1 text-[11px] md:text-xs font-bold text-amber-800 tracking-tight mb-6">
+                      {r.metric}
+                    </div>
+                    <div className="flex items-center gap-4 border-t border-slate-100 pt-5 mt-auto">
+                      <img loading="lazy" src={r.img} alt={r.author} className="size-12 rounded-full border-2 border-slate-100 gs-shadow shrink-0 object-cover" />
+                      <div className="min-w-0 text-sm">
+                        <p className="font-bold text-slate-900 leading-tight">{r.author}</p>
+                        <p className="text-[12px] text-slate-500 font-medium leading-tight mt-0.5">
+                          {r.role} · {r.city}
+                        </p>
+                        <p className="text-[11px] text-slate-400 font-medium leading-tight mt-1">{r.date}</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
+
+          {/* Prev / Next arrows — hidden on small screens (swipe) */}
+          <button
+            type="button"
+            onClick={() => emblaApi?.scrollPrev()}
+            aria-label="Previous review"
+            className="hidden md:flex absolute -left-4 lg:-left-6 top-1/2 -translate-y-1/2 size-11 rounded-full bg-white border border-slate-200 shadow-lg items-center justify-center text-slate-600 hover:text-blue-600 hover:border-blue-300 hover:scale-105 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+          >
+            <ArrowLeft className="size-5" />
+          </button>
+          <button
+            type="button"
+            onClick={() => emblaApi?.scrollNext()}
+            aria-label="Next review"
+            className="hidden md:flex absolute -right-4 lg:-right-6 top-1/2 -translate-y-1/2 size-11 rounded-full bg-white border border-slate-200 shadow-lg items-center justify-center text-slate-600 hover:text-blue-600 hover:border-blue-300 hover:scale-105 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+          >
+            <ArrowRight className="size-5" />
+          </button>
         </div>
+
+        {/* Dot indicators */}
+        <div className="flex items-center justify-center gap-2 mt-8">
+          {reviews.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => emblaApi?.scrollTo(i)}
+              aria-label={`Go to review ${i + 1}`}
+              className={`rounded-full transition-all ${activeIndex === i ? "w-6 h-2 bg-blue-600" : "w-2 h-2 bg-slate-300 hover:bg-slate-400"}`}
+            />
+          ))}
+        </div>
+
+        {/* Swipe hint on mobile only */}
+        <p className="md:hidden text-center text-[10px] text-slate-400 font-medium mt-3 flex items-center justify-center gap-1.5">
+          <ArrowLeft className="size-3" /> Swipe to see more <ArrowRight className="size-3" />
+        </p>
       </div>
     </section>
   );
