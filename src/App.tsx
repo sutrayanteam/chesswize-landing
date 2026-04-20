@@ -159,25 +159,18 @@ function Hero() {
         <div className="flex flex-col xl:flex-row gap-10 lg:gap-16 items-center">
           
           {/* Left Copy Side */}
-          <motion.div initial="hidden" animate="visible" variants={stagger} className="w-full xl:w-[55%] flex flex-col gap-5 md:gap-6">
-            <motion.div variants={fadeUp}>
-              <div className="trust-badge-container bg-blue-50/80 border-blue-200 inline-flex">
-                <div className="size-2 rounded-full bg-blue-500 animate-pulse" />
-                <span className="text-[10px] md:text-[11px] font-extrabold text-blue-800 uppercase tracking-widest-gs">Strictly Max 6 Kids Per Batch</span>
-              </div>
-            </motion.div>
-
-            <motion.h1 variants={fadeUp} className="text-3xl sm:text-4xl md:text-[2.75rem] lg:text-[3.25rem] font-extrabold tracking-tighter-gs text-slate-900 leading-[1.12] drop-shadow-sm">
+          <div className="w-full xl:w-[55%] flex flex-col gap-5 md:gap-6">
+            <h1 className="text-3xl sm:text-4xl md:text-[2.75rem] lg:text-[3.25rem] font-extrabold tracking-tighter-gs text-slate-900 leading-[1.12] drop-shadow-sm">
               Help your child{' '}
               <span className="text-gradient-primary">think deeper,</span>{' '}
               not scroll longer.
-            </motion.h1>
+            </h1>
 
-            <motion.p variants={fadeUp} className="text-base md:text-lg lg:text-xl text-slate-600 font-medium leading-[1.6] max-w-2xl tracking-tight-gs">
+            <p className="text-base md:text-lg lg:text-xl text-slate-600 font-medium leading-[1.6] max-w-2xl tracking-tight-gs">
               Structured online chess coaching by FIDE-rated masters. Small batches of six, same coach every session, real improvement you can see on the dashboard.
-            </motion.p>
+            </p>
 
-            <motion.div variants={fadeUp} className="bg-white p-5 md:p-6 rounded-2xl depth-panel mt-1 md:mt-2 max-w-xl relative overflow-hidden hover-lift">
+            <div className="bg-white p-5 md:p-6 rounded-2xl depth-panel mt-1 md:mt-2 max-w-xl relative overflow-hidden hover-lift">
               <div className="absolute top-0 left-0 w-1 h-full bg-blue-600" />
               <h3 className="text-sm font-extrabold text-slate-900 uppercase tracking-widest-gs mb-4 flex items-center gap-2">
                 <Target className="size-4 text-blue-600" /> Book My Child&apos;s Free Demo
@@ -209,29 +202,6 @@ function Hero() {
                 </svg>
                 Or ask us on WhatsApp
               </a>
-              {/* Counselor strip — human face at CTA moment */}
-              <div className="flex items-center gap-3 mt-3.5 pt-3.5 border-t border-slate-100">
-                <img src="/counselor-avatar.webp" alt="Priya Sharma — Academic Counsellor" className="size-10 rounded-full object-cover ring-2 ring-white shadow-md shrink-0" loading="lazy" decoding="async" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-[11px] md:text-xs font-extrabold text-slate-800">You&apos;ll talk to <span className="text-blue-700">Priya Sharma</span>, Academic Counsellor</p>
-                  <p className="text-[10px] md:text-[11px] text-slate-500 font-medium">Replies on WhatsApp in &lt;10 min · 10 AM–8 PM IST</p>
-                </div>
-              </div>
-              {/* What happens next — 4-step preview */}
-              <ul className="mt-3 grid grid-cols-4 gap-1.5 text-center">
-                {[
-                  { n: "1", t: "Book", s: "30-sec form" },
-                  { n: "2", t: "Match", s: "WhatsApp in <10 min" },
-                  { n: "3", t: "Demo", s: "50-min live class" },
-                  { n: "4", t: "Observe", s: "Parent welcome" },
-                ].map((s) => (
-                  <li key={s.n} className="flex flex-col items-center gap-0.5 rounded-md px-1 py-1.5 bg-slate-50 border border-slate-100">
-                    <span className="size-5 rounded-full bg-blue-600 text-white text-[9px] font-extrabold flex items-center justify-center">{s.n}</span>
-                    <span className="text-[10px] font-extrabold text-slate-900 leading-tight">{s.t}</span>
-                    <span className="text-[9px] text-slate-500 leading-tight">{s.s}</span>
-                  </li>
-                ))}
-              </ul>
               {/* Trust strip */}
               <div className="flex items-center flex-wrap gap-x-4 gap-y-1.5 mt-3">
                 <span className="flex items-center gap-1.5 text-[11px] md:text-xs font-bold text-slate-600">
@@ -249,8 +219,8 @@ function Hero() {
                   Refund on unused sessions
                 </span>
               </div>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
 
           {/* Right Media Side - VSL / Masterclass Snippet */}
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }} className="w-full xl:w-[45%] mt-6 lg:mt-0">
@@ -258,11 +228,11 @@ function Hero() {
               <div className="absolute -top-4 -right-4 md:-top-6 md:-right-6 w-24 md:w-32 h-24 md:h-32 bg-blue-400/20 blur-2xl md:blur-3xl rounded-full" />
               <div className="relative rounded-xl md:rounded-2xl overflow-hidden bg-slate-50 border border-slate-200 group shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)]">
                 <div className="absolute top-3 left-3 md:top-4 md:left-4 z-20 flex flex-col gap-2">
-                  <Badge className="bg-red-500/90 backdrop-blur-md text-white border-0 font-bold px-2 py-1 md:px-3 md:py-1 rounded shadow-lg uppercase tracking-widest-gs text-[9px] md:text-[10px] ring-1 ring-white/20">Inside Live Training</Badge>
+                  <Badge className="bg-red-500/85 text-white border-0 font-bold px-2 py-0.5 rounded uppercase tracking-widest-gs text-[9px]">Inside Live Training</Badge>
                 </div>
-                
+
                 <video
-                  src="https://chesswize.com/wp-content/uploads/2026/03/WhatsApp-Video-2026-03-07-at-22.51.22.mp4"
+                  src="/testimonial-kid-1.mp4"
                   autoPlay
                   loop
                   muted
@@ -1728,19 +1698,19 @@ function Mentors() {
               <Shield className="size-3" /> The Faculty Standard
             </h2>
             <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tighter-gs mb-4 md:mb-6 text-slate-900 leading-tight">
-              Only the top <span className="text-blue-700">1% of coaches</span> make it in.
+              Coaches we&apos;d send our own <span className="text-blue-700">kids</span> to.
             </h3>
             <p className="text-base md:text-lg text-slate-600 font-medium leading-relaxed mb-5 md:mb-6">
-              We reject hobbyists and 1500-rated amateurs. Our head coaches hold official FIDE titles, have background-verified IDs, and train under our in-house teaching rubric before they ever take a live class.
+              Our head coaches hold official FIDE titles, have background-verified IDs, and train under our in-house teaching rubric before they ever take a live class.
             </p>
-            <div className="flex flex-wrap gap-2 mb-6 md:mb-8">
-              <span className="inline-flex items-center gap-1.5 text-[11px] md:text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-full px-3 py-1.5 shadow-sm">
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mb-6 md:mb-8 text-[11px] md:text-xs font-bold text-slate-600">
+              <span className="inline-flex items-center gap-1.5">
                 <Shield className="size-3.5 text-blue-600" /> Background-verified
               </span>
-              <span className="inline-flex items-center gap-1.5 text-[11px] md:text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-full px-3 py-1.5 shadow-sm">
+              <span className="inline-flex items-center gap-1.5">
                 <CheckCircle className="size-3.5 text-emerald-500" /> FIDE-titled only
               </span>
-              <span className="inline-flex items-center gap-1.5 text-[11px] md:text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-full px-3 py-1.5 shadow-sm">
+              <span className="inline-flex items-center gap-1.5">
                 <PlayCircle className="size-3.5 text-blue-600" /> Classes recorded for parent review
               </span>
             </div>
@@ -1781,14 +1751,11 @@ function Mentors() {
                 {/* Top: Image + Name side by side */}
                 <div className="flex items-center gap-5 md:gap-6">
                   <div className="relative shrink-0">
-                    <img loading="lazy" src="/young-man-deep-in-thought-while-playing-game-of-ch-2026-01-09-00-57-38-utc.webp" alt="Coach" className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover border-2 border-slate-200 gs-shadow-lg relative z-10" />
-                    <div className="absolute -bottom-3 -right-3 bg-white border border-slate-200 rounded-lg p-1.5 gs-shadow-lg z-20">
-                       <SealBadge className="size-6 text-amber-500" />
-                    </div>
+                    <img loading="lazy" src="/young-man-deep-in-thought-while-playing-game-of-ch-2026-01-09-00-57-38-utc.webp" alt="Tarun R., Head Coach & Founder" className="size-40 md:size-48 rounded-2xl object-cover border-2 border-slate-200 gs-shadow-lg relative z-10" />
                   </div>
                   <div>
                     <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-200 border-0 rounded text-[9px] md:text-[10px] font-bold uppercase tracking-widest-gs mb-1.5 px-2 py-0.5">Head Coach & Founder</Badge>
-                    <h4 className="text-2xl md:text-3xl font-extrabold tracking-tighter-gs text-slate-900">Tarun Sir</h4>
+                    <h4 className="text-2xl md:text-3xl font-extrabold tracking-tighter-gs text-slate-900">Tarun R., Head Coach &amp; Founder</h4>
                   </div>
                 </div>
                 
@@ -1849,7 +1816,7 @@ function FounderStory() {
         <div className="bg-white/80 gs-shadow-xl backdrop-blur-xl rounded-3xl p-8 md:p-12 border border-slate-200 shadow-2xl flex flex-col md:flex-row gap-8 md:gap-12 items-center hover-lift">
           <div className="w-full md:w-1/3 shrink-0 relative">
             <div className="absolute inset-0 bg-blue-500/20 blur-2xl rounded-full" />
-           <img loading="lazy" src="/2026-04-15-10-34-00-founder-tarun-portrait.webp" alt="Tarun Sir, Founder and Head Coach" className="w-full aspect-square object-cover rounded-2xl border border-slate-200 relative z-10 shadow-lg grayscale hover:grayscale-0 transition-all duration-700" />
+           <img loading="lazy" src="/2026-04-15-10-34-00-founder-tarun-portrait.webp" alt="Tarun R., Founder and Head Coach" className="w-full aspect-square object-cover rounded-2xl border border-slate-200 relative z-10 shadow-lg grayscale hover:grayscale-0 transition-all duration-700" />
           </div>
           <div className="w-full md:w-2/3 flex flex-col">
             <h2 className="text-[10px] font-bold text-blue-600 uppercase tracking-widest-gs mb-3">A Note From The Founder</h2>
@@ -1862,7 +1829,7 @@ function FounderStory() {
               <p>If you're looking for a casual weekend hobby, we aren't the right fit. But if you want to build an emotionally resilient, analytical thinker, I invite you to book our diagnostic evaluation.</p>
             </div>
             <div className="mt-6 pt-6 border-t border-slate-200 flex flex-col">
-              <span className="font-extrabold text-slate-900 tracking-tight-gs text-lg">Tarun Sir</span>
+              <span className="font-extrabold text-slate-900 tracking-tight-gs text-lg">Tarun R.</span>
               <span className="text-xs font-bold text-slate-500 uppercase tracking-widest-gs mt-1">Founder & Head Coach</span>
             </div>
           </div>
