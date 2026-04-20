@@ -80,15 +80,11 @@ const RefundPolicy = lazy(() => import("./pages/Legal").then((m) => ({ default: 
 const CookiePolicy = lazy(() => import("./pages/Legal").then((m) => ({ default: m.CookiePolicy })));
 const Disclaimer = lazy(() => import("./pages/Legal").then((m) => ({ default: m.Disclaimer })));
 import { Toaster, toast } from "sonner";
-import { BrowserRouter, Routes, Route, Link, useLocation } from "react-router-dom";
+// BrowserRouter is mounted in main.tsx; App.tsx only needs Routes/Route/Link.
+import { Routes, Route, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-
-import { MediaPlayer, MediaProvider } from "@vidstack/react";
-import { DefaultVideoLayout, defaultLayoutIcons } from "@vidstack/react/player/layouts/default";
-import "@vidstack/react/player/styles/default/theme.css";
-import "@vidstack/react/player/styles/default/layouts/video.css";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -133,7 +129,7 @@ function TopNav() {
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -175,6 +171,7 @@ function TopNav() {
 function Hero() {
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [muted, setMuted] = useState(true);
+  const [heroAge, setHeroAge] = useState("");
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const modalRef = useRef<VideoModalHandle | null>(null);
 
@@ -260,7 +257,12 @@ function Hero() {
               </h3>
               <div className="flex flex-col sm:flex-row gap-3">
                 <div className="relative flex-1">
-                  <select className="w-full px-4 py-3.5 text-sm md:text-base border-2 border-slate-200 rounded-xl bg-white text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all appearance-none cursor-pointer hover:border-slate-300 shadow-sm">
+                  <select
+                    aria-label="Select your child's age range"
+                    value={heroAge}
+                    onChange={(e) => setHeroAge(e.target.value)}
+                    className="w-full px-4 py-3.5 text-sm md:text-base border-2 border-slate-200 rounded-xl bg-white text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all appearance-none cursor-pointer hover:border-slate-300 shadow-sm"
+                  >
                     <option value="">Select Child&apos;s Age</option>
                     <option value="4-6">4 - 6 Years</option>
                     <option value="7-9">7 - 9 Years</option>
@@ -269,7 +271,15 @@ function Hero() {
                   </select>
                   <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 size-4 md:size-5 text-slate-500 pointer-events-none" />
                 </div>
-                <Button onClick={scrollToForm} size="lg" className="w-full sm:w-auto h-12 md:h-14 px-6 md:px-8 gs-btn gs-btn-primary rounded-xl text-sm md:text-base font-bold transition-all">
+                <Button
+                  onClick={() => {
+                    // Persist the hero's age selection so the BottomForm picks it up.
+                    try { sessionStorage.setItem("cw.hero.age", heroAge); } catch { /* sessionStorage may be blocked */ }
+                    scrollToForm();
+                  }}
+                  size="lg"
+                  className="w-full sm:w-auto h-12 md:h-14 px-6 md:px-8 gs-btn gs-btn-primary rounded-xl text-sm md:text-base font-bold transition-all"
+                >
                   Book Free Demo <ArrowRight className="ml-2 size-4" />
                 </Button>
               </div>
@@ -1762,6 +1772,7 @@ const VideoModal = forwardRef<VideoModalHandle, VideoModalProps>(function VideoM
   ref,
 ) {
   const modalVideoRef = useRef<HTMLVideoElement | null>(null);
+  const modalContainerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!open) {
@@ -1793,9 +1804,44 @@ const VideoModal = forwardRef<VideoModalHandle, VideoModalProps>(function VideoM
       mv.addEventListener("canplay", tryPlay);
     }
 
+    // Remember who opened the modal so we can restore focus on close.
+    const opener = (document.activeElement as HTMLElement | null) ?? null;
+
+    // Focus trap + Escape key — small manual trap is lighter than a lib.
+    const modalEl = modalContainerRef.current;
+    const getFocusable = () => {
+      if (!modalEl) return [] as HTMLElement[];
+      return Array.from(
+        modalEl.querySelectorAll<HTMLElement>(
+          'button, [href], video[controls], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        )
+      ).filter((el) => !el.hasAttribute("disabled") && el.offsetParent !== null);
+    };
+
+    // Move focus into the modal (defer a tick so React has painted)
+    requestAnimationFrame(() => {
+      const first = getFocusable()[0];
+      first?.focus();
+    });
+
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         onClose();
+        return;
+      }
+      if (e.key === "Tab") {
+        const focusable = getFocusable();
+        if (focusable.length === 0) return;
+        const firstEl = focusable[0];
+        const lastEl = focusable[focusable.length - 1];
+        const active = document.activeElement;
+        if (e.shiftKey && active === firstEl) {
+          e.preventDefault();
+          lastEl.focus();
+        } else if (!e.shiftKey && active === lastEl) {
+          e.preventDefault();
+          firstEl.focus();
+        }
       }
     };
     document.addEventListener("keydown", onKey);
@@ -1828,6 +1874,8 @@ const VideoModal = forwardRef<VideoModalHandle, VideoModalProps>(function VideoM
       wasPlaying.forEach((v) => {
         v.play().catch(() => {});
       });
+      // Restore focus to whoever opened the modal.
+      opener?.focus?.();
     };
   }, [open, onClose]);
 
@@ -1871,6 +1919,7 @@ const VideoModal = forwardRef<VideoModalHandle, VideoModalProps>(function VideoM
       aria-label={label ?? "Video"}
     >
       <motion.div
+        ref={modalContainerRef}
         initial={false}
         animate={{
           opacity: open ? 1 : 0,
@@ -2021,7 +2070,14 @@ function VideoCarousel({ videos }: { videos: VideoItem[] }) {
       {/* Dot indicators */}
       <div className="flex items-center justify-center gap-2 mt-4">
         {videos.map((_, i) => (
-          <button key={i} onClick={() => emblaApi?.scrollTo(i)} className={`rounded-full transition-all ${activeIndex === i ? 'w-6 h-2 bg-blue-600' : 'w-2 h-2 bg-slate-300'}`} />
+          <button
+            key={i}
+            onClick={() => emblaApi?.scrollTo(i)}
+            type="button"
+            aria-label={`Go to video ${i + 1}`}
+            aria-current={activeIndex === i ? "true" : undefined}
+            className={`rounded-full transition-all ${activeIndex === i ? 'w-6 h-2 bg-blue-600' : 'w-2 h-2 bg-slate-300 hover:bg-slate-400'}`}
+          />
         ))}
       </div>
       {/* Swipe hint */}
@@ -3027,17 +3083,33 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
+type Delivery = { leadSaved: boolean; whatsappOpened: boolean };
+
 function BottomForm() {
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
   const [spamError, setSpamError] = useState("");
   const [step, setStep] = useState(1);
+  const [delivery, setDelivery] = useState<Delivery>({ leadSaved: false, whatsappOpened: false });
+  const [lastWhatsappUrl, setLastWhatsappUrl] = useState<string | null>(null);
+  const [submitErrorMsg, setSubmitErrorMsg] = useState<string | null>(null);
   const formLoadedAt = useRef(Date.now());
   const jsToken = useRef(Math.random().toString(36).slice(2) + Date.now().toString(36));
 
-  const { register, handleSubmit, formState: { errors }, reset, trigger, watch } = useForm<FormData>({
+  const { register, handleSubmit, formState: { errors }, reset, trigger, watch, setValue } = useForm<FormData>({
     resolver: zodResolver(formSchema),
     mode: "onTouched"
   });
+
+  // Pre-fill child_age_range if the user picked one in the hero dropdown.
+  useEffect(() => {
+    try {
+      const pre = sessionStorage.getItem("cw.hero.age");
+      if (pre) {
+        setValue("child_age_range", pre, { shouldValidate: false, shouldDirty: false });
+        sessionStorage.removeItem("cw.hero.age");
+      }
+    } catch { /* sessionStorage blocked — no-op */ }
+  }, [setValue]);
 
   const handleNextStep = async (fieldsToValidate: (keyof FormData)[]) => {
     const isValid = await trigger(fieldsToValidate);
@@ -3090,8 +3162,12 @@ function BottomForm() {
     /* Open the WhatsApp tab synchronously from the click handler so pop-up
      * blockers let it through. We do this BEFORE the fetch so it's never
      * swallowed by an async rejection path. */
-    const waWindow = window.open(buildWhatsAppUrl(), "_blank", "noopener,noreferrer");
+    const waUrl = buildWhatsAppUrl();
+    setLastWhatsappUrl(waUrl);
+    const waWindow = window.open(waUrl, "_blank", "noopener,noreferrer");
+    const whatsappOpened = waWindow !== null && !waWindow.closed;
 
+    let leadSaved = false;
     try {
       const res = await fetch("/api/leads", {
         method: "POST",
@@ -3102,17 +3178,34 @@ function BottomForm() {
           form_duration_s: Math.round(elapsed),
         }),
       });
-      /* Worker result is best-effort — even if it errors we still took the
-       * WhatsApp path, so the lead is never lost */
-      void res;
-    } catch {
-      /* Network failure — WhatsApp tab already opened, nothing else to do */
-      void waWindow;
+      leadSaved = res.ok;
+      if (!res.ok && import.meta.env.DEV) {
+        // eslint-disable-next-line no-console
+        console.warn("[lead] /api/leads returned", res.status);
+      }
+    } catch (err) {
+      leadSaved = false;
+      if (import.meta.env.DEV) {
+        // eslint-disable-next-line no-console
+        console.warn("[lead] fetch failed", err);
+      }
     }
 
-    setStatus("success");
-    setStep(4);
-    reset();
+    // Only treat as success if at least ONE delivery path worked.
+    // If both failed, we must surface an error so the user knows to retry
+    // or contact us directly — silent failure loses paying customers.
+    if (leadSaved || whatsappOpened) {
+      setDelivery({ leadSaved, whatsappOpened });
+      setStatus("success");
+      setStep(4);
+      reset();
+    } else {
+      setStatus("error");
+      setSubmitErrorMsg(
+        "We couldn't reach our server and your browser blocked the WhatsApp popup. " +
+          "Please WhatsApp us at +91 70075 78072 or email hello@chesswize.in so we don't miss your request."
+      );
+    }
   };
 
   const inputCls = (hasError: boolean) => `w-full px-4 py-3 text-sm md:text-base border-2 rounded-xl bg-white text-slate-900 font-bold placeholder:text-slate-400 placeholder:font-medium focus:outline-none focus:ring-2 focus:ring-offset-0 transition-all shadow-sm ${hasError ? 'border-red-500 focus:ring-red-500' : 'border-slate-300 focus:border-blue-600 focus:ring-blue-600/20 hover:border-slate-400'}`;
@@ -3153,23 +3246,42 @@ function BottomForm() {
           
           <AnimatePresence mode="wait">
             {step === 4 ? (
-              <motion.div key="success" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="text-center py-12 relative z-10">
+              <motion.div
+                key="success"
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                variants={stepVariants}
+                role="status"
+                aria-live="polite"
+                className="text-center py-12 relative z-10"
+              >
                 <div className="size-20 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center mx-auto mb-6">
                   <CheckCircle className="size-10 text-emerald-600" />
                 </div>
-                <h4 className="text-2xl md:text-3xl font-extrabold tracking-tight-gs text-slate-900 mb-3">Application Received</h4>
-                <p className="text-base md:text-lg font-medium text-slate-600 mb-4">A WhatsApp chat with our counsellor just opened in a new tab — <span className="font-extrabold text-emerald-700">tap Send to confirm your slot instantly</span>.</p>
-                <p className="text-sm text-slate-500 font-medium mb-5">We&apos;ll also email you within 4 hours at the address in your form. Your coach will review your answers before the call so the evaluation is tailored to your child from minute one.</p>
+                <h4 className="text-2xl md:text-3xl font-extrabold tracking-tight-gs text-slate-900 mb-3">
+                  {delivery.whatsappOpened ? "Application Received" : "We got your details"}
+                </h4>
+                <p className="text-base md:text-lg font-medium text-slate-600 mb-4">
+                  {delivery.whatsappOpened ? (
+                    <>A WhatsApp chat with our counsellor just opened in a new tab — <span className="font-extrabold text-emerald-700">tap Send to confirm your slot instantly</span>.</>
+                  ) : (
+                    <>Our academic counsellor will reach out on the WhatsApp number you shared, usually within a few hours.</>
+                  )}
+                </p>
+                <p className="text-sm text-slate-500 font-medium mb-5">
+                  Your coach will review your answers before the call so the evaluation is tailored to your child from minute one.
+                </p>
                 <a
-                  href="https://wa.me/917007578072?text=Hi%2C%20I%27ve%20just%20submitted%20a%20demo%20booking%20on%20chesswize.in"
+                  href={lastWhatsappUrl ?? "https://wa.me/917007578072?text=Hi%2C%20I%27ve%20just%20submitted%20a%20demo%20booking%20on%20chesswize.in"}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center justify-center gap-2 h-12 px-6 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-sm shadow-lg transition-all active:scale-[0.98]"
                 >
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="size-4">
+                  <svg viewBox="0 0 24 24" fill="currentColor" className="size-4" aria-hidden="true">
                     <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
                   </svg>
-                  Reopen WhatsApp chat
+                  {delivery.whatsappOpened ? "Reopen WhatsApp chat" : "Chat with us on WhatsApp"}
                 </a>
               </motion.div>
             ) : (
@@ -3354,8 +3466,16 @@ function BottomForm() {
                         {errors.referral_source && <p className="text-[10px] text-red-500 font-bold mt-1">{errors.referral_source.message}</p>}
                       </div>
 
-                      {spamError && <div className="p-4 text-sm bg-amber-50 text-amber-700 rounded-xl border border-amber-200 font-bold">{spamError}</div>}
-                      {status === "error" && <div className="p-4 text-sm bg-red-50 text-red-700 rounded-xl border border-red-200 font-bold">Transmission failed. Please try again.</div>}
+                      {spamError && (
+                        <div role="alert" className="p-4 text-sm bg-amber-50 text-amber-700 rounded-xl border border-amber-200 font-bold">
+                          {spamError}
+                        </div>
+                      )}
+                      {status === "error" && (
+                        <div role="alert" className="p-4 text-sm bg-red-50 text-red-700 rounded-xl border border-red-200 font-bold">
+                          {submitErrorMsg ?? "We couldn't send your request. Please WhatsApp us directly at +91 70075 78072."}
+                        </div>
+                      )}
                       
                       <div className="mt-2 p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-3">
                         <AlertTriangle className="size-5 text-amber-600 shrink-0 mt-0.5" />
@@ -3400,6 +3520,16 @@ function BottomForm() {
 
 function WhatsAppWidget() {
   const WA_HREF = "https://wa.me/917007578072?text=Hi%2C%20I%27d%20like%20to%20book%20a%20free%20demo%20for%20my%20child.";
+  // Hide the pill while the hero is on-screen so it doesn't occlude the
+  // hero video's own CTA. Show once user has scrolled past 700px.
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setVisible(window.scrollY > 700);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  if (!visible) return null;
   return (
     <a
       href={WA_HREF}
@@ -3503,7 +3633,7 @@ function Footer() {
               <a
                 href="https://www.linkedin.com/company/chesswize/"
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 aria-label="ChessWize on LinkedIn"
                 className="size-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all"
               >
@@ -3512,7 +3642,7 @@ function Footer() {
               <a
                 href="https://wa.me/917007578072?text=Hi%2C%20I%27d%20like%20to%20book%20a%20free%20demo%20for%20my%20child."
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 aria-label="ChessWize on WhatsApp"
                 className="size-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-emerald-300 hover:bg-white/10 hover:border-white/20 transition-all"
               >
@@ -3979,22 +4109,31 @@ function LandingPage() {
   return (
     <div className="min-h-screen flex flex-col selection:bg-blue-200 selection:text-blue-900 font-sans bg-white overflow-x-hidden">
       <Toaster theme="light" position="top-center" richColors />
+      {/* Skip link — visible only when keyboard-focused, first thing in tab order */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[200] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-blue-600 focus:text-white focus:font-bold focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-white"
+      >
+        Skip to main content
+      </a>
       <TopNav />
-      <Hero />
-      {/* ── Consensus CRO order from Codex + Gemini + Claude 3-way audit ── */}
-      <VideoShowcase />
-      <StarPerformers />
-      <WallOfLove />
-      <TheProblem />
-      <WhoIsThisFor />
-      <HowItWorks />
-      <Mentors />
-      <ValueStack />
-      <Platform />
-      <CertificateSection />
-      <SyllabusExplorer />
-      <FAQ />
-      <BottomForm />
+      <main id="main-content" role="main" className="flex-1">
+        <Hero />
+        {/* ── Consensus CRO order from Codex + Gemini + Claude 3-way audit ── */}
+        <VideoShowcase />
+        <StarPerformers />
+        <WallOfLove />
+        <TheProblem />
+        <WhoIsThisFor />
+        <HowItWorks />
+        <Mentors />
+        <ValueStack />
+        <Platform />
+        <CertificateSection />
+        <SyllabusExplorer />
+        <FAQ />
+        <BottomForm />
+      </main>
       <Footer />
       {/* ── Removed per consensus: ProgramStats, Transformation, Curriculum, LearningModes,
           FounderStory, ParentAssessmentQuiz, DailyRegimen, MidPageCTA, EloProjectionCalculator,

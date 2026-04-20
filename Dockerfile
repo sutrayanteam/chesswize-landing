@@ -7,9 +7,11 @@
 FROM oven/bun:1 AS build
 WORKDIR /app
 
-# deps first for better layer caching
-COPY package.json bun.lockb* ./
-RUN bun install --frozen-lockfile || bun install
+# deps first for better layer caching. --frozen-lockfile enforces the
+# committed bun.lock — no fallback to dev-style install — so prod builds
+# are reproducible.
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile
 
 # source + build
 COPY . .

@@ -141,11 +141,13 @@ video {
   border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
-/* Glassmorphism for sticky elements — Apple-style saturated blur masks body-text bleed */
+/* Glassmorphism for sticky elements — Apple-style saturated blur. Higher
+   opacity than before (0.88) to prevent body-text bleed-through on long
+   dark sections while the saturated blur keeps the glass feel. */
 .gs-glass {
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: saturate(180%) blur(20px);
-  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: saturate(180%) blur(24px);
+  -webkit-backdrop-filter: saturate(180%) blur(24px);
   border-bottom: 1px solid rgba(15, 23, 42, 0.08);
 }
 

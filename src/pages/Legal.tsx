@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useDocumentTitle } from "@/src/lib/useDocumentTitle";
+import { useRouteMeta } from "@/src/lib/useRouteMeta";
 
 function LegalLayout({ title, children }: { title: string; children: React.ReactNode }) {
   useEffect(() => {
@@ -60,7 +60,11 @@ function LegalLayout({ title, children }: { title: string; children: React.React
 }
 
 export function PrivacyPolicy() {
-  useDocumentTitle("Privacy Policy — ChessWize");
+  useRouteMeta({
+    title: "Privacy Policy — ChessWize",
+    description: "How ChessWize collects, uses, and protects your personal information when you book a demo or use our online chess coaching services.",
+    path: "/privacy-policy",
+  });
   return (
     <LegalLayout title="Privacy Policy">
       <p>Last updated: April 15, 2026</p>
@@ -153,7 +157,11 @@ export function PrivacyPolicy() {
 }
 
 export function TermsOfService() {
-  useDocumentTitle("Terms of Service — ChessWize");
+  useRouteMeta({
+    title: "Terms of Service — ChessWize",
+    description: "The agreement between you and ChessWize for using our website and online chess coaching services, including eligibility, conduct, and cancellation terms.",
+    path: "/terms",
+  });
   return (
     <LegalLayout title="Terms of Service">
       <p>Last updated: April 15, 2026</p>
@@ -226,7 +234,11 @@ export function TermsOfService() {
 }
 
 export function RefundPolicy() {
-  useDocumentTitle("Refund Policy — ChessWize");
+  useRouteMeta({
+    title: "Refund Policy — ChessWize",
+    description: "ChessWize's 30-Day Cognitive Growth Guarantee, session rescheduling rules, and cancellation procedure.",
+    path: "/refund-policy",
+  });
   return (
     <LegalLayout title="Refund Policy">
       <p>Last updated: April 15, 2026</p>
@@ -287,7 +299,11 @@ export function RefundPolicy() {
 }
 
 export function CookiePolicy() {
-  useDocumentTitle("Cookie Policy — ChessWize");
+  useRouteMeta({
+    title: "Cookie Policy — ChessWize",
+    description: "How ChessWize uses cookies, pixel tags, and similar tracking technologies, and how you can manage them.",
+    path: "/cookie-policy",
+  });
   return (
     <LegalLayout title="Cookie Policy">
       <p>Last updated: April 15, 2026</p>
@@ -351,7 +367,11 @@ export function CookiePolicy() {
 }
 
 export function Disclaimer() {
-  useDocumentTitle("Disclaimer — ChessWize");
+  useRouteMeta({
+    title: "Disclaimer — ChessWize",
+    description: "Legal disclaimer covering ChessWize's educational coaching services, testimonials, results claims, and limitation of liability.",
+    path: "/disclaimer",
+  });
   return (
     <LegalLayout title="Disclaimer">
       <p>Last updated: April 15, 2026</p>

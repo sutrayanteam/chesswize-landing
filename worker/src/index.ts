@@ -58,6 +58,50 @@ const json = (data: unknown, init: ResponseInit = {}) =>
     },
   });
 
+// Narrow-typed whitelist validator — lightweight since the worker can't pull
+// in zod without ballooning the bundle. Each field is size-capped so a bad
+// actor can't stuff Zoho with huge payloads.
+function str(v: unknown, max = 200): string | undefined {
+  return typeof v === "string" && v.length <= max ? v : undefined;
+}
+
+function strArr(v: unknown, maxItems = 20, maxEach = 200): string[] | undefined {
+  if (!Array.isArray(v) || v.length > maxItems) return undefined;
+  const out: string[] = [];
+  for (const item of v) {
+    if (typeof item !== "string" || item.length > maxEach) return undefined;
+    out.push(item);
+  }
+  return out;
+}
+
+function validateLead(raw: unknown): { ok: true; value: LeadBody } | { ok: false; reason: string } {
+  if (!raw || typeof raw !== "object") return { ok: false, reason: "not_object" };
+  const r = raw as Record<string, unknown>;
+
+  const phone = str(r.phone, 40);
+  if (!phone || phone.replace(/[^0-9]/g, "").length < 10) {
+    return { ok: false, reason: "phone_required" };
+  }
+
+  const value: LeadBody = {
+    phone,
+    child_name: str(r.child_name, 120),
+    child_age_range: str(r.child_age_range, 20),
+    child_level: str(r.child_level, 40),
+    parent_name: str(r.parent_name, 120),
+    parent_email: str(r.parent_email, 200),
+    city: str(r.city, 80),
+    parent_commitment: str(r.parent_commitment, 80),
+    referral_source: str(r.referral_source, 80),
+    parent_concern: Array.isArray(r.parent_concern) ? strArr(r.parent_concern) : str(r.parent_concern as unknown, 200),
+    website_url: str(r.website_url, 200),
+    form_duration_s: typeof r.form_duration_s === "number" ? r.form_duration_s : undefined,
+  };
+
+  return { ok: true, value };
+}
+
 const originAllowed = (env: Env, origin: string | null): boolean => {
   if (!origin) return true; // same-origin fetches have no Origin header
   const list = (env.ALLOWED_ORIGINS ?? "chesswize.in,www.chesswize.in").split(",").map(s => s.trim().toLowerCase());
@@ -225,31 +269,35 @@ async function handleLead(request: Request, env: Env): Promise<Response> {
     return json({ ok: false, error: "origin_blocked" }, { status: 403 });
   }
 
-  let body: LeadBody;
+  let body: unknown;
   try {
-    body = await request.json<LeadBody>();
+    body = await request.json();
   } catch {
     return json({ ok: false, error: "bad_json" }, { status: 400 });
   }
 
+  // Server-side shape validation — don't trust the client.
+  // Treat anything malformed as a hard reject (400) so automated scripts
+  // can't pollute Zoho with arbitrary data.
+  const validation = validateLead(body);
+  if (validation.ok === false) {
+    return json({ ok: false, error: "invalid_payload", detail: validation.reason }, { status: 400 });
+  }
+  const lead: LeadBody = validation.value;
+
   // Honeypot
-  if (body.website_url && body.website_url.length > 0) {
+  if (lead.website_url && lead.website_url.length > 0) {
     return json({ ok: true, stored: false, note: "filtered" });
   }
 
   // Anti-spam time-gate
-  if (typeof body.form_duration_s === "number" && body.form_duration_s < 8) {
+  if (typeof lead.form_duration_s === "number" && lead.form_duration_s < 8) {
     return json({ ok: false, error: "too_fast" }, { status: 429 });
   }
 
-  // Minimum validation
-  if (!body.phone || String(body.phone).replace(/[^0-9]/g, "").length < 10) {
-    return json({ ok: false, error: "phone_required" }, { status: 400 });
-  }
-
   const [zoho, email] = await Promise.allSettled([
-    pushLeadToZoho(env, body),
-    sendLeadEmail(env, body),
+    pushLeadToZoho(env, lead),
+    sendLeadEmail(env, lead),
   ]);
 
   const zohoOk = zoho.status === "fulfilled" && zoho.value.ok;
@@ -279,15 +327,21 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
 
-    // CORS preflight (mostly for local dev)
+    // CORS preflight — only echo the origin back if it's on the allowlist.
+    // Without this check, arbitrary origins can probe the API for existence.
     if (request.method === "OPTIONS") {
+      const origin = request.headers.get("origin");
+      if (!originAllowed(env, origin)) {
+        return new Response(null, { status: 403 });
+      }
       return new Response(null, {
         status: 204,
         headers: {
-          "access-control-allow-origin": request.headers.get("origin") ?? "*",
+          "access-control-allow-origin": origin ?? "https://chesswize.in",
           "access-control-allow-methods": "POST, GET, OPTIONS",
           "access-control-allow-headers": "content-type",
           "access-control-max-age": "86400",
+          "vary": "Origin",
         },
       });
     }

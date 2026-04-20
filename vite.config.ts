@@ -1,15 +1,16 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
-import {defineConfig, loadEnv} from 'vite';
+import { defineConfig } from 'vite';
 
-export default defineConfig(({mode}) => {
-  const env = loadEnv(mode, '.', '');
+// NOTE: intentionally no `define: { 'process.env.GEMINI_API_KEY': ... }`.
+// The Gemini API key is a server-only secret. Baking it into the client
+// bundle (as the old config did) leaked it into every browser payload.
+// Any AI-assisted feature that needs Gemini MUST go through the worker.
+
+export default defineConfig(() => {
   return {
     plugins: [react(), tailwindcss()],
-    define: {
-      'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-    },
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),
@@ -23,9 +24,10 @@ export default defineConfig(({mode}) => {
             'vendor-motion': ['motion'],
             'vendor-ui': ['lucide-react', 'sonner', 'clsx', 'tailwind-merge', 'class-variance-authority'],
             'vendor-carousel': ['embla-carousel-react', 'embla-carousel-autoplay'],
-            // react-parallax-tilt + canvas-confetti are now dynamic-imported,
-            // so they become their own async chunks automatically.
-            'vendor-extras': ['react-countup', 'lenis'],
+            // react-parallax-tilt + canvas-confetti are dynamic-imported,
+            // so they become their own async chunks automatically. `lenis`
+            // was listed here previously but is unused — removed.
+            'vendor-extras': ['react-countup'],
           },
         },
       },
