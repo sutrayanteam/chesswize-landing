@@ -168,16 +168,35 @@ function Hero() {
   const [muted, setMuted] = useState(true);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  const toggleMute = () => {
+  // Belt-and-suspenders Safari kick: once the element mounts, force autoplay.
+  // Safari/WebKit occasionally drops muted autoplay if the tab wasn't visible
+  // during initial paint or if the element mounts inside a hidden container.
+  useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
-    const next = !muted;
+    v.muted = true;
+    const tryPlay = () => v.play().catch(() => {});
+    tryPlay();
+    // Retry once on the next frame — Safari sometimes rejects the first call.
+    const id = requestAnimationFrame(tryPlay);
+    return () => cancelAnimationFrame(id);
+  }, []);
+
+  const toggleMute = async () => {
+    const v = videoRef.current;
+    if (!v) return;
+    // DOM state is source of truth on Safari — reading v.muted rather than
+    // the React state flag avoids drift if the browser pauses the video
+    // outside our control (autoplay policy intervention, tab-visibility, etc).
+    const next = !v.muted;
     v.muted = next;
-    if (!next) {
-      // Unmuted — make sure the video is playing
-      v.play().catch(() => {});
+    try {
+      await v.play();
+    } catch {
+      /* Safari rejected — surface will remain paused; user can re-click */
     }
-    setMuted(next);
+    // Sync React UI from whatever the DOM actually settled on.
+    setMuted(v.muted);
   };
 
   return (
@@ -288,15 +307,17 @@ function Hero() {
               <div className="relative rounded-xl md:rounded-2xl overflow-hidden bg-slate-50 border border-slate-200 group shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] aspect-square">
                 <video
                   ref={videoRef}
-                  src="/testimonial-kid-1.mp4"
                   autoPlay
                   loop
-                  muted={muted}
+                  muted
                   playsInline
+                  webkit-playsinline="true"
                   preload="metadata"
                   poster="/testimonial-kid-1-poster.webp"
                   className="absolute inset-0 w-full h-full object-cover"
-                />
+                >
+                  <source src="/testimonial-kid-1.mp4" type="video/mp4" />
+                </video>
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/55 via-slate-950/10 to-slate-950/30 pointer-events-none" />
 
                 {/* Top-left: badge */}
@@ -1697,23 +1718,50 @@ function VideoModal({ open, onClose, src, poster, label, portrait = false }: Vid
     if (!open) return;
 
     // Pause any OTHER video on the page so we never have two videos playing at once.
-    // Track which ones were playing so we can resume them when the modal closes.
+    // Only track ones that were MUTED when paused — resuming an unmuted
+    // background video on Safari after the modal closes is rejected by the
+    // autoplay policy, so we leave those paused and let the user re-start.
     const wasPlaying: HTMLVideoElement[] = [];
     document.querySelectorAll<HTMLVideoElement>("video").forEach((v) => {
       if (v !== modalVideoRef.current && !v.paused && !v.ended) {
+        const wasMuted = v.muted;
         v.pause();
-        wasPlaying.push(v);
+        if (wasMuted) wasPlaying.push(v);
       }
     });
 
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     document.addEventListener("keydown", onKey);
+    // Safari iOS fix: set `position:fixed` on body to prevent the rubber-band
+    // scroll leaking through the modal. Plain `overflow:hidden` is not enough
+    // on WebKit mobile.
+    const scrollY = window.scrollY;
     const prevOverflow = document.body.style.overflow;
+    const prevPosition = document.body.style.position;
+    const prevTop = document.body.style.top;
+    const prevWidth = document.body.style.width;
     document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = "100%";
+
+    // Kick the modal video — user gesture chain should let it auto-play,
+    // but Safari sometimes still blocks. Retry on next frame.
+    const kick = () => {
+      const mv = modalVideoRef.current;
+      if (mv) mv.play().catch(() => {});
+    };
+    kick();
+    const rafId = requestAnimationFrame(kick);
 
     return () => {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = prevOverflow;
+      document.body.style.position = prevPosition;
+      document.body.style.top = prevTop;
+      document.body.style.width = prevWidth;
+      window.scrollTo(0, scrollY);
+      cancelAnimationFrame(rafId);
       // Resume background videos that were auto-playing before we opened.
       wasPlaying.forEach((v) => { v.play().catch(() => {}); });
     };
@@ -1755,14 +1803,15 @@ function VideoModal({ open, onClose, src, poster, label, portrait = false }: Vid
             <video
               ref={modalVideoRef}
               key={src}
-              src={src}
               controls
-              autoPlay
               playsInline
-              preload="auto"
+              webkit-playsinline="true"
+              preload="metadata"
               poster={poster}
               className="w-full h-auto max-h-[85vh] bg-black"
-            />
+            >
+              <source src={src} type="video/mp4" />
+            </video>
           </motion.div>
         </motion.div>
       )}
@@ -2872,7 +2921,7 @@ function BottomForm() {
   const formLoadedAt = useRef(Date.now());
   const jsToken = useRef(Math.random().toString(36).slice(2) + Date.now().toString(36));
 
-  const { register, handleSubmit, formState: { errors }, reset, trigger } = useForm<FormData>({
+  const { register, handleSubmit, formState: { errors }, reset, trigger, watch } = useForm<FormData>({
     resolver: zodResolver(formSchema),
     mode: "onTouched"
   });
@@ -3113,8 +3162,17 @@ function BottomForm() {
                             { value: "tournament", label: "Train for tournaments / FIDE rating" },
                             { value: "confidence", label: "Build confidence &amp; emotional resilience" },
                             { value: "exploring", label: "Just exploring — not sure yet" },
-                          ].map((opt) => (
-                            <label key={opt.value} className="flex items-start gap-2.5 p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-white hover:border-blue-300 transition-all cursor-pointer has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 has-[:checked]:shadow-sm">
+                          ].map((opt) => {
+                            const selected = (watch("parent_concern") ?? []).includes(opt.value);
+                            return (
+                            <label
+                              key={opt.value}
+                              className={`flex items-start gap-2.5 p-3 rounded-xl border transition-all cursor-pointer ${
+                                selected
+                                  ? "border-blue-600 bg-blue-50 shadow-sm"
+                                  : "border-slate-200 bg-slate-50 hover:bg-white hover:border-blue-300"
+                              }`}
+                            >
                               <input
                                 type="checkbox"
                                 value={opt.value}
@@ -3126,7 +3184,8 @@ function BottomForm() {
                                 dangerouslySetInnerHTML={{ __html: opt.label }}
                               />
                             </label>
-                          ))}
+                            );
+                          })}
                         </div>
                         {errors.parent_concern && <p className="text-[10px] text-red-500 font-bold mt-1">{(errors.parent_concern as any).message}</p>}
                       </div>

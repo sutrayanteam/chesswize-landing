@@ -56,9 +56,17 @@ section[id] {
   scroll-margin-top: 80px;
 }
 
-/* Apply browser text-balance for pretty line breaks on headings */
+/* Pretty line breaks on headings — Safari 17.4+ / Chrome 114+. Older
+   Safari silently ignores this, so the plain overflow-wrap gives a
+   decent fallback. */
 h1, h2, h3 {
-  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+@supports (text-wrap: balance) {
+  h1, h2, h3 {
+    text-wrap: balance;
+    overflow-wrap: normal;
+  }
 }
 
 /* Respect user's reduced-motion preference globally */
@@ -94,6 +102,22 @@ body {
   background-color: #FFFFFF;
   text-rendering: optimizeLegibility;
   font-feature-settings: 'kern' 1, 'liga' 1;
+  /* iOS Safari — kill the grey tap-highlight on buttons/links */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Safari/iOS: HTML5 video autoplay requires the element to actually be
+   muted + playsinline. Belt-and-suspenders default sizing avoids layout
+   jumps if the browser fails the autoplay and shows the poster only. */
+video {
+  max-width: 100%;
+  /* Safari renders black flash on load — fixes with explicit bg */
+  background-color: #000;
+}
+
+/* Prevent the long chess terms / URLs in legal copy from breaking iOS layout */
+.prose p, .prose li {
+  overflow-wrap: anywhere;
 }
 
 /* --- Enterprise Visual Primitives --- */
@@ -349,11 +373,6 @@ select, input, textarea {
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
-}
-
-/* Force Vidstack player in testimonial cards to use portrait aspect ratio */
-.video-card-contain [data-media-player][data-view-type='video'] {
-  aspect-ratio: 9 / 16 !important;
 }
 
 @layer base {

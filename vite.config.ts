@@ -29,7 +29,10 @@ export default defineConfig(({mode}) => {
           },
         },
       },
-      target: 'esnext',
+      // Explicit support floor: Safari 15 is the oldest version we target,
+      // so we cap output syntax to what Safari 15 can parse. esnext would
+      // leave some features untranspiled and Safari 15 would choke silently.
+      target: ['safari15', 'chrome107', 'firefox104', 'edge107'],
     },
     server: {
       hmr: process.env.DISABLE_HMR !== 'true',
