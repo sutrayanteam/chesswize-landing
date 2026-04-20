@@ -3340,7 +3340,7 @@ function Footer() {
         {/* ────────── Bottom bar ────────── */}
         <div className="border-t border-white/5 pt-6 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           <p className="text-xs font-medium text-slate-500">
-            © {new Date().getFullYear()} Chesswize Education&nbsp;LLP · Building sharper minds, one move at a time.
+            © {new Date().getFullYear()} ChessWize · Building sharper minds, one move at a time.
           </p>
           <p className="text-xs font-medium text-slate-600">
             Made in <span className="text-slate-400">Kanpur</span> · For parents everywhere.
@@ -3722,7 +3722,7 @@ function LegalLayout({ title, children }: { title: string, children: React.React
             <Link to="/disclaimer" className="hover:text-white transition-colors">Disclaimer</Link>
           </div>
           <p className="text-[10px] font-bold uppercase tracking-widest-gs text-slate-600">
-            © {new Date().getFullYear()} Chesswize Education LLP. All rights reserved.
+            © {new Date().getFullYear()} ChessWize. All rights reserved.
           </p>
         </div>
       </footer>
@@ -3734,7 +3734,7 @@ function PrivacyPolicy() {
   return (
     <LegalLayout title="Privacy Policy">
       <p>Last updated: April 15, 2026</p>
-      <p>ChessWize, operated by Chesswize Education LLP ("we", "our", or "us"), is committed to protecting your privacy. This Privacy Policy describes how we collect, use, share, and safeguard personal information when you visit <strong>chesswize.com</strong> (the "Site"), interact with our advertisements on third-party platforms, or use our online chess coaching services (the "Services").</p>
+      <p>ChessWize ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy describes how we collect, use, share, and safeguard personal information when you visit <strong>chesswize.in</strong> (the "Site"), interact with our advertisements on third-party platforms, or use our online chess coaching services (the "Services").</p>
       <p>By using our Site or Services, you consent to the practices described in this policy. If you do not agree, please discontinue use immediately.</p>
 
       <h3>1. Information We Collect</h3>
@@ -3826,7 +3826,7 @@ function TermsOfService() {
   return (
     <LegalLayout title="Terms of Service">
       <p>Last updated: April 15, 2026</p>
-      <p>These Terms of Service ("Terms") constitute a legally binding agreement between you ("you", "your", or "Parent/Guardian") and Chesswize Education LLP, operating as ChessWize ("we", "us", "our", or "ChessWize"). By accessing <strong>chesswize.com</strong> or enrolling in any of our programs, you agree to these Terms in full.</p>
+      <p>These Terms of Service ("Terms") constitute a legally binding agreement between you ("you", "your", or "Parent/Guardian") and ChessWize ("we", "us", "our", or "ChessWize"). By accessing <strong>chesswize.in</strong> or enrolling in any of our programs, you agree to these Terms in full.</p>
 
       <h3>1. Eligibility &amp; Account Registration</h3>
       <p>Our Services are intended for parents or legal guardians enrolling children aged 5–17 in chess coaching programs. By creating an account, you represent that you are at least 18 years old and have the legal authority to bind yourself and your child to these Terms. You are responsible for all activity under your account and for maintaining the confidentiality of your login credentials.</p>
@@ -3898,7 +3898,7 @@ function RefundPolicy() {
   return (
     <LegalLayout title="Refund Policy">
       <p>Last updated: April 15, 2026</p>
-      <p>At ChessWize (operated by Chesswize Education LLP), we are confident in the quality of our coaching. This Refund Policy outlines the conditions under which refunds, cancellations, and rescheduling are handled.</p>
+      <p>At ChessWize, we are confident in the quality of our coaching. This Refund Policy outlines the conditions under which refunds, cancellations, and rescheduling are handled.</p>
 
       <h3>1. 30-Day Cognitive Growth Guarantee</h3>
       <p>We stand behind our methodology with a results-backed guarantee. If you are not satisfied with the measurable progress your child has made within the first 30 calendar days of beginning a paid program, you are eligible for a <strong>full refund</strong> of your initial month's tuition, subject to the following conditions:</p>
@@ -3958,7 +3958,7 @@ function CookiePolicy() {
   return (
     <LegalLayout title="Cookie Policy">
       <p>Last updated: April 15, 2026</p>
-      <p>This Cookie Policy explains how ChessWize (operated by Chesswize Education LLP) uses cookies and similar tracking technologies when you visit <strong>chesswize.com</strong>. It should be read alongside our <Link to="/privacy-policy"><strong>Privacy Policy</strong></Link>.</p>
+      <p>This Cookie Policy explains how ChessWize uses cookies and similar tracking technologies when you visit <strong>chesswize.in</strong>. It should be read alongside our <Link to="/privacy-policy"><strong>Privacy Policy</strong></Link>.</p>
 
       <h3>1. What Are Cookies?</h3>
       <p>Cookies are small text files placed on your device by websites you visit. They are widely used to make websites work efficiently, provide analytics, and enable advertising features. Similar technologies include pixel tags, web beacons, and local storage.</p>
@@ -4021,7 +4021,7 @@ function Disclaimer() {
   return (
     <LegalLayout title="Disclaimer">
       <p>Last updated: April 15, 2026</p>
-      <p>The information provided on <strong>chesswize.com</strong> (the "Site") and through ChessWize's coaching services is for general educational and informational purposes only. By using our Site and Services, you acknowledge and agree to the following.</p>
+      <p>The information provided on <strong>chesswize.in</strong> (the "Site") and through ChessWize's coaching services is for general educational and informational purposes only. By using our Site and Services, you acknowledge and agree to the following.</p>
 
       <h3>1. No Guaranteed Outcomes</h3>
       <p>While we are confident in our structured coaching methodology and have documented measurable improvements across hundreds of students, individual results may vary. Chess performance depends on numerous factors including the student's dedication, practice frequency, natural aptitude, and external circumstances. Elo ratings, tournament results, and cognitive improvements referenced on our Site are based on historical data from past students and are not a guarantee of future performance.</p>
