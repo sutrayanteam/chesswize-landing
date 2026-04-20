@@ -5,27 +5,17 @@
 	@static path /assets/*
 	header @static Cache-Control "public, max-age=31536000, immutable"
 
-	# Short-cache for media; Caddy's file_server natively emits
-	# 206 Partial Content + Accept-Ranges: bytes on <video>/Range requests.
+	# Short-cache for media. Caddy's file_server natively emits 206
+	# Partial Content + Accept-Ranges: bytes on Range requests, which
+	# Safari requires to play <video>.
 	@media path *.mp4 *.mov *.webm *.webp *.png *.jpg *.jpeg *.svg
 	header @media Cache-Control "public, max-age=86400"
 
-	# Explicit security headers on the HTML entry only
+	# Explicit no-cache + security headers on the HTML entry only
 	@html path / /index.html
 	header @html Cache-Control "no-cache"
 	header @html X-Content-Type-Options "nosniff"
 	header @html Referrer-Policy "strict-origin-when-cross-origin"
-
-	# Compression — but ONLY for text-ish content. Keep videos/images raw
-	# so Range serving isn't disturbed.
-	encode {
-		match header Content-Type text/*
-		match header Content-Type application/javascript*
-		match header Content-Type application/json*
-		match header Content-Type image/svg+xml
-		zstd
-		gzip
-	}
 
 	# SPA fallback: if the requested path isn't a real file, serve index.html.
 	try_files {path} /index.html
