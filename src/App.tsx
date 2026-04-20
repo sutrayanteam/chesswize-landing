@@ -211,7 +211,7 @@ function Hero() {
               </a>
               {/* Counselor strip — human face at CTA moment */}
               <div className="flex items-center gap-3 mt-3.5 pt-3.5 border-t border-slate-100">
-                <img src="/counselor-avatar.jpg" alt="Priya Sharma — Academic Counsellor" className="size-10 rounded-full object-cover ring-2 ring-white shadow-md shrink-0" loading="lazy" decoding="async" />
+                <img src="/counselor-avatar.webp" alt="Priya Sharma — Academic Counsellor" className="size-10 rounded-full object-cover ring-2 ring-white shadow-md shrink-0" loading="lazy" decoding="async" />
                 <div className="flex-1 min-w-0">
                   <p className="text-[11px] md:text-xs font-extrabold text-slate-800">You&apos;ll talk to <span className="text-blue-700">Priya Sharma</span>, Academic Counsellor</p>
                   <p className="text-[10px] md:text-[11px] text-slate-500 font-medium">Replies on WhatsApp in &lt;10 min · 10 AM–8 PM IST</p>
@@ -593,7 +593,7 @@ function TheProblem() {
                 <div className="absolute top-2 left-2 bg-red-600 text-slate-50 text-[10px] font-extrabold uppercase tracking-widest-gs px-2 py-1 rounded shadow">Passive Scrolling</div>
               </div>
               <div className="rounded-2xl overflow-hidden shadow-lg border border-slate-200 aspect-square relative group">
-                 <img loading="lazy" src="/kid-chess-online-class-1200.jpg" alt="A child analysing a chess position on a real board while his FIDE coach explains the move over a laptop video call — a ChessWize live class" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                 <img loading="lazy" src="/kid-chess-online-class-1200.webp" alt="A child analysing a chess position on a real board while his FIDE coach explains the move over a laptop video call — a ChessWize live class" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                  <div className="absolute top-2 left-2 bg-blue-600 text-slate-50 text-[10px] font-extrabold uppercase tracking-widest-gs px-2 py-1 rounded shadow">Purposeful Training</div>
               </div>
             </div>
@@ -1583,7 +1583,7 @@ type VideoItem = { src: string; title: string; label: string; badge: string; pos
 function VideoCard({ v }: { v: VideoItem }) {
   const [activated, setActivated] = useState(false);
   // derive poster path from src unless provided: `/foo.mp4` → `/foo-poster.jpg`
-  const poster = v.poster ?? v.src.replace(/\.mp4$/i, "-poster.jpg");
+  const poster = v.poster ?? v.src.replace(/\.mp4$/i, "-poster.webp");
   return (
     <div className="rounded-2xl overflow-hidden hover-lift group relative flex-shrink-0 w-[180px] md:w-full bg-white border border-slate-200 shadow-md">
       <div className="absolute top-3 left-3 z-20 pointer-events-none">
