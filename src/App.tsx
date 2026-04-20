@@ -2558,15 +2558,17 @@ function FAQ() {
    CONTACT / BOOKING SECTION (Bottom)
    ════════════════════════════════════════════════ */
 const formSchema = z.object({
+  /* Step 1 — minimum viable lead (required) */
   parent_name: z.string().min(2, "Parent's name must be at least 2 characters"),
   phone: z.string().regex(/^\+?[0-9\s-]{10,15}$/, "Please enter a valid phone number"),
-  child_name: z.string().min(2, "Child's name must be at least 2 characters"),
   child_age_range: z.string().min(1, "Please select your child's age group"),
   child_level: z.string().min(1, "Please select an estimated level"),
-  city: z.string().min(2, "Please enter your city"),
-  referral_source: z.string().min(1, "Please tell us how you found us"),
-  parent_concern: z.array(z.string()).min(1, "Pick at least one goal so our coach can prepare"),
-  parent_commitment: z.string().min(1, "Please select your commitment level"),
+  /* Step 2 & 3 — enrichment fields (optional; submit works with just Step 1) */
+  child_name: z.string().min(2, "Child's name must be at least 2 characters").optional().or(z.literal("")),
+  city: z.string().min(2, "Please enter your city").optional().or(z.literal("")),
+  referral_source: z.string().optional(),
+  parent_concern: z.array(z.string()).optional(),
+  parent_commitment: z.string().optional(),
   /* Honeypot — hidden from real users, bots auto-fill it */
   website_url: z.string().max(0, "Bot detected").optional(),
 });
@@ -2733,9 +2735,9 @@ function BottomForm() {
 
                 <div className="flex items-center justify-between mb-6">
                   <h4 className="text-xl font-extrabold text-slate-900">
-                    {step === 1 && "Step 1: The Student"}
-                    {step === 2 && "Step 2: The Challenge"}
-                    {step === 3 && "Step 3: Contact Info"}
+                    {step === 1 && "Tell us who your child is"}
+                    {step === 2 && "A few details (optional)"}
+                    {step === 3 && "Last bits (optional)"}
                   </h4>
                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest-gs">Step {step} of 3</span>
                 </div>
@@ -2750,11 +2752,17 @@ function BottomForm() {
                   {step === 1 && (
                     <motion.div key="step1" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="flex flex-col gap-4 md:gap-5">
                       <div className="flex flex-col gap-1.5 md:gap-2">
-                        <label htmlFor="bottom_child_name" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">Child's First Name <span className="text-red-500">*</span></label>
-                        <input id="bottom_child_name" {...register("child_name")} type="text" className={inputCls(!!errors.child_name)} placeholder="e.g. Aarav" />
-                        {errors.child_name && <p className="text-[10px] text-red-500 font-bold mt-1">{errors.child_name.message}</p>}
+                        <label htmlFor="bottom_parent_name" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">Parent's Full Name <span className="text-red-500">*</span></label>
+                        <input id="bottom_parent_name" {...register("parent_name")} type="text" autoComplete="name" className={inputCls(!!errors.parent_name)} placeholder="e.g. Rahul Sharma" />
+                        {errors.parent_name && <p className="text-[10px] text-red-500 font-bold mt-1">{errors.parent_name.message}</p>}
                       </div>
-                      
+
+                      <div className="flex flex-col gap-1.5 md:gap-2">
+                        <label htmlFor="bottom_phone" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">WhatsApp Number <span className="text-red-500">*</span></label>
+                        <input id="bottom_phone" {...register("phone")} type="tel" inputMode="tel" autoComplete="tel" className={inputCls(!!errors.phone)} placeholder="+91 98765 43210" />
+                        {errors.phone && <p className="text-[10px] text-red-500 font-bold mt-1">{errors.phone.message}</p>}
+                      </div>
+
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5">
                         <div className="flex flex-col gap-1.5 md:gap-2 min-w-0">
                           <label htmlFor="bottom_child_age_range" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">Child's Age <span className="text-red-500">*</span></label>
@@ -2788,7 +2796,7 @@ function BottomForm() {
                         </div>
                       </div>
 
-                      <Button type="button" onClick={() => handleNextStep(['child_name', 'child_age_range', 'child_level'])} className="w-full h-14 mt-2 text-base font-extrabold tracking-tight gs-btn gs-btn-primary rounded-xl shadow-lg">
+                      <Button type="button" onClick={() => handleNextStep(['parent_name', 'phone', 'child_age_range', 'child_level'])} className="w-full h-14 mt-2 text-base font-extrabold tracking-tight gs-btn gs-btn-primary rounded-xl shadow-lg">
                         Continue to Next Step <ArrowRight className="ml-2 size-4" />
                       </Button>
                     </motion.div>
@@ -2797,8 +2805,14 @@ function BottomForm() {
                   {step === 2 && (
                     <motion.div key="step2" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="flex flex-col gap-4 md:gap-5">
                       <div className="flex flex-col gap-1.5 md:gap-2">
+                        <label htmlFor="bottom_child_name" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">Child's First Name</label>
+                        <input id="bottom_child_name" {...register("child_name")} type="text" className={inputCls(!!errors.child_name)} placeholder="e.g. Aarav" />
+                        {errors.child_name && <p className="text-[10px] text-red-500 font-bold mt-1">{errors.child_name.message}</p>}
+                      </div>
+
+                      <div className="flex flex-col gap-1.5 md:gap-2">
                         <label className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">
-                          What do you want chess to do for your child? <span className="text-red-500">*</span>
+                          What do you want chess to do for your child?
                         </label>
                         <p className="text-[10px] text-slate-400 font-medium -mt-0.5">Pick all that apply — our coach uses this to tailor the demo.</p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-1">
@@ -2828,7 +2842,7 @@ function BottomForm() {
                       </div>
 
                       <div className="flex flex-col gap-1.5 md:gap-2">
-                        <label htmlFor="bottom_commitment" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">What is your commitment level? <span className="text-red-500">*</span></label>
+                        <label htmlFor="bottom_commitment" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">What is your commitment level?</label>
                         <div className="relative">
                           <select id="bottom_commitment" {...register("parent_commitment")} className={inputCls(!!errors.parent_commitment) + " appearance-none cursor-pointer pr-10"}>
                             <option value="">Select commitment</option>
@@ -2845,7 +2859,7 @@ function BottomForm() {
                         <Button type="button" onClick={() => setStep(1)} variant="outline" className="h-14 px-6 font-bold text-slate-600 border-slate-200 rounded-xl hover:bg-slate-50">
                           <ArrowLeft className="size-4" />
                         </Button>
-                        <Button type="button" onClick={() => handleNextStep(['parent_concern', 'parent_commitment'])} className="flex-1 h-14 text-base font-extrabold tracking-tight gs-btn gs-btn-primary rounded-xl shadow-lg">
+                        <Button type="button" onClick={() => handleNextStep(['child_name', 'parent_concern', 'parent_commitment'])} className="flex-1 h-14 text-base font-extrabold tracking-tight gs-btn gs-btn-primary rounded-xl shadow-lg">
                           Continue to Final Step <ArrowRight className="ml-2 size-4" />
                         </Button>
                       </div>
@@ -2855,26 +2869,13 @@ function BottomForm() {
                   {step === 3 && (
                     <motion.div key="step3" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="flex flex-col gap-4 md:gap-5">
                       <div className="flex flex-col gap-1.5 md:gap-2">
-                        <label htmlFor="bottom_parent_name" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">Parent's Full Name <span className="text-red-500">*</span></label>
-                        <input id="bottom_parent_name" {...register("parent_name")} type="text" autoComplete="name" className={inputCls(!!errors.parent_name)} placeholder="e.g. Rahul Sharma" />
-                        {errors.parent_name && <p className="text-[10px] text-red-500 font-bold mt-1">{errors.parent_name.message}</p>}
-                      </div>
-                      
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5">
-                        <div className="flex flex-col gap-1.5 md:gap-2">
-                          <label htmlFor="bottom_phone" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">WhatsApp Number <span className="text-red-500">*</span></label>
-                          <input id="bottom_phone" {...register("phone")} type="tel" inputMode="tel" autoComplete="tel" className={inputCls(!!errors.phone)} placeholder="+91 98765 43210" />
-                          {errors.phone && <p className="text-[10px] text-red-500 font-bold mt-1">{errors.phone.message}</p>}
-                        </div>
-                        <div className="flex flex-col gap-1.5 md:gap-2">
-                          <label htmlFor="bottom_city" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">City <span className="text-red-500">*</span></label>
-                          <input id="bottom_city" {...register("city")} type="text" autoComplete="address-level2" className={inputCls(!!errors.city)} placeholder="e.g. Bangalore" />
-                          {errors.city && <p className="text-[10px] text-red-500 font-bold mt-1">{errors.city.message}</p>}
-                        </div>
+                        <label htmlFor="bottom_city" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">City</label>
+                        <input id="bottom_city" {...register("city")} type="text" autoComplete="address-level2" className={inputCls(!!errors.city)} placeholder="e.g. Bangalore" />
+                        {errors.city && <p className="text-[10px] text-red-500 font-bold mt-1">{errors.city.message}</p>}
                       </div>
 
                       <div className="flex flex-col gap-1.5 md:gap-2">
-                        <label htmlFor="bottom_referral" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">How did you hear about us? <span className="text-red-500">*</span></label>
+                        <label htmlFor="bottom_referral" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">How did you hear about us?</label>
                         <div className="relative">
                           <select id="bottom_referral" {...register("referral_source")} className={inputCls(!!errors.referral_source) + " appearance-none cursor-pointer pr-10"}>
                             <option value="">Select one</option>
