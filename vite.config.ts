@@ -23,7 +23,9 @@ export default defineConfig(({mode}) => {
             'vendor-motion': ['motion'],
             'vendor-ui': ['lucide-react', 'sonner', 'clsx', 'tailwind-merge', 'class-variance-authority'],
             'vendor-carousel': ['embla-carousel-react', 'embla-carousel-autoplay'],
-            'vendor-extras': ['react-countup', 'react-parallax-tilt', 'canvas-confetti', 'lenis'],
+            // react-parallax-tilt + canvas-confetti are now dynamic-imported,
+            // so they become their own async chunks automatically.
+            'vendor-extras': ['react-countup', 'lenis'],
           },
         },
       },
