@@ -28,9 +28,8 @@ import {
   Timer,
   Calculator,
   ListChecks,
-  Facebook,
-  Instagram,
   Linkedin,
+  MessageCircle,
   MapPin,
   Mail,
   Phone,
@@ -122,9 +121,14 @@ function TopNav() {
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "gs-glass py-2 md:py-3" : "bg-white border-b border-slate-200 py-3 md:py-4"}`}>
       <div className="max-w-[1400px] mx-auto px-4 md:px-8 flex items-center justify-between">
-        <div className="flex items-center gap-2 md:gap-3 cursor-pointer" onClick={() => window.scrollTo(0, 0)}>
+        <button
+          type="button"
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          aria-label="ChessWize — back to top"
+          className="flex items-center gap-2 md:gap-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-md"
+        >
           <img src="/logo-side-black-v2.svg" alt="ChessWize Logo" className="h-7 md:h-9 w-auto object-contain" />
-        </div>
+        </button>
         <nav className="hidden lg:flex items-center gap-8">
           {["Programs", "Mentors", "Testimonials", "Methodology", "Tuition"].map((item) => (
             <button key={item} onClick={() => scrollToSection(item.toLowerCase().replace(' ', '-'))} className="text-[13px] font-bold text-slate-500 hover:text-slate-900 uppercase tracking-widest-gs transition-colors">
@@ -1527,7 +1531,7 @@ function Curriculum() {
         </div>
 
         <div className="flex flex-col gap-8 md:gap-10 relative">
-          <div className="hidden lg:block absolute left-[3.5rem] top-20 bottom-20 w-1 bg-gradient-to-b from-blue-200 via-emerald-200 to-amber-200 z-0" />
+          <div className="hidden lg:block absolute left-[3.5rem] top-20 bottom-20 w-1 bg-blue-200 z-0" />
           
           {modules.map((mod, i) => (
             <div key={i} className="bg-white gs-border rounded-3xl p-6 md:p-8 lg:p-12 gs-shadow-xl flex flex-col lg:flex-row gap-8 lg:gap-16 relative overflow-hidden group hover:border-blue-300 transition-all duration-300 hover-lift z-10">
@@ -1587,7 +1591,7 @@ function VideoCard({ v }: { v: VideoItem }) {
   return (
     <div className="rounded-2xl overflow-hidden hover-lift group relative flex-shrink-0 w-[180px] md:w-full bg-white border border-slate-200 shadow-md">
       <div className="absolute top-3 left-3 z-20 pointer-events-none">
-        <Badge className="bg-amber-500 text-white border-0 text-[10px] font-bold shadow-lg">
+        <Badge className="bg-blue-600 text-white border-0 text-[10px] font-bold shadow-lg">
           <PlayCircle className="size-3 mr-1" /> {v.badge}
         </Badge>
       </div>
@@ -1659,7 +1663,7 @@ function VideoCarousel({ videos }: { videos: VideoItem[] }) {
       {/* Dot indicators */}
       <div className="flex items-center justify-center gap-2 mt-4">
         {videos.map((_, i) => (
-          <button key={i} onClick={() => emblaApi?.scrollTo(i)} className={`rounded-full transition-all ${activeIndex === i ? 'w-6 h-2 bg-amber-500' : 'w-2 h-2 bg-slate-300'}`} />
+          <button key={i} onClick={() => emblaApi?.scrollTo(i)} className={`rounded-full transition-all ${activeIndex === i ? 'w-6 h-2 bg-blue-600' : 'w-2 h-2 bg-slate-300'}`} />
         ))}
       </div>
       {/* Swipe hint */}
@@ -1680,14 +1684,14 @@ function VideoShowcase() {
 
   return (
     <section id="testimonials" className="py-16 md:py-24 bg-slate-50 border-b border-slate-200 gs-grid-pattern relative overflow-hidden">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-amber-500/5 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-500/5 rounded-full blur-[100px] pointer-events-none" />
       <div className="max-w-[1400px] mx-auto px-4 md:px-8 relative z-10">
         <div className="max-w-2xl mx-auto text-center mb-10 md:mb-16">
-          <h2 className="text-[10px] font-bold text-amber-600 uppercase tracking-widest-gs mb-2 md:mb-3 flex items-center justify-center gap-2">
+          <h2 className="text-[10px] font-bold text-blue-600 uppercase tracking-widest-gs mb-2 md:mb-3 flex items-center justify-center gap-2">
             <PlayCircle className="size-3" /> Video Testimonials
           </h2>
           <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tighter-gs mb-3 md:mb-4 leading-tight drop-shadow-sm">
-            Hear it from <span className="text-amber-600">real families.</span>
+            Hear it from <span className="text-blue-600">real families.</span>
           </h3>
           <p className="text-base md:text-lg text-slate-600 font-medium">
             Real parents and students share their ChessWize journey in their own words.
@@ -2209,11 +2213,11 @@ function StarPerformers() {
     <section className="py-16 md:py-24 bg-slate-50 border-b border-slate-200 gs-grid-pattern relative overflow-hidden">
       <div className="max-w-[1400px] mx-auto px-4 md:px-8 relative z-10">
         <div className="text-center mb-12 md:mb-16">
-          <Badge className="bg-amber-500/20 text-amber-600 border border-amber-500/30 rounded-full font-bold mb-4 px-3 py-1 text-[9px] md:text-[10px] uppercase tracking-widest-gs">
+          <Badge className="bg-blue-500/10 text-blue-700 border border-blue-500/30 rounded-full font-bold mb-4 px-3 py-1 text-[9px] md:text-[10px] uppercase tracking-widest-gs">
             <Trophy className="size-3 mr-1.5 inline" /> Our Star Performers
           </Badge>
           <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tighter-gs text-slate-900 mb-4 leading-tight">
-            Excellence is <span className="text-amber-600">engineered.</span>
+            Excellence is <span className="text-blue-600">engineered.</span>
           </h3>
           <p className="text-base md:text-lg text-slate-600 font-medium max-w-2xl mx-auto">
             Meet the students who have fully embraced the ChessWize Programme and are dominating their local tournament circuits.
@@ -2230,7 +2234,7 @@ function StarPerformers() {
                   <div className="aspect-[4/3] rounded-2xl overflow-hidden border border-slate-200 shadow-lg">
                     <img loading="lazy" src={p.img} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                   </div>
-                  <div className="absolute -bottom-4 right-4 bg-amber-500 text-slate-50 font-extrabold text-[10px] uppercase tracking-widest-gs px-3 py-1 rounded-md shadow-lg border border-amber-400">
+                  <div className="absolute -bottom-4 right-4 bg-blue-600 text-white font-extrabold text-[10px] uppercase tracking-widest-gs px-3 py-1 rounded-md shadow-lg border border-blue-500">
                     {p.tag}
                   </div>
                   <div className="absolute -bottom-4 left-4 bg-blue-600 text-slate-50 font-extrabold text-[10px] uppercase tracking-widest-gs px-3 py-1 rounded-md shadow-lg border border-blue-500">
@@ -2651,7 +2655,7 @@ function BottomForm() {
 
   return (
     <section id="book-evaluation" className="py-16 md:py-24 bg-slate-50 border-t border-slate-200 gs-grid-pattern relative overflow-hidden">
-      <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-600 via-emerald-500 to-amber-500" />
+      <div className="absolute top-0 left-0 w-full h-1 bg-blue-600" />
       <div className="max-w-3xl mx-auto px-4 md:px-8 relative z-10">
         <div className="text-center mb-10 md:mb-12">
           <h2 className="text-[10px] font-bold text-blue-600 uppercase tracking-widest-gs mb-2 md:mb-3">Take the next step</h2>
@@ -2940,93 +2944,6 @@ function WhatsAppWidget() {
   );
 }
 
-function ExitIntentPopup() {
-  const [show, setShow] = useState(false);
-  const [hasTriggered, setHasTriggered] = useState(false);
-
-  useEffect(() => {
-    if (hasTriggered) return;
-
-    const handleMouseLeave = (e: MouseEvent) => {
-      // Only trigger when the cursor exits through the very top of the viewport
-      // (i.e. heading toward the address bar / close button). Ignore side and
-      // bottom exits which happen during normal mouse movement.
-      if (e.clientY <= 0 && e.clientX > 0 && e.clientX < window.innerWidth) {
-        setShow(true);
-        setHasTriggered(true);
-      }
-    };
-
-    let lastScrollY = window.scrollY;
-    let lastTime = Date.now();
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      const currentTime = Date.now();
-      const elapsed = currentTime - lastTime;
-
-      // Avoid division-by-zero and ignore tiny time deltas that produce
-      // unreliable speed readings (e.g. rapid-fire scroll events).
-      if (elapsed > 50) {
-        const speed = (lastScrollY - currentScrollY) / elapsed;
-
-        if (speed > 3 && currentScrollY > 500) {
-          setShow(true);
-          setHasTriggered(true);
-        }
-
-        lastScrollY = currentScrollY;
-        lastTime = currentTime;
-      }
-    };
-
-    document.documentElement.addEventListener("mouseleave", handleMouseLeave);
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => {
-      document.documentElement.removeEventListener("mouseleave", handleMouseLeave);
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [hasTriggered]);
-
-  return (
-    <AnimatePresence>
-      {show && (
-        <motion.div 
-          initial={{ opacity: 0 }} 
-          animate={{ opacity: 1 }} 
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[200] bg-slate-50/80 backdrop-blur-md flex items-center justify-center p-4"
-        >
-          <motion.div 
-            initial={{ scale: 0.9, y: 20 }} 
-            animate={{ scale: 1, y: 0 }} 
-            exit={{ scale: 0.9, y: 20 }}
-            className="bg-white rounded-3xl p-8 md:p-12 gs-border gs-shadow-2xl max-w-md w-full relative"
-          >
-            <button onClick={() => setShow(false)} className="absolute top-4 right-4 text-slate-600 hover:text-slate-900 transition-colors">
-              <XCircle className="size-6" />
-            </button>
-            <div className="flex justify-center mb-6">
-              <div className="size-16 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-center">
-                <FileText className="size-8 text-amber-600" />
-              </div>
-            </div>
-            <h3 className="text-2xl font-extrabold text-slate-900 tracking-tighter-gs mb-2 text-center leading-tight">Wait! Don't leave empty-handed.</h3>
-            <p className="text-sm text-slate-600 font-medium text-center mb-6">
-              Download our proprietary PDF: <strong>"The 5 Algorithmic Mistakes Kids Make in Chess (And How to Fix Them)."</strong>
-            </p>
-            <div className="flex flex-col gap-3">
-              <input type="email" placeholder="Enter your email address" className="w-full px-4 py-4 text-sm border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-600 font-bold placeholder:font-medium transition-all" />
-              <Button onClick={() => setShow(false)} className="w-full h-14 gs-btn gs-btn-primary rounded-xl font-bold hover-lift shadow-lg">
-                Get The Data Now
-              </Button>
-            </div>
-            <p className="text-[10px] text-slate-600 font-bold uppercase tracking-widest-gs text-center mt-6 cursor-pointer hover:text-slate-600 transition-colors" onClick={() => setShow(false)}>No thanks, I prefer unstructured learning.</p>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
-}
 
 function Footer() {
   return (
@@ -3072,7 +2989,7 @@ function Footer() {
                 <div className="p-2 rounded-lg bg-slate-800 border border-slate-700 group-hover:border-blue-500/50 group-hover:bg-blue-500/10 transition-colors shadow-inner">
                   <Mail className="size-4 text-slate-300 group-hover:text-blue-400 transition-colors" />
                 </div>
-                <a href="mailto:chesswize79@gmail.com" className="hover:text-blue-400 transition-colors mt-1.5 drop-shadow-sm">chesswize79@gmail.com</a>
+                <a href="mailto:hello@chesswize.in" className="hover:text-blue-400 transition-colors mt-1.5 drop-shadow-sm">hello@chesswize.in</a>
               </li>
               <li className="flex items-start gap-3 group">
                 <div className="p-2 rounded-lg bg-slate-800 border border-slate-700 shadow-inner">
@@ -3096,14 +3013,11 @@ function Footer() {
 
             <h4 className="text-[11px] font-extrabold text-slate-200 uppercase tracking-widest-gs mb-6 drop-shadow-sm">Follow Us</h4>
             <div className="flex gap-4">
-              <a href="https://www.linkedin.com/company/chesswize/" target="_blank" rel="noreferrer" className="size-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 hover:bg-blue-600 hover:text-white hover:border-blue-500 transition-all shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0_0_15px_rgba(37,99,235,0.4)] hover-lift">
+              <a href="https://www.linkedin.com/company/chesswize/" target="_blank" rel="noreferrer" aria-label="ChessWize on LinkedIn" className="size-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 hover:bg-blue-600 hover:text-white hover:border-blue-500 transition-all">
                 <Linkedin className="size-4" />
               </a>
-              <a href="https://www.facebook.com/chesswize" target="_blank" rel="noreferrer" className="size-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 hover:bg-blue-600 hover:text-white hover:border-blue-500 transition-all shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0_0_15px_rgba(37,99,235,0.4)] hover-lift">
-                <Facebook className="size-4" />
-              </a>
-              <a href="https://www.instagram.com/chesswize/" target="_blank" rel="noreferrer" className="size-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 hover:bg-pink-600 hover:text-white hover:border-pink-500 transition-all shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_2px_4px_rgba(0,0,0,0.2)] hover:shadow-[0_0_15px_rgba(219,39,119,0.4)] hover-lift">
-                <Instagram className="size-4" />
+              <a href="https://wa.me/917007578072" target="_blank" rel="noreferrer" aria-label="ChessWize on WhatsApp" className="size-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 hover:bg-emerald-600 hover:text-white hover:border-emerald-500 transition-all">
+                <MessageCircle className="size-4" />
               </a>
             </div>
           </div>
@@ -3116,12 +3030,6 @@ function Footer() {
           <p className="text-[10px] font-bold uppercase tracking-widest-gs text-slate-500 drop-shadow-sm">
             © 2026 by Chesswize. All rights reserved.
           </p>
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-bold tracking-widest-gs text-slate-500 drop-shadow-sm">Designed by</span>
-            <a href="https://engazedigital.com" target="_blank" rel="noopener noreferrer" className="text-[10px] font-extrabold tracking-widest-gs text-slate-400 hover:text-white transition-colors drop-shadow-sm">
-              Engaze Digital
-            </a>
-          </div>
         </div>
       </div>
     </footer>
@@ -3492,8 +3400,7 @@ function LegalLayout({ title, children }: { title: string, children: React.React
             <Link to="/disclaimer" className="hover:text-white transition-colors">Disclaimer</Link>
           </div>
           <p className="text-[10px] font-bold uppercase tracking-widest-gs text-slate-600">
-            © {new Date().getFullYear()} Chesswize. <span className="text-slate-500">Designed by</span>{" "}
-            <a href="https://engazedigital.com" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-white transition-colors">Engaze Digital</a>
+            © {new Date().getFullYear()} Chesswize Education LLP. All rights reserved.
           </p>
         </div>
       </footer>
@@ -3574,7 +3481,7 @@ function PrivacyPolicy() {
         <li>Request data portability.</li>
         <li>Lodge a complaint with a supervisory authority.</li>
       </ul>
-      <p>To exercise any of these rights, email us at <strong>chesswize79@gmail.com</strong> with the subject line "Privacy Request".</p>
+      <p>To exercise any of these rights, email us at <strong>hello@chesswize.in</strong> with the subject line "Privacy Request".</p>
 
       <h3>9. International Data Transfers</h3>
       <p>Our servers and service providers may be located outside India. By using our Services, you consent to the transfer of your data to jurisdictions that may have different data protection laws. We ensure appropriate safeguards are in place for such transfers.</p>
@@ -3585,7 +3492,7 @@ function PrivacyPolicy() {
       <h3>11. Contact Us</h3>
       <p>For privacy-related enquiries:</p>
       <ul>
-        <li><strong>Email:</strong> chesswize79@gmail.com</li>
+        <li><strong>Email:</strong> hello@chesswize.in</li>
         <li><strong>Phone:</strong> +91-70075-78072</li>
         <li><strong>Address:</strong> Kanpur, Uttar Pradesh, India</li>
       </ul>
@@ -3658,7 +3565,7 @@ function TermsOfService() {
       <h3>14. Contact</h3>
       <p>For questions about these Terms:</p>
       <ul>
-        <li><strong>Email:</strong> chesswize79@gmail.com</li>
+        <li><strong>Email:</strong> hello@chesswize.in</li>
         <li><strong>Phone:</strong> +91-70075-78072</li>
       </ul>
     </LegalLayout>
@@ -3675,7 +3582,7 @@ function RefundPolicy() {
       <p>We stand behind our methodology with a results-backed guarantee. If you are not satisfied with the measurable progress your child has made within the first 30 calendar days of beginning a paid program, you are eligible for a <strong>full refund</strong> of your initial month's tuition, subject to the following conditions:</p>
       <ul>
         <li>The student must have attended all scheduled sessions during the 30-day period.</li>
-        <li>The refund request must be submitted in writing to <strong>chesswize79@gmail.com</strong> within 7 days of the 30-day period ending.</li>
+        <li>The refund request must be submitted in writing to <strong>hello@chesswize.in</strong> within 7 days of the 30-day period ending.</li>
         <li>This guarantee applies once per family and only to the first enrolment.</li>
       </ul>
 
@@ -3691,7 +3598,7 @@ function RefundPolicy() {
 
       <h3>3. Subscription Cancellations</h3>
       <ul>
-        <li>You may cancel your monthly subscription at any time by emailing <strong>chesswize79@gmail.com</strong> or contacting us via WhatsApp.</li>
+        <li>You may cancel your monthly subscription at any time by emailing <strong>hello@chesswize.in</strong> or contacting us via WhatsApp.</li>
         <li>Cancellations take effect at the end of the current billing cycle. You will continue to have access to scheduled sessions until the cycle ends.</li>
         <li>No prorated refunds are issued for mid-cycle cancellations after the initial 30-day guarantee period.</li>
         <li>Annual or multi-month plans: Cancellations are subject to a pro-rata calculation minus a 15% early termination fee, applicable only after the 30-day guarantee window.</li>
@@ -3720,7 +3627,7 @@ function RefundPolicy() {
         <li>The programme/plan you are enrolled in.</li>
         <li>Reason for the refund request.</li>
       </ul>
-      <p><strong>Email:</strong> chesswize79@gmail.com | <strong>Phone/WhatsApp:</strong> +91-70075-78072</p>
+      <p><strong>Email:</strong> hello@chesswize.in | <strong>Phone/WhatsApp:</strong> +91-70075-78072</p>
     </LegalLayout>
   );
 }
@@ -3783,7 +3690,7 @@ function CookiePolicy() {
       <p>We may update this Cookie Policy to reflect changes in technology or regulation. The "Last updated" date at the top will be revised accordingly.</p>
 
       <h3>6. Contact</h3>
-      <p>For questions about our use of cookies, contact us at <strong>chesswize79@gmail.com</strong>.</p>
+      <p>For questions about our use of cookies, contact us at <strong>hello@chesswize.in</strong>.</p>
     </LegalLayout>
   );
 }
@@ -3819,7 +3726,7 @@ function Disclaimer() {
       <p>Nothing on this Site constitutes professional, legal, financial, or medical advice. For specific concerns about your child's development, please consult a qualified professional.</p>
 
       <h3>9. Contact</h3>
-      <p>If you have questions about this Disclaimer, please contact us at <strong>chesswize79@gmail.com</strong>.</p>
+      <p>If you have questions about this Disclaimer, please contact us at <strong>hello@chesswize.in</strong>.</p>
     </LegalLayout>
   );
 }
