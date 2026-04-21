@@ -93,7 +93,10 @@ import {
   trackLeadStep2,
 } from "@/src/lib/tracking";
 import { buildWhatsAppHref, onWhatsAppClick } from "@/src/lib/whatsapp";
-import { renderTurnstile, removeTurnstile, resetTurnstile } from "@/src/lib/turnstile";
+// Cloudflare Turnstile was previously imported from "@/src/lib/turnstile".
+// It's been removed from the form because the widget was silently failing
+// for Indian mobile users (blank widget area, no error, "Verifying..." stuck
+// forever). Backend defences remain: honeypot, 8s time-gate, origin allowlist.
 
 const ThankYou = lazy(() => import("./pages/ThankYou"));
 
@@ -3122,19 +3125,10 @@ function BottomForm() {
   const leadStartFired = useRef(false);
   const step2Fired = useRef(false);
   const navigate = useNavigate();
-  const turnstileRef = useRef<HTMLDivElement | null>(null);
-  const turnstileWidgetId = useRef<string | null>(null);
-  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
-  const [turnstileError, setTurnstileError] = useState<string | null>(null);
-  // Bump this to force a fresh widget mount after an error/timeout — the old
-  // widget id may be in a stuck state that reset() can't recover from.
-  const [turnstileAttempt, setTurnstileAttempt] = useState(0);
-  // Failsafe: if Turnstile hasn't produced a token within ~8s of step-3
-  // mount (and hasn't errored either), release the lock so the parent can
-  // submit anyway. The form still has the honeypot + time-gate + origin
-  // allowlist on the worker, so we're not wide-open; we just refuse to
-  // leave a real parent stuck staring at a spinner.
-  const [turnstileBypass, setTurnstileBypass] = useState(false);
+  // Turnstile state removed — see import comment. Bot defences are now
+  // entirely server-side: honeypot input (website_url), form duration ≥8s
+  // time-gate, and the worker's origin allowlist. That's what was carrying
+  // the load anyway while Turnstile itself was broken.
 
   const { register, handleSubmit, formState: { errors }, reset, trigger, watch, setValue } = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -3185,68 +3179,7 @@ function BottomForm() {
     return () => sub.unsubscribe();
   }, [watch]);
 
-  // Mount Turnstile only once the user reaches step 3. Lazy-mounting keeps
-  // the challenge iframe out of the initial LP payload and out of the
-  // first paint — Turnstile takes ~200 ms to load and isn't needed earlier.
-  // Re-runs when `turnstileAttempt` bumps so the user can click "Verify
-  // again" after an error/timeout and get a fresh widget mount.
-  useEffect(() => {
-    if (step !== 3) return;
-    const el = turnstileRef.current;
-    if (!el) return;
-    // Clear any content left behind by a prior mount in the same container —
-    // Turnstile appends a hidden input on render(), and rendering twice into
-    // a populated node is what trips error 300030.
-    el.innerHTML = "";
-    let cancelled = false;
-    let widgetId: string | null = null;
-    setTurnstileToken(null);
-    setTurnstileError(null);
-    setTurnstileBypass(false);
-    // Start the failsafe timer. If the widget hasn't yielded a token or
-    // surfaced an error within 8s, let the user proceed without a token.
-    const bypassTimer = window.setTimeout(() => {
-      if (!cancelled) setTurnstileBypass(true);
-    }, 8000);
-    renderTurnstile(
-      el,
-      (token) => {
-        if (!cancelled) {
-          setTurnstileToken(token);
-          setTurnstileError(null);
-        }
-      },
-      () => {
-        if (!cancelled) setTurnstileToken(null);
-      },
-      (code) => {
-        if (!cancelled) {
-          setTurnstileToken(null);
-          setTurnstileError(code ?? "failed");
-        }
-      },
-    ).then((id) => {
-      if (cancelled && id) {
-        removeTurnstile(id);
-      } else {
-        widgetId = id;
-        turnstileWidgetId.current = id;
-      }
-    }).catch((err) => {
-      // Promise-side failure (rare — try/catch inside renderTurnstile should
-      // handle most cases). Surface as an error so the UI offers a retry.
-      if (!cancelled) {
-        setTurnstileToken(null);
-        setTurnstileError(`promise_rejected:${String(err).slice(0, 80)}`);
-      }
-    });
-    return () => {
-      cancelled = true;
-      window.clearTimeout(bypassTimer);
-      if (widgetId) removeTurnstile(widgetId);
-      turnstileWidgetId.current = null;
-    };
-  }, [step, turnstileAttempt]);
+  // Turnstile mount effect removed.
 
   const fireLeadStartOnce = () => {
     if (leadStartFired.current) return;
@@ -3310,7 +3243,8 @@ function BottomForm() {
           ...cleanData,
           js_token: jsToken.current,
           form_duration_s: Math.round(elapsed),
-          turnstile_token: turnstileToken ?? undefined,
+          // turnstile_token intentionally omitted — server allows token-less
+          // submits now that TURNSTILE_SECRET_KEY is unset on the Worker.
           attribution,
         }),
       });
@@ -3360,13 +3294,9 @@ function BottomForm() {
     // so the parent can retry without retyping.
     setStatus("error");
     setSubmitErrorMsg(
-      failureDetail === "turnstile_failed"
-        ? "We couldn't verify your browser. Please try submitting once more — the check usually clears on the second try."
-        : "We couldn't save your details right now. Please try again in a moment — your answers are saved on this page, so nothing's lost."
+      "We couldn't save your details right now. Please try again in a moment — your answers are saved on this page, so nothing's lost."
     );
-    // Turnstile tokens are single-use — reset so the next attempt has a fresh one.
-    setTurnstileToken(null);
-    if (turnstileWidgetId.current) resetTurnstile(turnstileWidgetId.current);
+    void failureDetail;
   };
 
   const inputCls = (hasError: boolean) => `w-full px-4 py-3 text-sm md:text-base border-2 rounded-xl bg-white text-slate-900 font-bold placeholder:text-slate-400 placeholder:font-medium focus:outline-none focus:ring-2 focus:ring-offset-0 transition-all shadow-sm ${hasError ? 'border-red-500 focus:ring-red-500' : 'border-slate-300 focus:border-blue-600 focus:ring-blue-600/20 hover:border-slate-400'}`;
@@ -3642,42 +3572,19 @@ function BottomForm() {
                         </div>
                       </div>
 
-                      {/* Cloudflare Turnstile — managed challenge. Lazy-mounted when
-                          step 3 first appears so it doesn't inflate LCP. Key is
-                          bumped on error so we remount a fresh widget. */}
-                      <div
-                        key={`ts-${turnstileAttempt}`}
-                        ref={turnstileRef}
-                        className="mt-2 flex justify-center"
-                        aria-label="Human verification"
-                      />
-                      {(turnstileError || turnstileBypass) && !turnstileToken && (
-                        <button
-                          type="button"
-                          onClick={() => { setTurnstileBypass(false); setTurnstileAttempt((n) => n + 1); }}
-                          className="mt-1 text-xs font-bold text-blue-700 hover:text-blue-800 underline self-center"
-                        >
-                          Verification {turnstileError ? "didn't complete" : "is taking too long"} — tap to retry
-                        </button>
-                      )}
-
                       <div className="flex gap-3 mt-2">
                         <Button type="button" onClick={() => setStep(2)} variant="outline" className="h-16 px-6 font-bold text-slate-600 border-slate-200 rounded-xl hover:bg-slate-50">
                           <ArrowLeft className="size-4" />
                         </Button>
                         <Button
                           type="submit"
-                          disabled={status === "sending" || (!turnstileToken && !turnstileBypass)}
+                          disabled={status === "sending"}
                           className="flex-1 h-16 text-lg font-extrabold tracking-tight gs-btn gs-btn-primary rounded-xl shadow-xl hover:shadow-2xl hover-lift active:scale-[0.98]"
                         >
                           {status === "sending" ? (
                             <><Loader2 className="size-5 animate-spin mr-2" /> Processing...</>
-                          ) : turnstileToken ? (
-                            <>Lock In Your Evaluation <ArrowRight className="ml-2 size-5" /></>
-                          ) : turnstileBypass ? (
-                            <>Continue anyway <ArrowRight className="ml-2 size-5" /></>
                           ) : (
-                            <><Loader2 className="size-5 animate-spin mr-2" /> Verifying...</>
+                            <>Lock In Your Evaluation <ArrowRight className="ml-2 size-5" /></>
                           )}
                         </Button>
                       </div>
