@@ -3107,14 +3107,15 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
-type Delivery = { leadSaved: boolean; whatsappOpened: boolean };
+type Delivery = { leadSaved: boolean };
+
+const FORM_DRAFT_KEY = "cw.form.draft";
 
 function BottomForm() {
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
   const [spamError, setSpamError] = useState("");
   const [step, setStep] = useState(1);
-  const [delivery, setDelivery] = useState<Delivery>({ leadSaved: false, whatsappOpened: false });
-  const [lastWhatsappUrl, setLastWhatsappUrl] = useState<string | null>(null);
+  const [delivery, setDelivery] = useState<Delivery>({ leadSaved: false });
   const [submitErrorMsg, setSubmitErrorMsg] = useState<string | null>(null);
   const formLoadedAt = useRef(Date.now());
   const jsToken = useRef(Math.random().toString(36).slice(2) + Date.now().toString(36));
@@ -3127,10 +3128,15 @@ function BottomForm() {
 
   const { register, handleSubmit, formState: { errors }, reset, trigger, watch, setValue } = useForm<FormData>({
     resolver: zodResolver(formSchema),
-    mode: "onTouched"
+    mode: "onTouched",
+    // Default phone to +91 since we only run paid in India — saves a tap and
+    // nudges the user into the correct format the backend expects.
+    defaultValues: { phone: "+91 " } as Partial<FormData>,
   });
 
-  // Pre-fill child_age_range if the user picked one in the hero dropdown.
+  // Pre-fill child_age_range if the user picked one in the hero dropdown,
+  // then restore any persisted draft so a failed or reloaded session doesn't
+  // force the parent to retype everything.
   useEffect(() => {
     try {
       const pre = sessionStorage.getItem("cw.hero.age");
@@ -3139,7 +3145,35 @@ function BottomForm() {
         sessionStorage.removeItem("cw.hero.age");
       }
     } catch { /* sessionStorage blocked — no-op */ }
+    try {
+      const raw = localStorage.getItem(FORM_DRAFT_KEY);
+      if (raw) {
+        const draft = JSON.parse(raw) as Partial<FormData>;
+        if (draft && typeof draft === "object") {
+          (Object.keys(draft) as (keyof FormData)[]).forEach((k) => {
+            const v = draft[k];
+            if (v !== undefined && v !== null && v !== "") {
+              setValue(k, v as FormData[typeof k], { shouldValidate: false, shouldDirty: false });
+            }
+          });
+        }
+      }
+    } catch { /* localStorage blocked or malformed — no-op */ }
   }, [setValue]);
+
+  // Persist the in-progress form to localStorage so the parent doesn't lose
+  // typed answers if the server rejects the submit, the tab closes, or they
+  // refresh mid-way. Cleared on successful submission below.
+  useEffect(() => {
+    const sub = watch((values) => {
+      try {
+        const { website_url: _hp, ...safe } = values as Record<string, unknown>;
+        void _hp;
+        localStorage.setItem(FORM_DRAFT_KEY, JSON.stringify(safe));
+      } catch { /* quota or privacy mode — no-op */ }
+    });
+    return () => sub.unsubscribe();
+  }, [watch]);
 
   // Mount Turnstile only once the user reaches step 3. Lazy-mounting keeps
   // the challenge iframe out of the initial LP payload and out of the
@@ -3207,43 +3241,26 @@ function BottomForm() {
 
     setStatus("sending");
     const { website_url: _hp, ...cleanData } = data;
+    void _hp;
 
     /*
-     * Lead-delivery flow:
-     *   1. Open WhatsApp tab synchronously with a pre-filled lead message and
-     *      embedded attribution, so pop-up blockers let it through.
-     *   2. POST to /api/leads → Cloudflare Worker pushes to Zoho CRM + emails
+     * Lead-delivery flow (single-source-of-truth):
+     *   1. POST to /api/leads → Cloudflare Worker pushes to Zoho CRM + emails
      *      counsellor via Resend + fires Meta CAPI Lead (shared event_id).
-     *   3. On success, React-Router-navigate to /thank-you?eid=<uuid>. The
-     *      ThankYou page fires the browser-side fbq Lead with that same
-     *      event_id so Meta dedupes server + browser to a single event.
-     *   4. If the worker call fails but WhatsApp opened, we still degrade to
-     *      the in-place success UI — no Lead event (can't dedupe without id),
-     *      but the lead is still delivered via WhatsApp.
+     *   2. On success, navigate to /thank-you?eid=<uuid>. The ThankYou page
+     *      fires the browser-side fbq Lead with that same event_id so Meta
+     *      dedupes server + browser to a single event.
+     *   3. On failure, we preserve the typed answers and surface a clear
+     *      retry error. We no longer auto-pop a WhatsApp tab — that popup
+     *      was getting blocked by browsers and producing a confusing fallback
+     *      message. The green WhatsApp CTA remains available as a manual
+     *      escape hatch if the parent wants to chat directly.
      */
     const attribution = getAttribution() ?? undefined;
 
-    const goals = Array.isArray(cleanData.parent_concern)
-      ? cleanData.parent_concern.join(", ")
-      : String(cleanData.parent_concern ?? "");
-    const msgLines = [
-      "Hi ChessWize, I'd like to book a free demo:",
-      `• Child: ${cleanData.child_name ?? ""} (${cleanData.child_age_range ?? ""}, ${cleanData.child_level ?? ""})`,
-      `• Parent: ${cleanData.parent_name ?? ""} · ${cleanData.phone ?? ""} · ${cleanData.city ?? ""}`,
-      goals ? `• Goals: ${goals}` : "",
-      cleanData.parent_commitment ? `• Commitment: ${cleanData.parent_commitment}` : "",
-      cleanData.referral_source ? `• Heard via: ${cleanData.referral_source}` : "",
-    ].filter(Boolean);
-    const waUrl = buildWhatsAppHref({
-      source: "form_submit",
-      text: msgLines.join("\n"),
-    });
-    setLastWhatsappUrl(waUrl);
-    const waWindow = window.open(waUrl, "_blank", "noopener,noreferrer");
-    const whatsappOpened = waWindow !== null && !waWindow.closed;
-
     let leadSaved = false;
     let eventId: string | undefined;
+    let failureDetail: string | undefined;
     try {
       const res = await fetch("/api/leads", {
         method: "POST",
@@ -3260,12 +3277,17 @@ function BottomForm() {
       if (res.ok) {
         const payload = await res.json().catch(() => ({} as { event_id?: string }));
         eventId = typeof payload.event_id === "string" ? payload.event_id : undefined;
-      } else if (import.meta.env.DEV) {
-        // eslint-disable-next-line no-console
-        console.warn("[lead] /api/leads returned", res.status);
+      } else {
+        const body = await res.json().catch(() => ({} as { error?: string }));
+        failureDetail = typeof body?.error === "string" ? body.error : `http_${res.status}`;
+        if (import.meta.env.DEV) {
+          // eslint-disable-next-line no-console
+          console.warn("[lead] /api/leads returned", res.status, failureDetail);
+        }
       }
     } catch (err) {
       leadSaved = false;
+      failureDetail = "network";
       if (import.meta.env.DEV) {
         // eslint-disable-next-line no-console
         console.warn("[lead] fetch failed", err);
@@ -3273,28 +3295,37 @@ function BottomForm() {
     }
 
     if (leadSaved && eventId) {
-      // Happy path — navigate to /thank-you so browser+server Lead dedupe.
+      // Happy path — clear the draft, reset the form, navigate to /thank-you
+      // so browser+server Lead dedupe.
+      try { localStorage.removeItem(FORM_DRAFT_KEY); } catch { /* no-op */ }
       reset();
       navigate(`/thank-you?eid=${encodeURIComponent(eventId)}`);
       return;
     }
 
-    // Degraded paths — at least one delivery succeeded but we can't fire Lead.
-    if (leadSaved || whatsappOpened) {
-      setDelivery({ leadSaved, whatsappOpened });
+    if (leadSaved) {
+      // Lead stored but the server didn't return an event_id — rare. Still a
+      // legitimate success from the parent's perspective; keep the draft
+      // cleared and show the success UI.
+      try { localStorage.removeItem(FORM_DRAFT_KEY); } catch { /* no-op */ }
+      setDelivery({ leadSaved: true });
       setStatus("success");
       setStep(4);
       reset();
-    } else {
-      setStatus("error");
-      setSubmitErrorMsg(
-        "We couldn't reach our server and your browser blocked the WhatsApp popup. " +
-          "Please WhatsApp us at +91 70075 78072 or email hello@chesswize.in so we don't miss your request."
-      );
-      // Turnstile tokens are single-use — reset so the next attempt has a fresh one.
-      setTurnstileToken(null);
-      if (turnstileWidgetId.current) resetTurnstile(turnstileWidgetId.current);
+      return;
     }
+
+    // Failure — leave the form populated (localStorage already has the draft)
+    // so the parent can retry without retyping.
+    setStatus("error");
+    setSubmitErrorMsg(
+      failureDetail === "turnstile_failed"
+        ? "We couldn't verify your browser. Please try submitting once more — the check usually clears on the second try."
+        : "We couldn't save your details right now. Please try again in a moment — your answers are saved on this page, so nothing's lost."
+    );
+    // Turnstile tokens are single-use — reset so the next attempt has a fresh one.
+    setTurnstileToken(null);
+    if (turnstileWidgetId.current) resetTurnstile(turnstileWidgetId.current);
   };
 
   const inputCls = (hasError: boolean) => `w-full px-4 py-3 text-sm md:text-base border-2 rounded-xl bg-white text-slate-900 font-bold placeholder:text-slate-400 placeholder:font-medium focus:outline-none focus:ring-2 focus:ring-offset-0 transition-all shadow-sm ${hasError ? 'border-red-500 focus:ring-red-500' : 'border-slate-300 focus:border-blue-600 focus:ring-blue-600/20 hover:border-slate-400'}`;
@@ -3349,20 +3380,16 @@ function BottomForm() {
                   <CheckCircle className="size-10 text-emerald-600" />
                 </div>
                 <h4 className="text-2xl md:text-3xl font-extrabold tracking-tight-gs text-slate-900 mb-3">
-                  {delivery.whatsappOpened ? "Application Received" : "We got your details"}
+                  We got your details
                 </h4>
                 <p className="text-base md:text-lg font-medium text-slate-600 mb-4">
-                  {delivery.whatsappOpened ? (
-                    <>A WhatsApp chat with our counsellor just opened in a new tab — <span className="font-extrabold text-emerald-700">tap Send to confirm your slot instantly</span>.</>
-                  ) : (
-                    <>Our academic counsellor will reach out on the WhatsApp number you shared, usually within a few hours.</>
-                  )}
+                  Our academic counsellor will reach out on the WhatsApp number you shared, usually within a few hours.
                 </p>
                 <p className="text-sm text-slate-500 font-medium mb-5">
                   Your coach will review your answers before the call so the evaluation is tailored to your child from minute one.
                 </p>
                 <a
-                  href={lastWhatsappUrl ?? buildWhatsAppHref({ source: "form_success", text: "Hi, I've just submitted a demo booking on chesswize.in." })}
+                  href={buildWhatsAppHref({ source: "form_success", text: "Hi, I've just submitted a demo booking on chesswize.in." })}
                   onClick={onWhatsAppClick("form_success")}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -3371,7 +3398,7 @@ function BottomForm() {
                   <svg viewBox="0 0 24 24" fill="currentColor" className="size-4" aria-hidden="true">
                     <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
                   </svg>
-                  {delivery.whatsappOpened ? "Reopen WhatsApp chat" : "Chat with us on WhatsApp"}
+                  Chat with us on WhatsApp
                 </a>
               </motion.div>
             ) : (
@@ -3582,8 +3609,14 @@ function BottomForm() {
                         <Button type="button" onClick={() => setStep(2)} variant="outline" className="h-16 px-6 font-bold text-slate-600 border-slate-200 rounded-xl hover:bg-slate-50">
                           <ArrowLeft className="size-4" />
                         </Button>
-                        <Button type="submit" disabled={status === "sending"} className="flex-1 h-16 text-lg font-extrabold tracking-tight gs-btn gs-btn-primary rounded-xl shadow-xl hover:shadow-2xl hover-lift active:scale-[0.98]">
-                          {status === "sending" ? (<><Loader2 className="size-5 animate-spin mr-2" /> Processing...</>) : (<>Lock In Your Evaluation <ArrowRight className="ml-2 size-5" /></>)}
+                        <Button type="submit" disabled={status === "sending" || !turnstileToken} className="flex-1 h-16 text-lg font-extrabold tracking-tight gs-btn gs-btn-primary rounded-xl shadow-xl hover:shadow-2xl hover-lift active:scale-[0.98]">
+                          {status === "sending" ? (
+                            <><Loader2 className="size-5 animate-spin mr-2" /> Processing...</>
+                          ) : !turnstileToken ? (
+                            <><Loader2 className="size-5 animate-spin mr-2" /> Verifying...</>
+                          ) : (
+                            <>Lock In Your Evaluation <ArrowRight className="ml-2 size-5" /></>
+                          )}
                         </Button>
                       </div>
                       
