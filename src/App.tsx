@@ -275,7 +275,16 @@ function Hero() {
                   <select
                     aria-label="Select your child's age range"
                     value={heroAge}
-                    onChange={(e) => setHeroAge(e.target.value)}
+                    onChange={(e) => {
+                      const next = e.target.value;
+                      setHeroAge(next);
+                      // Broadcast the hero's selection to the BottomForm so it
+                      // stays in sync even when the parent scrolls down without
+                      // clicking "Book Free Demo". sessionStorage is the fallback
+                      // for pages where the BottomForm mounts after this fires.
+                      try { sessionStorage.setItem("cw.hero.age", next); } catch { /* sessionStorage blocked */ }
+                      try { window.dispatchEvent(new CustomEvent("cw:hero-age", { detail: next })); } catch { /* CustomEvent unsupported */ }
+                    }}
                     className="w-full px-4 py-3.5 text-sm md:text-base border-2 border-slate-200 rounded-xl bg-white text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all appearance-none cursor-pointer hover:border-slate-300 shadow-sm"
                   >
                     <option value="">Select Child&apos;s Age</option>
@@ -3146,9 +3155,20 @@ function BottomForm() {
       const pre = sessionStorage.getItem("cw.hero.age");
       if (pre) {
         setValue("child_age_range", pre, { shouldValidate: false, shouldDirty: false });
-        sessionStorage.removeItem("cw.hero.age");
+        // Keep sessionStorage populated so scrolling back up and changing the
+        // hero dropdown keeps the BottomForm in sync. Cleared on successful
+        // submit below.
       }
     } catch { /* sessionStorage blocked — no-op */ }
+    // Live-sync: if the parent changes the hero dropdown after the BottomForm
+    // has already mounted, mirror it into the form field immediately.
+    const onHeroAge = (e: Event) => {
+      const detail = (e as CustomEvent<string>).detail;
+      if (typeof detail === "string") {
+        setValue("child_age_range", detail, { shouldValidate: false, shouldDirty: true });
+      }
+    };
+    window.addEventListener("cw:hero-age", onHeroAge);
     try {
       const raw = localStorage.getItem(FORM_DRAFT_KEY);
       if (raw) {
@@ -3163,6 +3183,9 @@ function BottomForm() {
         }
       }
     } catch { /* localStorage blocked or malformed — no-op */ }
+    return () => {
+      window.removeEventListener("cw:hero-age", onHeroAge);
+    };
   }, [setValue]);
 
   // Persist the in-progress form to localStorage so the parent doesn't lose
@@ -3273,6 +3296,7 @@ function BottomForm() {
       // Happy path — clear the draft, reset the form, navigate to /thank-you
       // so browser+server Lead dedupe.
       try { localStorage.removeItem(FORM_DRAFT_KEY); } catch { /* no-op */ }
+      try { sessionStorage.removeItem("cw.hero.age"); } catch { /* no-op */ }
       reset();
       navigate(`/thank-you?eid=${encodeURIComponent(eventId)}`);
       return;
@@ -3283,6 +3307,7 @@ function BottomForm() {
       // legitimate success from the parent's perspective; keep the draft
       // cleared and show the success UI.
       try { localStorage.removeItem(FORM_DRAFT_KEY); } catch { /* no-op */ }
+      try { sessionStorage.removeItem("cw.hero.age"); } catch { /* no-op */ }
       setDelivery({ leadSaved: true });
       setStatus("success");
       setStep(4);
