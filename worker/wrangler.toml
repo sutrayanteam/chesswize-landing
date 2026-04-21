@@ -3,6 +3,10 @@ main = "src/index.ts"
 compatibility_date = "2025-04-01"
 compatibility_flags = ["nodejs_compat"]
 
+# Don't deploy a workers.dev subdomain — this worker only serves
+# chesswize.in/api/* and the routes block below is the sole entry.
+workers_dev = false
+
 # Route the worker under chesswize.in/api/* — same-origin, no CORS needed
 [[routes]]
 pattern = "chesswize.in/api/*"
