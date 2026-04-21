@@ -3129,6 +3129,12 @@ function BottomForm() {
   // Bump this to force a fresh widget mount after an error/timeout — the old
   // widget id may be in a stuck state that reset() can't recover from.
   const [turnstileAttempt, setTurnstileAttempt] = useState(0);
+  // Failsafe: if Turnstile hasn't produced a token within ~8s of step-3
+  // mount (and hasn't errored either), release the lock so the parent can
+  // submit anyway. The form still has the honeypot + time-gate + origin
+  // allowlist on the worker, so we're not wide-open; we just refuse to
+  // leave a real parent stuck staring at a spinner.
+  const [turnstileBypass, setTurnstileBypass] = useState(false);
 
   const { register, handleSubmit, formState: { errors }, reset, trigger, watch, setValue } = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -3196,6 +3202,12 @@ function BottomForm() {
     let widgetId: string | null = null;
     setTurnstileToken(null);
     setTurnstileError(null);
+    setTurnstileBypass(false);
+    // Start the failsafe timer. If the widget hasn't yielded a token or
+    // surfaced an error within 8s, let the user proceed without a token.
+    const bypassTimer = window.setTimeout(() => {
+      if (!cancelled) setTurnstileBypass(true);
+    }, 8000);
     renderTurnstile(
       el,
       (token) => {
@@ -3220,9 +3232,17 @@ function BottomForm() {
         widgetId = id;
         turnstileWidgetId.current = id;
       }
+    }).catch((err) => {
+      // Promise-side failure (rare — try/catch inside renderTurnstile should
+      // handle most cases). Surface as an error so the UI offers a retry.
+      if (!cancelled) {
+        setTurnstileToken(null);
+        setTurnstileError(`promise_rejected:${String(err).slice(0, 80)}`);
+      }
     });
     return () => {
       cancelled = true;
+      window.clearTimeout(bypassTimer);
       if (widgetId) removeTurnstile(widgetId);
       turnstileWidgetId.current = null;
     };
@@ -3631,13 +3651,13 @@ function BottomForm() {
                         className="mt-2 flex justify-center"
                         aria-label="Human verification"
                       />
-                      {turnstileError && (
+                      {(turnstileError || turnstileBypass) && !turnstileToken && (
                         <button
                           type="button"
-                          onClick={() => setTurnstileAttempt((n) => n + 1)}
+                          onClick={() => { setTurnstileBypass(false); setTurnstileAttempt((n) => n + 1); }}
                           className="mt-1 text-xs font-bold text-blue-700 hover:text-blue-800 underline self-center"
                         >
-                          Verification didn't complete — tap to retry
+                          Verification {turnstileError ? "didn't complete" : "is taking too long"} — tap to retry
                         </button>
                       )}
 
@@ -3647,17 +3667,17 @@ function BottomForm() {
                         </Button>
                         <Button
                           type="submit"
-                          disabled={status === "sending" || !turnstileToken}
+                          disabled={status === "sending" || (!turnstileToken && !turnstileBypass)}
                           className="flex-1 h-16 text-lg font-extrabold tracking-tight gs-btn gs-btn-primary rounded-xl shadow-xl hover:shadow-2xl hover-lift active:scale-[0.98]"
                         >
                           {status === "sending" ? (
                             <><Loader2 className="size-5 animate-spin mr-2" /> Processing...</>
-                          ) : turnstileError ? (
-                            <>Verification failed — retry above</>
-                          ) : !turnstileToken ? (
-                            <><Loader2 className="size-5 animate-spin mr-2" /> Verifying...</>
-                          ) : (
+                          ) : turnstileToken ? (
                             <>Lock In Your Evaluation <ArrowRight className="ml-2 size-5" /></>
+                          ) : turnstileBypass ? (
+                            <>Continue anyway <ArrowRight className="ml-2 size-5" /></>
+                          ) : (
+                            <><Loader2 className="size-5 animate-spin mr-2" /> Verifying...</>
                           )}
                         </Button>
                       </div>

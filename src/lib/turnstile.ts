@@ -66,22 +66,27 @@ export async function renderTurnstile(
     onError?.("script_unavailable");
     return null;
   }
-  return api.render(container, {
-    sitekey: DEFAULT_SITE_KEY,
-    action: "lead_submit",
-    callback: onToken,
-    "expired-callback": onExpire,
-    // error / timeout paths were previously unhandled — a failed challenge
-    // left the caller stuck with a null token (= "Verifying..." forever).
-    // Bubble both up so the form can offer a retry.
-    "error-callback": (code?: string) => { onError?.(code); },
-    "timeout-callback": () => { onError?.("timeout"); },
-    theme: "light",
-    // "flexible" renders differently in different containers and, in practice,
-    // has caused silent no-render on the mobile form layout. "normal" is the
-    // stock checkbox widget and behaves consistently.
-    size: "normal",
-  });
+  // turnstile.render() can throw synchronously on bad sitekey / duplicate
+  // render / CF edge issues. Without this catch, the error vanishes and the
+  // caller is left with token=null, error=null — the infamous "Verifying..."
+  // deadlock. Surface it via onError instead.
+  try {
+    return api.render(container, {
+      sitekey: DEFAULT_SITE_KEY,
+      action: "lead_submit",
+      callback: onToken,
+      "expired-callback": onExpire,
+      "error-callback": (code?: string) => { onError?.(code); },
+      "timeout-callback": () => { onError?.("timeout"); },
+      theme: "light",
+      // "flexible" has caused silent no-render on mobile layouts;
+      // "normal" is the stock checkbox widget and renders reliably.
+      size: "normal",
+    });
+  } catch (err) {
+    onError?.(`render_threw:${String(err).slice(0, 80)}`);
+    return null;
+  }
 }
 
 export async function removeTurnstile(widgetId: string): Promise<void> {
