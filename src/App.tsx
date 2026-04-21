@@ -3092,7 +3092,7 @@ function FAQ() {
 const formSchema = z.object({
   /* Step 1 — minimum viable lead (required) */
   parent_name: z.string().min(2, "Parent's name must be at least 2 characters"),
-  phone: z.string().regex(/^\+?[0-9\s-]{10,15}$/, "Please enter a valid phone number"),
+  phone: z.string().regex(/^\+?[0-9\s-]{10,20}$/, "Please enter a valid phone number"),
   child_age_range: z.string().min(1, "Please select your child's age group"),
   child_level: z.string().min(1, "Please select an estimated level"),
   /* Step 2 & 3 — enrichment fields (optional; submit works with just Step 1) */
@@ -3125,6 +3125,10 @@ function BottomForm() {
   const turnstileRef = useRef<HTMLDivElement | null>(null);
   const turnstileWidgetId = useRef<string | null>(null);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileError, setTurnstileError] = useState<string | null>(null);
+  // Bump this to force a fresh widget mount after an error/timeout — the old
+  // widget id may be in a stuck state that reset() can't recover from.
+  const [turnstileAttempt, setTurnstileAttempt] = useState(0);
 
   const { register, handleSubmit, formState: { errors }, reset, trigger, watch, setValue } = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -3178,19 +3182,36 @@ function BottomForm() {
   // Mount Turnstile only once the user reaches step 3. Lazy-mounting keeps
   // the challenge iframe out of the initial LP payload and out of the
   // first paint — Turnstile takes ~200 ms to load and isn't needed earlier.
+  // Re-runs when `turnstileAttempt` bumps so the user can click "Verify
+  // again" after an error/timeout and get a fresh widget mount.
   useEffect(() => {
     if (step !== 3) return;
     const el = turnstileRef.current;
     if (!el) return;
+    // Clear any content left behind by a prior mount in the same container —
+    // Turnstile appends a hidden input on render(), and rendering twice into
+    // a populated node is what trips error 300030.
+    el.innerHTML = "";
     let cancelled = false;
     let widgetId: string | null = null;
+    setTurnstileToken(null);
+    setTurnstileError(null);
     renderTurnstile(
       el,
       (token) => {
-        if (!cancelled) setTurnstileToken(token);
+        if (!cancelled) {
+          setTurnstileToken(token);
+          setTurnstileError(null);
+        }
       },
       () => {
         if (!cancelled) setTurnstileToken(null);
+      },
+      (code) => {
+        if (!cancelled) {
+          setTurnstileToken(null);
+          setTurnstileError(code ?? "failed");
+        }
       },
     ).then((id) => {
       if (cancelled && id) {
@@ -3205,7 +3226,7 @@ function BottomForm() {
       if (widgetId) removeTurnstile(widgetId);
       turnstileWidgetId.current = null;
     };
-  }, [step]);
+  }, [step, turnstileAttempt]);
 
   const fireLeadStartOnce = () => {
     if (leadStartFired.current) return;
@@ -3601,17 +3622,38 @@ function BottomForm() {
                         </div>
                       </div>
 
-                      {/* Cloudflare Turnstile — invisible/managed challenge. Lazy-mounted
-                          when step 3 first appears so it doesn't inflate LCP. */}
-                      <div ref={turnstileRef} className="mt-2 flex justify-center" aria-label="Human verification" />
+                      {/* Cloudflare Turnstile — managed challenge. Lazy-mounted when
+                          step 3 first appears so it doesn't inflate LCP. Key is
+                          bumped on error so we remount a fresh widget. */}
+                      <div
+                        key={`ts-${turnstileAttempt}`}
+                        ref={turnstileRef}
+                        className="mt-2 flex justify-center"
+                        aria-label="Human verification"
+                      />
+                      {turnstileError && (
+                        <button
+                          type="button"
+                          onClick={() => setTurnstileAttempt((n) => n + 1)}
+                          className="mt-1 text-xs font-bold text-blue-700 hover:text-blue-800 underline self-center"
+                        >
+                          Verification didn't complete — tap to retry
+                        </button>
+                      )}
 
                       <div className="flex gap-3 mt-2">
                         <Button type="button" onClick={() => setStep(2)} variant="outline" className="h-16 px-6 font-bold text-slate-600 border-slate-200 rounded-xl hover:bg-slate-50">
                           <ArrowLeft className="size-4" />
                         </Button>
-                        <Button type="submit" disabled={status === "sending" || !turnstileToken} className="flex-1 h-16 text-lg font-extrabold tracking-tight gs-btn gs-btn-primary rounded-xl shadow-xl hover:shadow-2xl hover-lift active:scale-[0.98]">
+                        <Button
+                          type="submit"
+                          disabled={status === "sending" || !turnstileToken}
+                          className="flex-1 h-16 text-lg font-extrabold tracking-tight gs-btn gs-btn-primary rounded-xl shadow-xl hover:shadow-2xl hover-lift active:scale-[0.98]"
+                        >
                           {status === "sending" ? (
                             <><Loader2 className="size-5 animate-spin mr-2" /> Processing...</>
+                          ) : turnstileError ? (
+                            <>Verification failed — retry above</>
                           ) : !turnstileToken ? (
                             <><Loader2 className="size-5 animate-spin mr-2" /> Verifying...</>
                           ) : (

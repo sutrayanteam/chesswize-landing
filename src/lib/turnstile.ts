@@ -54,16 +54,33 @@ export function turnstileReady(): Promise<TurnstileApi | null> {
   });
 }
 
-export async function renderTurnstile(container: HTMLElement, onToken: (t: string) => void, onExpire?: () => void): Promise<string | null> {
+export async function renderTurnstile(
+  container: HTMLElement,
+  onToken: (t: string) => void,
+  onExpire?: () => void,
+  onError?: (code?: string) => void,
+): Promise<string | null> {
   const api = await turnstileReady();
-  if (!api) return null;
+  if (!api) {
+    // Script never loaded at all — surface as an error so the UI can recover.
+    onError?.("script_unavailable");
+    return null;
+  }
   return api.render(container, {
     sitekey: DEFAULT_SITE_KEY,
     action: "lead_submit",
     callback: onToken,
     "expired-callback": onExpire,
+    // error / timeout paths were previously unhandled — a failed challenge
+    // left the caller stuck with a null token (= "Verifying..." forever).
+    // Bubble both up so the form can offer a retry.
+    "error-callback": (code?: string) => { onError?.(code); },
+    "timeout-callback": () => { onError?.("timeout"); },
     theme: "light",
-    size: "flexible",
+    // "flexible" renders differently in different containers and, in practice,
+    // has caused silent no-render on the mobile form layout. "normal" is the
+    // stock checkbox widget and behaves consistently.
+    size: "normal",
   });
 }
 
