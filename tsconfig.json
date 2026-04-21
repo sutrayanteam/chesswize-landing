@@ -26,6 +26,7 @@
   "exclude": [
     "node_modules",
     "dist",
-    "src/backups"
+    "src/backups",
+    "worker"
   ]
 }

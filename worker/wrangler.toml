@@ -31,6 +31,12 @@ enabled = true
 #   NOTIFY_EMAIL            — internal inbox that receives new-lead emails
 #   FROM_EMAIL              — verified sender, e.g. "ChessWize <noreply@chesswize.in>"
 #
+# Required for Meta Conversions API (server-side Lead events):
+#   META_CAPI_TOKEN         — Events Manager → Pixel → Conversions API →
+#                              "Generate Access Token". Never commit.
+#   META_TEST_EVENT_CODE    — OPTIONAL, only during QA. Copy from Events
+#                              Manager → Test Events. Remove in production.
+#
 # Optional:
 #   ALLOWED_ORIGINS         — comma-separated (default: chesswize.in,www.chesswize.in)
 
@@ -49,3 +55,6 @@ FROM_EMAIL = "ChessWize <noreply@updates.chesswize.in>"
 # email. A failure for one doesn't block the others.
 NOTIFY_EMAIL = "support@chesswize.com,chesswize79@gmail.com"
 ALLOWED_ORIGINS = "chesswize.in,www.chesswize.in,localhost"
+
+# Meta Pixel ID — public, safe to commit. Matches fbq('init', ...) in index.html.
+META_PIXEL_ID = "1315250227040245"

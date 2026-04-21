@@ -2,14 +2,18 @@
  * ChessWize Lead-capture Worker
  *
  * Runs on chesswize.in/api/*. Handles:
- *   POST /api/leads       — creates Zoho CRM Lead + emails counsellor via Resend
+ *   POST /api/leads       — creates Zoho CRM Lead + emails counsellor via
+ *                           Resend + fires Meta Conversions API Lead event
  *   GET  /api/health      — returns worker status + which integrations are wired
  *
  * Fails gracefully: if Zoho env vars aren't set, the lead is still emailed.
  * If Resend isn't set, the lead is still pushed to Zoho. If neither is set,
  * the worker returns 200 with `stored: false` so the frontend's WhatsApp
- * fallback kicks in for the user-facing confirmation.
+ * fallback kicks in for the user-facing confirmation. CAPI is always fired
+ * via ctx.waitUntil so a slow Meta endpoint never delays the user response.
  */
+
+import { capiConfigured, sendCapiLead } from "./lib/capi";
 
 export interface Env {
   // Zoho
@@ -23,6 +27,11 @@ export interface Env {
   RESEND_API_KEY?: string;
   FROM_EMAIL?: string;
   NOTIFY_EMAIL?: string;
+
+  // Meta Conversions API
+  META_PIXEL_ID?: string;        // "1315250227040245" — defaulted in wrangler.toml [vars]
+  META_CAPI_TOKEN?: string;      // wrangler secret put META_CAPI_TOKEN
+  META_TEST_EVENT_CODE?: string; // optional, wrangler secret put — remove in prod
 
   // Misc
   ALLOWED_ORIGINS?: string;
@@ -46,6 +55,22 @@ interface LeadBody {
   website_url?: string;
   // Anti-spam
   form_duration_s?: number;
+  // First-touch attribution captured client-side (src/lib/attribution.ts)
+  attribution?: LeadAttribution;
+}
+
+interface LeadAttribution {
+  fbp?: string;
+  fbc?: string;
+  fbclid?: string;
+  gclid?: string;
+  utm_source?: string;
+  utm_medium?: string;
+  utm_campaign?: string;
+  utm_content?: string;
+  utm_term?: string;
+  landing_page?: string;
+  referrer?: string;
 }
 
 const json = (data: unknown, init: ResponseInit = {}) =>
@@ -75,6 +100,22 @@ function strArr(v: unknown, maxItems = 20, maxEach = 200): string[] | undefined 
   return out;
 }
 
+function validateAttribution(raw: unknown): LeadAttribution | undefined {
+  if (!raw || typeof raw !== "object") return undefined;
+  const r = raw as Record<string, unknown>;
+  const out: LeadAttribution = {};
+  const keys: (keyof LeadAttribution)[] = [
+    "fbp", "fbc", "fbclid", "gclid",
+    "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term",
+    "landing_page", "referrer",
+  ];
+  for (const k of keys) {
+    const v = str(r[k], 500);
+    if (v) out[k] = v;
+  }
+  return Object.keys(out).length > 0 ? out : undefined;
+}
+
 function validateLead(raw: unknown): { ok: true; value: LeadBody } | { ok: false; reason: string } {
   if (!raw || typeof raw !== "object") return { ok: false, reason: "not_object" };
   const r = raw as Record<string, unknown>;
@@ -97,6 +138,7 @@ function validateLead(raw: unknown): { ok: true; value: LeadBody } | { ok: false
     parent_concern: Array.isArray(r.parent_concern) ? strArr(r.parent_concern) : str(r.parent_concern as unknown, 200),
     website_url: str(r.website_url, 200),
     form_duration_s: typeof r.form_duration_s === "number" ? r.form_duration_s : undefined,
+    attribution: validateAttribution(r.attribution),
   };
 
   return { ok: true, value };
@@ -263,7 +305,7 @@ function escapeHtml(s: string): string {
 
 /* ────────────────────────────── Handlers ────────────────────────────── */
 
-async function handleLead(request: Request, env: Env): Promise<Response> {
+async function handleLead(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
   const origin = request.headers.get("origin");
   if (origin && !originAllowed(env, origin)) {
     return json({ ok: false, error: "origin_blocked" }, { status: 403 });
@@ -295,6 +337,10 @@ async function handleLead(request: Request, env: Env): Promise<Response> {
     return json({ ok: false, error: "too_fast" }, { status: 429 });
   }
 
+  // Server-generated event_id — shared with the browser fbq Lead so Meta
+  // dedupes the two into a single Lead in the dashboard.
+  const eventId = crypto.randomUUID();
+
   const [zoho, email] = await Promise.allSettled([
     pushLeadToZoho(env, lead),
     sendLeadEmail(env, lead),
@@ -303,9 +349,40 @@ async function handleLead(request: Request, env: Env): Promise<Response> {
   const zohoOk = zoho.status === "fulfilled" && zoho.value.ok;
   const emailOk = email.status === "fulfilled" && email.value.ok;
 
+  // Fire Meta CAPI without blocking the user response. ctx.waitUntil lets
+  // the worker stay alive long enough to finish the Meta POST.
+  if (capiConfigured(env)) {
+    const origin = request.headers.get("origin") || "https://chesswize.in";
+    const eventSourceUrl = `${origin.replace(/\/+$/, "")}/thank-you`;
+    const clientIp =
+      request.headers.get("cf-connecting-ip") ||
+      request.headers.get("x-real-ip") ||
+      undefined;
+    const clientUserAgent = request.headers.get("user-agent") ?? undefined;
+    ctx.waitUntil(
+      sendCapiLead(env, {
+        eventId,
+        eventSourceUrl,
+        clientIp,
+        clientUserAgent,
+        attribution: lead.attribution,
+        parentName: lead.parent_name,
+        parentEmail: lead.parent_email,
+        phone: lead.phone,
+        city: lead.city,
+      }).then((r) => {
+        if (!r.ok) {
+          // eslint-disable-next-line no-console
+          console.warn("[capi] lead send failed", r.status, r.detail);
+        }
+      }),
+    );
+  }
+
   return json({
     ok: true,
     stored: zohoOk || emailOk,
+    event_id: eventId,
     zoho: zoho.status === "fulfilled" ? zoho.value : { ok: false, error: "rejected" },
     email: email.status === "fulfilled" ? email.value : { ok: false, error: "rejected" },
   });
@@ -318,13 +395,14 @@ function handleHealth(env: Env): Response {
     integrations: {
       zoho: zohoConfigured(env) ? "configured" : "missing_env",
       resend: resendConfigured(env) ? "configured" : "missing_env",
+      meta_capi: capiConfigured(env) ? "configured" : "missing_env",
     },
     ts: new Date().toISOString(),
   });
 }
 
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
 
     // CORS preflight — only echo the origin back if it's on the allowlist.
@@ -350,7 +428,7 @@ export default {
       return handleHealth(env);
     }
     if (request.method === "POST" && url.pathname === "/api/leads") {
-      const res = await handleLead(request, env);
+      const res = await handleLead(request, env, ctx);
       // If cross-origin allow it
       const origin = request.headers.get("origin");
       if (origin && originAllowed(env, origin)) {

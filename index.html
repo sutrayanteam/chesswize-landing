@@ -65,14 +65,23 @@
     </script>
 
     <!--
-      === Analytics / Pixels ===
-      Tracking snippets removed until real IDs are wired in.
-      When available, drop the GTM / Meta Pixel / Clarity snippets here with real IDs.
-      Placeholder IDs (GTM-XXXXXXX etc.) were loading vendor scripts for nothing and
-      cost ~200-400ms on first paint. Kept as a clean no-op until you ship real IDs.
+      === Meta Pixel — pixel ID 1315250227040245 (chesswize 30-12) ===
+      Async, no render-blocking. Fires the initial PageView immediately so
+      the very first hit from an ad is tracked even if the React bundle is
+      still loading. SPA route changes fire additional PageView calls via
+      src/lib/tracking.ts after bootstrap.
     -->
+    <script>
+      !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init','1315250227040245');
+      fbq('track','PageView');
+    </script>
   </head>
   <body>
+    <!-- Meta Pixel noscript fallback — must live in body per HTML spec -->
+    <noscript>
+      <img height="1" width="1" style="display:none" alt="" src="https://www.facebook.com/tr?id=1315250227040245&ev=PageView&noscript=1" />
+    </noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

@@ -81,10 +81,20 @@ const CookiePolicy = lazy(() => import("./pages/Legal").then((m) => ({ default: 
 const Disclaimer = lazy(() => import("./pages/Legal").then((m) => ({ default: m.Disclaimer })));
 import { Toaster, toast } from "sonner";
 // BrowserRouter is mounted in main.tsx; App.tsx only needs Routes/Route/Link.
-import { Routes, Route, Link } from "react-router-dom";
+import { Routes, Route, Link, useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { captureAttribution, getAttribution } from "@/src/lib/attribution";
+import {
+  trackPageView,
+  trackViewContent,
+  trackLeadFormStart,
+  trackLeadStep2,
+} from "@/src/lib/tracking";
+import { buildWhatsAppHref, onWhatsAppClick } from "@/src/lib/whatsapp";
+
+const ThankYou = lazy(() => import("./pages/ThankYou"));
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -286,7 +296,8 @@ function Hero() {
               </div>
               {/* Secondary WhatsApp CTA */}
               <a
-                href="https://wa.me/917007578072?text=Hi%2C%20I%27d%20like%20to%20book%20a%20free%20demo%20for%20my%20child."
+                href={buildWhatsAppHref({ source: "hero" })}
+                onClick={onWhatsAppClick("hero")}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-3 flex items-center justify-center gap-2 h-11 md:h-12 w-full rounded-xl border-2 border-emerald-500 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 font-bold text-xs md:text-sm transition-all"
@@ -3106,6 +3117,9 @@ function BottomForm() {
   const [submitErrorMsg, setSubmitErrorMsg] = useState<string | null>(null);
   const formLoadedAt = useRef(Date.now());
   const jsToken = useRef(Math.random().toString(36).slice(2) + Date.now().toString(36));
+  const leadStartFired = useRef(false);
+  const step2Fired = useRef(false);
+  const navigate = useNavigate();
 
   const { register, handleSubmit, formState: { errors }, reset, trigger, watch, setValue } = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -3123,9 +3137,21 @@ function BottomForm() {
     } catch { /* sessionStorage blocked — no-op */ }
   }, [setValue]);
 
+  const fireLeadStartOnce = () => {
+    if (leadStartFired.current) return;
+    leadStartFired.current = true;
+    trackLeadFormStart();
+  };
+
   const handleNextStep = async (fieldsToValidate: (keyof FormData)[]) => {
     const isValid = await trigger(fieldsToValidate);
     if (isValid) {
+      // When advancing past step 1 the user has completed the minimum-viable
+      // lead fields — fire the LeadStep2 custom event (for retargeting) once.
+      if (step === 1 && !step2Fired.current) {
+        step2Fired.current = true;
+        trackLeadStep2();
+      }
       setStep((prev) => prev + 1);
     }
   };
@@ -3148,38 +3174,40 @@ function BottomForm() {
 
     /*
      * Lead-delivery flow:
-     *   1. POST to /api/leads → Cloudflare Worker pushes to Zoho CRM + emails
-     *      counsellor via Resend. (Primary persistent capture.)
-     *   2. Always open wa.me in a new tab with a pre-filled lead message so the
-     *      parent can tap Send and our counsellor gets an inbound WhatsApp
-     *      immediately. (Secondary real-time delivery.)
-     *   3. If the worker call fails, the WhatsApp step still runs so we never
-     *      lose the lead.
+     *   1. Open WhatsApp tab synchronously with a pre-filled lead message and
+     *      embedded attribution, so pop-up blockers let it through.
+     *   2. POST to /api/leads → Cloudflare Worker pushes to Zoho CRM + emails
+     *      counsellor via Resend + fires Meta CAPI Lead (shared event_id).
+     *   3. On success, React-Router-navigate to /thank-you?eid=<uuid>. The
+     *      ThankYou page fires the browser-side fbq Lead with that same
+     *      event_id so Meta dedupes server + browser to a single event.
+     *   4. If the worker call fails but WhatsApp opened, we still degrade to
+     *      the in-place success UI — no Lead event (can't dedupe without id),
+     *      but the lead is still delivered via WhatsApp.
      */
-    const buildWhatsAppUrl = () => {
-      const goals = Array.isArray(cleanData.parent_concern)
-        ? cleanData.parent_concern.join(", ")
-        : String(cleanData.parent_concern ?? "");
-      const msgLines = [
-        "Hi ChessWize, I'd like to book a free demo:",
-        `• Child: ${cleanData.child_name ?? ""} (${cleanData.child_age_range ?? ""}, ${cleanData.child_level ?? ""})`,
-        `• Parent: ${cleanData.parent_name ?? ""} · ${cleanData.phone ?? ""} · ${cleanData.city ?? ""}`,
-        goals ? `• Goals: ${goals}` : "",
-        cleanData.parent_commitment ? `• Commitment: ${cleanData.parent_commitment}` : "",
-        cleanData.referral_source ? `• Heard via: ${cleanData.referral_source}` : "",
-      ].filter(Boolean);
-      return `https://wa.me/917007578072?text=${encodeURIComponent(msgLines.join("\n"))}`;
-    };
+    const attribution = getAttribution() ?? undefined;
 
-    /* Open the WhatsApp tab synchronously from the click handler so pop-up
-     * blockers let it through. We do this BEFORE the fetch so it's never
-     * swallowed by an async rejection path. */
-    const waUrl = buildWhatsAppUrl();
+    const goals = Array.isArray(cleanData.parent_concern)
+      ? cleanData.parent_concern.join(", ")
+      : String(cleanData.parent_concern ?? "");
+    const msgLines = [
+      "Hi ChessWize, I'd like to book a free demo:",
+      `• Child: ${cleanData.child_name ?? ""} (${cleanData.child_age_range ?? ""}, ${cleanData.child_level ?? ""})`,
+      `• Parent: ${cleanData.parent_name ?? ""} · ${cleanData.phone ?? ""} · ${cleanData.city ?? ""}`,
+      goals ? `• Goals: ${goals}` : "",
+      cleanData.parent_commitment ? `• Commitment: ${cleanData.parent_commitment}` : "",
+      cleanData.referral_source ? `• Heard via: ${cleanData.referral_source}` : "",
+    ].filter(Boolean);
+    const waUrl = buildWhatsAppHref({
+      source: "form_submit",
+      text: msgLines.join("\n"),
+    });
     setLastWhatsappUrl(waUrl);
     const waWindow = window.open(waUrl, "_blank", "noopener,noreferrer");
     const whatsappOpened = waWindow !== null && !waWindow.closed;
 
     let leadSaved = false;
+    let eventId: string | undefined;
     try {
       const res = await fetch("/api/leads", {
         method: "POST",
@@ -3188,10 +3216,14 @@ function BottomForm() {
           ...cleanData,
           js_token: jsToken.current,
           form_duration_s: Math.round(elapsed),
+          attribution,
         }),
       });
       leadSaved = res.ok;
-      if (!res.ok && import.meta.env.DEV) {
+      if (res.ok) {
+        const payload = await res.json().catch(() => ({} as { event_id?: string }));
+        eventId = typeof payload.event_id === "string" ? payload.event_id : undefined;
+      } else if (import.meta.env.DEV) {
         // eslint-disable-next-line no-console
         console.warn("[lead] /api/leads returned", res.status);
       }
@@ -3203,9 +3235,14 @@ function BottomForm() {
       }
     }
 
-    // Only treat as success if at least ONE delivery path worked.
-    // If both failed, we must surface an error so the user knows to retry
-    // or contact us directly — silent failure loses paying customers.
+    if (leadSaved && eventId) {
+      // Happy path — navigate to /thank-you so browser+server Lead dedupe.
+      reset();
+      navigate(`/thank-you?eid=${encodeURIComponent(eventId)}`);
+      return;
+    }
+
+    // Degraded paths — at least one delivery succeeded but we can't fire Lead.
     if (leadSaved || whatsappOpened) {
       setDelivery({ leadSaved, whatsappOpened });
       setStatus("success");
@@ -3285,7 +3322,8 @@ function BottomForm() {
                   Your coach will review your answers before the call so the evaluation is tailored to your child from minute one.
                 </p>
                 <a
-                  href={lastWhatsappUrl ?? "https://wa.me/917007578072?text=Hi%2C%20I%27ve%20just%20submitted%20a%20demo%20booking%20on%20chesswize.in"}
+                  href={lastWhatsappUrl ?? buildWhatsAppHref({ source: "form_success", text: "Hi, I've just submitted a demo booking on chesswize.in." })}
+                  onClick={onWhatsAppClick("form_success")}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center justify-center gap-2 h-12 px-6 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-sm shadow-lg transition-all active:scale-[0.98]"
@@ -3297,7 +3335,7 @@ function BottomForm() {
                 </a>
               </motion.div>
             ) : (
-              <motion.form key="form" initial="hidden" animate="visible" exit="exit" variants={stepVariants} onSubmit={handleSubmit(onSubmit)} className="flex flex-col relative z-10 w-full">
+              <motion.form key="form" initial="hidden" animate="visible" exit="exit" variants={stepVariants} onSubmit={handleSubmit(onSubmit)} onFocus={fireLeadStartOnce} onInput={fireLeadStartOnce} className="flex flex-col relative z-10 w-full">
                 
                 {/* Progress Bar */}
                 <div className="w-full h-1.5 bg-slate-100 rounded-full mb-6 overflow-hidden">
@@ -3530,7 +3568,6 @@ function BottomForm() {
 }
 
 function WhatsAppWidget() {
-  const WA_HREF = "https://wa.me/917007578072?text=Hi%2C%20I%27d%20like%20to%20book%20a%20free%20demo%20for%20my%20child.";
   // Hide the pill while the hero is on-screen so it doesn't occlude the
   // hero video's own CTA. Show once user has scrolled past 700px.
   const [visible, setVisible] = useState(false);
@@ -3543,7 +3580,8 @@ function WhatsAppWidget() {
   if (!visible) return null;
   return (
     <a
-      href={WA_HREF}
+      href={buildWhatsAppHref({ source: "widget" })}
+      onClick={onWhatsAppClick("widget")}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Chat with an academic counselor on WhatsApp"
@@ -3593,7 +3631,8 @@ function Footer() {
                 Book Free Demo <ArrowRight className="ml-2 size-4" />
               </Button>
               <a
-                href="https://wa.me/917007578072?text=Hi%2C%20I%27d%20like%20to%20book%20a%20free%20demo%20for%20my%20child."
+                href={buildWhatsAppHref({ source: "footer_bento" })}
+                onClick={onWhatsAppClick("footer_bento")}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="h-12 md:h-13 inline-flex items-center justify-center gap-2 px-6 rounded-xl border border-emerald-500/40 text-emerald-400 hover:text-white hover:bg-emerald-500 hover:border-emerald-500 font-extrabold text-sm md:text-base transition-all"
@@ -3651,7 +3690,8 @@ function Footer() {
                 <Linkedin className="size-4" />
               </a>
               <a
-                href="https://wa.me/917007578072?text=Hi%2C%20I%27d%20like%20to%20book%20a%20free%20demo%20for%20my%20child."
+                href={buildWhatsAppHref({ source: "footer_social" })}
+                onClick={onWhatsAppClick("footer_social")}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="ChessWize on WhatsApp"
@@ -3786,7 +3826,8 @@ function MobileStickyCTA() {
               Book Free Demo
             </Button>
             <a
-              href="https://wa.me/917007578072?text=Hi%2C%20I%27d%20like%20to%20book%20a%20free%20demo%20for%20my%20child."
+              href={buildWhatsAppHref({ source: "sticky_mobile" })}
+              onClick={onWhatsAppClick("sticky_mobile")}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Chat on WhatsApp"
@@ -4160,15 +4201,78 @@ function LandingPage() {
 
 const LegalFallback = () => <div className="min-h-screen bg-slate-50" aria-busy="true" />;
 
+/**
+ * RouteTracker — wired at the root of the Routes tree. Fires fbq PageView on
+ * every SPA navigation (not just the initial HTML load), captures first-touch
+ * attribution on first mount, and arms the ViewContent trigger (3s dwell OR
+ * 25% scroll, whichever first — once per session).
+ */
+function RouteTracker() {
+  const { pathname, search } = useLocation();
+
+  // First-touch attribution — only writes on first landing; no-op thereafter.
+  useEffect(() => {
+    captureAttribution();
+  }, []);
+
+  // SPA route-change PageView. index.html fires the initial PageView
+  // synchronously, so skip the very first mount to avoid a double-count.
+  const first = useRef(true);
+  useEffect(() => {
+    if (first.current) {
+      first.current = false;
+      return;
+    }
+    trackPageView();
+  }, [pathname, search]);
+
+  // ViewContent — 3s dwell OR 25% scroll, fires once per session. Skips
+  // non-landing routes entirely (legal/thank-you have their own intent signal).
+  useEffect(() => {
+    if (pathname !== "/") return;
+    try {
+      if (sessionStorage.getItem("cw_vc_fired")) return;
+    } catch { /* ignore */ }
+
+    let fired = false;
+    const fire = () => {
+      if (fired) return;
+      fired = true;
+      try { sessionStorage.setItem("cw_vc_fired", "1"); } catch { /* ignore */ }
+      trackViewContent();
+      cleanup();
+    };
+
+    const timer = window.setTimeout(fire, 3000);
+    const onScroll = () => {
+      const h = document.documentElement;
+      const scrolled = (window.scrollY + window.innerHeight) / Math.max(h.scrollHeight, 1);
+      if (scrolled >= 0.25) fire();
+    };
+    const cleanup = () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("scroll", onScroll);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return cleanup;
+  }, [pathname]);
+
+  return null;
+}
+
 export default function App() {
   return (
-    <Routes>
-      <Route path="/" element={<LandingPage />} />
-      <Route path="/privacy-policy" element={<Suspense fallback={<LegalFallback />}><PrivacyPolicy /></Suspense>} />
-      <Route path="/terms" element={<Suspense fallback={<LegalFallback />}><TermsOfService /></Suspense>} />
-      <Route path="/refund-policy" element={<Suspense fallback={<LegalFallback />}><RefundPolicy /></Suspense>} />
-      <Route path="/cookie-policy" element={<Suspense fallback={<LegalFallback />}><CookiePolicy /></Suspense>} />
-      <Route path="/disclaimer" element={<Suspense fallback={<LegalFallback />}><Disclaimer /></Suspense>} />
-    </Routes>
+    <>
+      <RouteTracker />
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/thank-you" element={<Suspense fallback={<LegalFallback />}><ThankYou /></Suspense>} />
+        <Route path="/privacy-policy" element={<Suspense fallback={<LegalFallback />}><PrivacyPolicy /></Suspense>} />
+        <Route path="/terms" element={<Suspense fallback={<LegalFallback />}><TermsOfService /></Suspense>} />
+        <Route path="/refund-policy" element={<Suspense fallback={<LegalFallback />}><RefundPolicy /></Suspense>} />
+        <Route path="/cookie-policy" element={<Suspense fallback={<LegalFallback />}><CookiePolicy /></Suspense>} />
+        <Route path="/disclaimer" element={<Suspense fallback={<LegalFallback />}><Disclaimer /></Suspense>} />
+      </Routes>
+    </>
   );
 }

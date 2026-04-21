@@ -6,6 +6,12 @@ import { BrowserRouter } from 'react-router-dom';
 import '@fontsource-variable/plus-jakarta-sans';
 import App from './App.tsx';
 import './index.css';
+import { captureAttribution } from './lib/attribution';
+
+// Capture first-touch attribution synchronously, BEFORE React renders,
+// so the very first WhatsApp CTA the user sees already has UTM/fbclid
+// baked into the message body — no render→effect race.
+captureAttribution();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
