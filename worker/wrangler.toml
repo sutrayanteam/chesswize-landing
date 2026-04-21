@@ -37,6 +37,15 @@ enabled = true
 #   META_TEST_EVENT_CODE    — OPTIONAL, only during QA. Copy from Events
 #                              Manager → Test Events. Remove in production.
 #
+# Required for Cloudflare Turnstile anti-spam:
+#   TURNSTILE_SECRET_KEY    — dash.cloudflare.com → Turnstile → site → Secret
+#                              Key. Absent → verification skipped (dev only).
+#                              Client-side site key is injected via Vite at
+#                              build time: set VITE_TURNSTILE_SITE_KEY in the
+#                              landing-page build env (defaults to Cloudflare's
+#                              always-passes test key 1x00000000000000000000AA
+#                              when unset, so dev + staging still work).
+#
 # Optional:
 #   ALLOWED_ORIGINS         — comma-separated (default: chesswize.in,www.chesswize.in)
 

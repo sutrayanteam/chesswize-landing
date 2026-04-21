@@ -50,6 +50,17 @@ Once creative + client items above are resolved:
 - Confirm `_fbp` / `_fbc` cookies are present after landing with `?fbclid=TEST`.
 - Sitemap already lists `/` + 5 legal pages; `/thank-you` deliberately excluded (noindex).
 
+### Cloudflare Turnstile — promote to production keys
+
+The form and worker ship with Cloudflare's **always-passes test keys** so dev and initial rollout aren't blocked. Replace before real ad traffic:
+
+1. dash.cloudflare.com → Turnstile → **Add site**. Domain: `chesswize.in`.
+2. Widget mode: **Managed**. Pre-clearance: off. Action name: `lead_submit`.
+3. Copy the **Site Key** → set build-time env var `VITE_TURNSTILE_SITE_KEY=<site-key>` before `bun run build` (Coolify → Environment Variables on the app).
+4. Copy the **Secret Key** → `cd worker && wrangler secret put TURNSTILE_SECRET_KEY`.
+5. Trigger a Coolify redeploy (client) + `wrangler deploy` (worker).
+6. Verify: `curl https://chesswize.in/api/health` → `turnstile: "configured"`.
+
 ---
 
 References:

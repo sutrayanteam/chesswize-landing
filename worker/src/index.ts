@@ -33,6 +33,11 @@ export interface Env {
   META_CAPI_TOKEN?: string;      // wrangler secret put META_CAPI_TOKEN
   META_TEST_EVENT_CODE?: string; // optional, wrangler secret put — remove in prod
 
+  // Cloudflare Turnstile — server-side verification of the widget token.
+  // Without TURNSTILE_SECRET_KEY the worker skips verification and logs a
+  // warning, so the form still works during dev / initial rollout.
+  TURNSTILE_SECRET_KEY?: string;
+
   // Misc
   ALLOWED_ORIGINS?: string;
 
@@ -55,6 +60,8 @@ interface LeadBody {
   website_url?: string;
   // Anti-spam
   form_duration_s?: number;
+  // Cloudflare Turnstile token — verified server-side before lead acceptance.
+  turnstile_token?: string;
   // First-touch attribution captured client-side (src/lib/attribution.ts)
   attribution?: LeadAttribution;
 }
@@ -138,10 +145,43 @@ function validateLead(raw: unknown): { ok: true; value: LeadBody } | { ok: false
     parent_concern: Array.isArray(r.parent_concern) ? strArr(r.parent_concern) : str(r.parent_concern as unknown, 200),
     website_url: str(r.website_url, 200),
     form_duration_s: typeof r.form_duration_s === "number" ? r.form_duration_s : undefined,
+    turnstile_token: str(r.turnstile_token, 4096),
     attribution: validateAttribution(r.attribution),
   };
 
   return { ok: true, value };
+}
+
+/**
+ * Verify a Turnstile widget token with Cloudflare's siteverify endpoint.
+ * Returns { ok:true } on success. If TURNSTILE_SECRET_KEY is unset (dev /
+ * initial rollout), returns { ok:true, skipped:true } — the honeypot +
+ * time-gate still protect the endpoint in the meantime.
+ */
+async function verifyTurnstile(env: Env, token: string | undefined, remoteIp?: string): Promise<{ ok: boolean; skipped?: boolean; error?: string }> {
+  if (!env.TURNSTILE_SECRET_KEY) {
+    return { ok: true, skipped: true };
+  }
+  if (!token) {
+    return { ok: false, error: "missing_token" };
+  }
+  try {
+    const body = new URLSearchParams({
+      secret: env.TURNSTILE_SECRET_KEY,
+      response: token,
+    });
+    if (remoteIp) body.set("remoteip", remoteIp);
+    const res = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+      method: "POST",
+      headers: { "content-type": "application/x-www-form-urlencoded" },
+      body,
+    });
+    const data = (await res.json().catch(() => ({}))) as { success?: boolean; "error-codes"?: string[] };
+    if (data.success) return { ok: true };
+    return { ok: false, error: (data["error-codes"] ?? ["invalid"]).join(",").slice(0, 200) };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : "fetch_error" };
+  }
 }
 
 const originAllowed = (env: Env, origin: string | null): boolean => {
@@ -337,6 +377,15 @@ async function handleLead(request: Request, env: Env, ctx: ExecutionContext): Pr
     return json({ ok: false, error: "too_fast" }, { status: 429 });
   }
 
+  // Cloudflare Turnstile verification — skipped only when secret is unset
+  // (dev / initial rollout). Once TURNSTILE_SECRET_KEY is set, any lead
+  // without a valid token is rejected outright.
+  const remoteIp = request.headers.get("cf-connecting-ip") || request.headers.get("x-real-ip") || undefined;
+  const turnstile = await verifyTurnstile(env, lead.turnstile_token, remoteIp);
+  if (!turnstile.ok) {
+    return json({ ok: false, error: "turnstile_failed", detail: turnstile.error }, { status: 403 });
+  }
+
   // Server-generated event_id — shared with the browser fbq Lead so Meta
   // dedupes the two into a single Lead in the dashboard.
   const eventId = crypto.randomUUID();
@@ -396,6 +445,7 @@ function handleHealth(env: Env): Response {
       zoho: zohoConfigured(env) ? "configured" : "missing_env",
       resend: resendConfigured(env) ? "configured" : "missing_env",
       meta_capi: capiConfigured(env) ? "configured" : "missing_env",
+      turnstile: env.TURNSTILE_SECRET_KEY ? "configured" : "missing_env",
     },
     ts: new Date().toISOString(),
   });

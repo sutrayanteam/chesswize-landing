@@ -93,6 +93,7 @@ import {
   trackLeadStep2,
 } from "@/src/lib/tracking";
 import { buildWhatsAppHref, onWhatsAppClick } from "@/src/lib/whatsapp";
+import { renderTurnstile, removeTurnstile, resetTurnstile } from "@/src/lib/turnstile";
 
 const ThankYou = lazy(() => import("./pages/ThankYou"));
 
@@ -3120,6 +3121,9 @@ function BottomForm() {
   const leadStartFired = useRef(false);
   const step2Fired = useRef(false);
   const navigate = useNavigate();
+  const turnstileRef = useRef<HTMLDivElement | null>(null);
+  const turnstileWidgetId = useRef<string | null>(null);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
   const { register, handleSubmit, formState: { errors }, reset, trigger, watch, setValue } = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -3136,6 +3140,38 @@ function BottomForm() {
       }
     } catch { /* sessionStorage blocked — no-op */ }
   }, [setValue]);
+
+  // Mount Turnstile only once the user reaches step 3. Lazy-mounting keeps
+  // the challenge iframe out of the initial LP payload and out of the
+  // first paint — Turnstile takes ~200 ms to load and isn't needed earlier.
+  useEffect(() => {
+    if (step !== 3) return;
+    const el = turnstileRef.current;
+    if (!el) return;
+    let cancelled = false;
+    let widgetId: string | null = null;
+    renderTurnstile(
+      el,
+      (token) => {
+        if (!cancelled) setTurnstileToken(token);
+      },
+      () => {
+        if (!cancelled) setTurnstileToken(null);
+      },
+    ).then((id) => {
+      if (cancelled && id) {
+        removeTurnstile(id);
+      } else {
+        widgetId = id;
+        turnstileWidgetId.current = id;
+      }
+    });
+    return () => {
+      cancelled = true;
+      if (widgetId) removeTurnstile(widgetId);
+      turnstileWidgetId.current = null;
+    };
+  }, [step]);
 
   const fireLeadStartOnce = () => {
     if (leadStartFired.current) return;
@@ -3216,6 +3252,7 @@ function BottomForm() {
           ...cleanData,
           js_token: jsToken.current,
           form_duration_s: Math.round(elapsed),
+          turnstile_token: turnstileToken ?? undefined,
           attribution,
         }),
       });
@@ -3254,6 +3291,9 @@ function BottomForm() {
         "We couldn't reach our server and your browser blocked the WhatsApp popup. " +
           "Please WhatsApp us at +91 70075 78072 or email hello@chesswize.in so we don't miss your request."
       );
+      // Turnstile tokens are single-use — reset so the next attempt has a fresh one.
+      setTurnstileToken(null);
+      if (turnstileWidgetId.current) resetTurnstile(turnstileWidgetId.current);
     }
   };
 
@@ -3533,6 +3573,10 @@ function BottomForm() {
                           <p className="text-xs text-amber-800 font-medium">We cap cohorts at 6 students so each child gets real attention — limited slots, first come, first served.</p>
                         </div>
                       </div>
+
+                      {/* Cloudflare Turnstile — invisible/managed challenge. Lazy-mounted
+                          when step 3 first appears so it doesn't inflate LCP. */}
+                      <div ref={turnstileRef} className="mt-2 flex justify-center" aria-label="Human verification" />
 
                       <div className="flex gap-3 mt-2">
                         <Button type="button" onClick={() => setStep(2)} variant="outline" className="h-16 px-6 font-bold text-slate-600 border-slate-200 rounded-xl hover:bg-slate-50">

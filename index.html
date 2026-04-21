@@ -15,10 +15,14 @@
     <link rel="preload" as="image" type="image/webp" href="/testimonial-kid-1-poster.webp">
     <link rel="canonical" href="https://chesswize.in/" />
     <meta property="og:url" content="https://chesswize.in/" />
-    <meta property="og:image" content="https://chesswize.in/logo-for-white-bg-v2.svg" />
+    <meta property="og:image" content="https://chesswize.in/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="ChessWize — Online chess coaching for kids. FIDE-rated coaches, cohorts of six, 30-day growth guarantee." />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="ChessWize — Online Chess Coaching for Kids" />
     <meta name="twitter:description" content="FIDE-titled coaches, cohorts of six, measurable progress. Book a free demo." />
+    <meta name="twitter:image" content="https://chesswize.in/og-image.png" />
     <meta name="theme-color" content="#2563eb" />
 
     <!-- Structured data: Organization -->
@@ -76,6 +80,11 @@
       fbq('init','1315250227040245');
       fbq('track','PageView');
     </script>
+
+    <!-- Cloudflare Turnstile — anti-spam challenge on /api/leads.
+         Async + defer so it doesn't block LCP. Widget is explicit-render in
+         BottomForm (see src/lib/turnstile.ts). -->
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
   </head>
   <body>
     <!-- Meta Pixel noscript fallback — must live in body per HTML spec -->
