@@ -301,7 +301,7 @@ export default function ThankYou() {
                   img: "/2026-04-15-10-40-00-12-week-syllabus-planner.webp",
                   eyebrow: "Within 24 hours",
                   title: "Written growth plan",
-                  body: "You get a personalised report on strengths, gaps, and a recommended 30-day track.",
+                  body: "You get a personalised report on strengths, gaps, and a recommended 15-day track.",
                   accent: "from-amber-500 to-amber-600",
                   ring: "ring-amber-100",
                 },

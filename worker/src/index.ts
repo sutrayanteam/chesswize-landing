@@ -737,7 +737,7 @@ async function sendParentThankYouEmail(env: Env, body: LeadBody, eventId: string
           ${[
             { num: "1", emoji: "💬", title: "We WhatsApp you", body: `To confirm the exact time and share the Zoom link.${phoneDisplay ? ` On ${escapeHtml(phoneDisplay)}.` : ""}` },
             { num: "2", emoji: "🎯", title: "20-min live evaluation", body: `A FIDE-rated coach plays a few positions with ${escapeHtml(childName)} and reads the style + temperament.` },
-            { num: "3", emoji: "📊", title: "Personalised growth plan", body: `A written report on strengths, gaps, and a recommended 30-day track lands in your inbox.` },
+            { num: "3", emoji: "📊", title: "Personalised growth plan", body: `A written report on strengths, gaps, and a recommended 15-day track lands in your inbox.` },
             { num: "4", emoji: "🙌", title: "Zero pressure to enrol", body: `If the chemistry isn't right, we'll say so first — and point you elsewhere.` },
           ].map((s) => `
           <tr>

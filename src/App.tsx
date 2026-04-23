@@ -1055,7 +1055,7 @@ function Platform() {
                   </div>
                 </div>
                 <div className="bg-gradient-to-b from-emerald-50 to-emerald-100/50 text-emerald-700 px-3 py-1.5 rounded-lg text-[10px] font-extrabold uppercase tracking-widest-gs border border-emerald-200 shadow-sm flex items-center gap-1.5">
-                  <TrendingUp className="size-3.5" /> +142 Elo (30 Days)
+                  <TrendingUp className="size-3.5" /> +142 Elo (15 Days)
                 </div>
               </div>
 
@@ -2569,7 +2569,7 @@ function ValueStack() {
           })}
         </div>
 
-        {/* 30-day refund guarantee banner — the most-agreed missing element */}
+        {/* Unused-sessions refund banner — the most-agreed missing element */}
         <div className="mb-6 md:mb-8 rounded-2xl bg-gradient-to-br from-emerald-50 via-white to-emerald-50 border-2 border-emerald-200 p-5 md:p-6 flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-6 shadow-sm">
           <div className="size-12 md:size-14 rounded-2xl bg-emerald-100 flex items-center justify-center shrink-0 ring-4 ring-emerald-50">
             <Shield className="size-6 md:size-7 text-emerald-700" />
@@ -3000,7 +3000,7 @@ function FAQ() {
     {
       category: "fit",
       q: "My child is 5 and can't sit still for 10 minutes. Will this work?",
-      a: "Yes. Our Foundation Programme is specifically designed for high-energy children. We use rapid-fire, gamified puzzles that naturally stretch their attention span over 30 days. Parents typically report their child going from 5-minute focus to 25-30 minutes within the first month — not because they're forced to sit, but because the puzzles are genuinely engaging at their exact skill level.",
+      a: "Yes. Our Foundation Programme is specifically designed for high-energy children. We use rapid-fire, gamified puzzles that naturally stretch their attention span over 15 days. Parents typically report their child going from 5-minute focus to 25-30 minutes within the first two weeks — not because they're forced to sit, but because the puzzles are genuinely engaging at their exact skill level.",
     },
     {
       category: "fit",
