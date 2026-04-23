@@ -38,6 +38,15 @@ export default defineConfig(() => {
     },
     server: {
       hmr: process.env.DISABLE_HMR !== 'true',
+      // Forward /api/* to a locally-running wrangler dev (worker/). In prod
+      // the Cloudflare route handles this same-origin; in dev we have to
+      // proxy explicitly since Vite and the Worker are separate processes.
+      proxy: {
+        '/api': {
+          target: process.env.VITE_API_TARGET || 'http://127.0.0.1:8787',
+          changeOrigin: true,
+        },
+      },
     },
   };
 });

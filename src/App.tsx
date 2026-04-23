@@ -2,6 +2,7 @@ import React, {
   useState,
   useEffect,
   useRef,
+  useMemo,
   lazy,
   Suspense,
   forwardRef,
@@ -3104,15 +3105,23 @@ function FAQ() {
 const formSchema = z.object({
   /* Step 1 — minimum viable lead (required) */
   parent_name: z.string().min(2, "Parent's name must be at least 2 characters"),
-  phone: z.string().regex(/^\+?[0-9\s-]{10,20}$/, "Please enter a valid phone number"),
+  parent_email: z.string().trim().email("Please enter a valid email address"),
+  // Phone value is exactly 10 digits — the +91 country code is rendered as
+  // a locked visual prefix (see step 1 UI) and prepended at submit time, so
+  // the user never types it and it's never counted toward the 10-digit length.
+  phone: z.string().regex(/^[6-9]\d{9}$/, "Please enter a valid 10-digit mobile number"),
   child_age_range: z.string().min(1, "Please select your child's age group"),
   child_level: z.string().min(1, "Please select an estimated level"),
-  /* Step 2 & 3 — enrichment fields (optional; submit works with just Step 1) */
-  child_name: z.string().min(2, "Child's name must be at least 2 characters").optional().or(z.literal("")),
-  city: z.string().min(2, "Please enter your city").optional().or(z.literal("")),
+  /* Step 2 & 3 — enrichment fields */
+  child_name: z.string().min(2, "Child's name must be at least 2 characters"),
+  city: z.string().min(2, "Please enter your city"),
   referral_source: z.string().optional(),
-  parent_concern: z.array(z.string()).optional(),
-  parent_commitment: z.string().optional(),
+  parent_concern: z.array(z.string()).min(1, "Please pick at least one goal"),
+  parent_commitment: z.string().min(1, "Please select a commitment level"),
+  // ISO-ish string "YYYY-MM-DD HH:mm" in IST. Stored as a single field so the
+  // worker can pass it straight through to Zoho + the parent email. Picked
+  // via the date-strip + slot-grid below, never typed.
+  preferred_datetime: z.string().min(1, "Please pick a date and time for the call"),
   /* Honeypot — hidden from real users, bots auto-fill it */
   website_url: z.string().max(0, "Bot detected").optional(),
 });
@@ -3122,6 +3131,160 @@ type FormData = z.infer<typeof formSchema>;
 type Delivery = { leadSaved: boolean };
 
 const FORM_DRAFT_KEY = "cw.form.draft";
+
+/* ═════════════════════════════════════════════════════════════
+   Calendar + 20-min slot picker helpers (IST business hours)
+   - Business window: 10:00 – 21:00 IST, 20-min increments.
+   - Show next 14 days. Exclude slots < 60 min from now to give
+     the counsellor room to actually confirm the booking.
+   - All labels formatted via Intl.DateTimeFormat(Asia/Kolkata)
+     so NRI parents see IST regardless of device timezone.
+   ═════════════════════════════════════════════════════════════ */
+const PICKER_DAYS = 14;
+const SLOT_START_HOUR = 10; // 10 AM IST
+const SLOT_END_HOUR = 21;   // last slot starts at 20:40
+const SLOT_STEP_MIN = 20;
+const MIN_LEAD_TIME_MIN = 60;
+
+const pickerDateFmt = new Intl.DateTimeFormat("en-IN", {
+  timeZone: "Asia/Kolkata",
+  weekday: "short",
+  day: "numeric",
+  month: "short",
+});
+const pickerTimeFmt = new Intl.DateTimeFormat("en-IN", {
+  timeZone: "Asia/Kolkata",
+  hour: "numeric",
+  minute: "2-digit",
+  hour12: true,
+});
+const pickerFullFmt = new Intl.DateTimeFormat("en-IN", {
+  timeZone: "Asia/Kolkata",
+  weekday: "long",
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+  hour: "numeric",
+  minute: "2-digit",
+  hour12: true,
+});
+
+// Format a Date into the storage key "YYYY-MM-DD" using IST calendar day.
+// Built from Intl parts because Date.toISOString() is always UTC and a
+// device in UTC-07 could silently roll the day back.
+function istDateKey(d: Date): string {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Kolkata",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(d);
+  const y = parts.find((p) => p.type === "year")?.value ?? "0000";
+  const m = parts.find((p) => p.type === "month")?.value ?? "01";
+  const day = parts.find((p) => p.type === "day")?.value ?? "01";
+  return `${y}-${m}-${day}`;
+}
+
+// Build the "YYYY-MM-DD HH:mm" storage value for a slot. The hour/minute are
+// already IST (we generate them in IST business hours), so we just stitch.
+function slotValue(dateKey: string, hour: number, minute: number): string {
+  const hh = String(hour).padStart(2, "0");
+  const mm = String(minute).padStart(2, "0");
+  return `${dateKey} ${hh}:${mm}`;
+}
+
+// Parse our storage format back into a Date. The date/time is IST. We
+// convert to UTC by subtracting 5h30m so any downstream JS code treats
+// the Date consistently; display code always uses the IST formatter.
+function parseSlotValue(v: string): Date | null {
+  const m = /^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2})$/.exec(v);
+  if (!m) return null;
+  const [, y, mo, d, hh, mm] = m;
+  // Construct as UTC then subtract IST offset — this yields the instant
+  // the picker intended (a wall-clock 5PM IST maps to 11:30 UTC).
+  const iso = `${y}-${mo}-${d}T${hh}:${mm}:00+05:30`;
+  const date = new Date(iso);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+// Pretty label for the confirmation chip + downstream emails.
+function formatSlotLabel(v: string): string {
+  const d = parseSlotValue(v);
+  if (!d) return v;
+  return `${pickerFullFmt.format(d)} IST`;
+}
+
+interface DateOption {
+  key: string;           // YYYY-MM-DD IST
+  short: string;         // "Sat, 26 Apr"
+  weekday: string;       // "Sat"
+  dayNum: string;        // "26"
+  isToday: boolean;
+  isWeekend: boolean;
+  date: Date;            // 00:00 IST instant
+}
+
+interface SlotOption {
+  value: string;         // "YYYY-MM-DD HH:mm"
+  label: string;         // "5:00 PM"
+  hour: number;
+  minute: number;
+  period: "morning" | "afternoon" | "evening";
+  disabled: boolean;     // too close to now
+}
+
+function buildDateOptions(now: Date): DateOption[] {
+  const todayKey = istDateKey(now);
+  const out: DateOption[] = [];
+  // Use a cursor at local midnight, advance by 1 day at a time. We only
+  // need the IST date key + a representative Date for weekday detection,
+  // so exact midnight in any tz is fine as a cursor.
+  const cursor = new Date(now);
+  for (let i = 0; i < PICKER_DAYS; i++) {
+    const d = new Date(cursor.getTime() + i * 24 * 60 * 60 * 1000);
+    const key = istDateKey(d);
+    const parts = pickerDateFmt.formatToParts(d);
+    const weekday = parts.find((p) => p.type === "weekday")?.value ?? "";
+    const dayNum = parts.find((p) => p.type === "day")?.value ?? "";
+    const short = pickerDateFmt.format(d);
+    const weekdayLong = new Intl.DateTimeFormat("en-IN", { timeZone: "Asia/Kolkata", weekday: "long" }).format(d);
+    const isWeekend = weekdayLong === "Saturday" || weekdayLong === "Sunday";
+    out.push({
+      key,
+      short,
+      weekday,
+      dayNum,
+      isToday: key === todayKey,
+      isWeekend,
+      date: d,
+    });
+  }
+  return out;
+}
+
+function buildSlotsForDate(dateKey: string, now: Date): SlotOption[] {
+  const minTs = now.getTime() + MIN_LEAD_TIME_MIN * 60 * 1000;
+  const slots: SlotOption[] = [];
+  for (let hour = SLOT_START_HOUR; hour < SLOT_END_HOUR; hour++) {
+    for (let minute = 0; minute < 60; minute += SLOT_STEP_MIN) {
+      const value = slotValue(dateKey, hour, minute);
+      const d = parseSlotValue(value);
+      if (!d) continue;
+      const label = pickerTimeFmt.format(d);
+      const period: SlotOption["period"] =
+        hour < 13 ? "morning" : hour < 17 ? "afternoon" : "evening";
+      slots.push({
+        value,
+        label,
+        hour,
+        minute,
+        period,
+        disabled: d.getTime() < minTs,
+      });
+    }
+  }
+  return slots;
+}
 
 function BottomForm() {
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
@@ -3133,6 +3296,11 @@ function BottomForm() {
   const jsToken = useRef(Math.random().toString(36).slice(2) + Date.now().toString(36));
   const leadStartFired = useRef(false);
   const step2Fired = useRef(false);
+  // In-flight guard so a double-tap / Enter-key burst can't fire POST twice.
+  // setStatus("sending") still drives the button disabled state for the UX;
+  // this ref short-circuits onSubmit synchronously — setStatus is async and
+  // otherwise racy within the same render cycle.
+  const submitInFlight = useRef(false);
   const navigate = useNavigate();
   // Turnstile state removed — see import comment. Bot defences are now
   // entirely server-side: honeypot input (website_url), form duration ≥8s
@@ -3144,22 +3312,138 @@ function BottomForm() {
     mode: "onTouched",
     // Default phone to +91 since we only run paid in India — saves a tap and
     // nudges the user into the correct format the backend expects.
-    defaultValues: { phone: "+91 " } as Partial<FormData>,
+    // Seed *every* schema field so zod's custom `.min(...)` / `.email(...)`
+    // messages surface on blur instead of a generic "Required" from RHF's
+    // uncontrolled-field default.
+    defaultValues: {
+      parent_name: "",
+      parent_email: "",
+      phone: "",
+      child_age_range: "",
+      child_level: "",
+      child_name: "",
+      city: "",
+      referral_source: "",
+      parent_concern: [],
+      parent_commitment: "",
+      preferred_datetime: "",
+    } as Partial<FormData>,
   });
 
-  // Pre-fill child_age_range if the user picked one in the hero dropdown,
-  // then restore any persisted draft so a failed or reloaded session doesn't
-  // force the parent to retype everything.
+  // Calendar + 20-min slot picker state. dateOptions is built once at mount
+  // so day boundaries don't shift mid-session. viewedDateKey tracks which
+  // column's slots are visible; the form field itself stores "YYYY-MM-DD HH:mm".
+  const dateOptions = useMemo<DateOption[]>(() => buildDateOptions(new Date()), []);
+  const selectedDatetime = watch("preferred_datetime");
+  const initialDateKey = useMemo(() => {
+    if (selectedDatetime && /^(\d{4}-\d{2}-\d{2}) /.test(selectedDatetime)) {
+      return selectedDatetime.slice(0, 10);
+    }
+    return dateOptions[0]?.key ?? "";
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const [viewedDateKey, setViewedDateKey] = useState<string>(initialDateKey);
+  const slotsForDate = useMemo<SlotOption[]>(() => {
+    if (!viewedDateKey) return [];
+    return buildSlotsForDate(viewedDateKey, new Date());
+  }, [viewedDateKey]);
+  const slotGroups = useMemo(() => ({
+    morning: slotsForDate.filter((s) => s.period === "morning"),
+    afternoon: slotsForDate.filter((s) => s.period === "afternoon"),
+    evening: slotsForDate.filter((s) => s.period === "evening"),
+  }), [slotsForDate]);
+  const hasAvailableSlots = slotsForDate.some((s) => !s.disabled);
+
+  // Period tab bar — controls which section of the day is visible. Default
+  // "evening" since that's when Indian parents are most free, but auto-jumps
+  // to the first period that actually has available slots when the viewed
+  // date changes (e.g., you pick today @ 6 PM → morning/afternoon empty).
+  type PeriodKey = "morning" | "afternoon" | "evening";
+  const [activePeriod, setActivePeriod] = useState<PeriodKey>("evening");
   useEffect(() => {
+    const order: PeriodKey[] = [activePeriod, "morning", "afternoon", "evening"];
+    const firstWithSlots = order.find((p) => slotGroups[p].some((s) => !s.disabled));
+    if (firstWithSlots && firstWithSlots !== activePeriod) {
+      setActivePeriod(firstWithSlots);
+    }
+  // Intentionally only watch viewedDateKey — re-running on activePeriod
+  // change would fight the user's manual tab tap.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [viewedDateKey]);
+
+  const handleSlotPick = (value: string) => {
+    setValue("preferred_datetime", value, {
+      shouldValidate: true,
+      shouldDirty: true,
+      shouldTouch: true,
+    });
+    // Soft haptic on supported mobile browsers — 6ms is barely perceptible,
+    // just enough to confirm the tap registered (HIG "tactile feedback").
+    try { (navigator as Navigator & { vibrate?: (n: number) => void }).vibrate?.(6); } catch { /* ignore */ }
+  };
+
+  // Restore any persisted draft first, then let the hero-age sessionStorage
+  // override child_age_range last — hero.age is the user's most recent,
+  // explicit action so it wins over the draft. Order matters.
+  //
+  // Uses a single reset() instead of a setValue loop so the watch()
+  // subscription fires *once* (one localStorage write) instead of N times
+  // mid-restore with partial state. Avoids draft-corruption races if the
+  // tab closes between iterations.
+  useEffect(() => {
+    let merged: Partial<FormData> | null = null;
+    try {
+      const raw = localStorage.getItem(FORM_DRAFT_KEY);
+      if (raw) {
+        const draft = JSON.parse(raw) as Partial<FormData>;
+        if (draft && typeof draft === "object") {
+          const sanitized: Partial<FormData> = {};
+          (Object.keys(draft) as (keyof FormData)[]).forEach((k) => {
+            const v = draft[k];
+            if (v === undefined || v === null || v === "") return;
+            // parent_concern must stay an array — a stale draft with a boolean
+            // (older RHF multi-checkbox shape) would crash the slot map on
+            // `.includes` downstream.
+            if (k === "parent_concern" && !Array.isArray(v)) return;
+            // Phone: older drafts stored "+91 9876543210". Strip everything
+            // but the last 10 digits so the value matches the new schema
+            // (phone := 10 digits, country code is a UI addon only).
+            if (k === "phone" && typeof v === "string") {
+              const digits = v.replace(/\D/g, "");
+              const local =
+                digits.length === 12 && digits.startsWith("91") ? digits.slice(2) :
+                digits.length === 11 && digits.startsWith("0")  ? digits.slice(1) :
+                digits;
+              if (/^[6-9]\d{9}$/.test(local)) {
+                (sanitized as Record<string, unknown>)[k] = local;
+              }
+              return;
+            }
+            (sanitized as Record<string, unknown>)[k] = v;
+          });
+          merged = sanitized;
+        }
+      }
+    } catch { /* localStorage blocked or malformed — no-op */ }
+
+    // Hero age overrides whatever the draft had — it's the fresher user
+    // intent from the current session.
     try {
       const pre = sessionStorage.getItem("cw.hero.age");
       if (pre) {
-        setValue("child_age_range", pre, { shouldValidate: false, shouldDirty: false });
-        // Keep sessionStorage populated so scrolling back up and changing the
-        // hero dropdown keeps the BottomForm in sync. Cleared on successful
-        // submit below.
+        merged = { ...(merged ?? {}), child_age_range: pre };
       }
     } catch { /* sessionStorage blocked — no-op */ }
+
+    if (merged && Object.keys(merged).length > 0) {
+      reset({ ...(merged as FormData) }, { keepDefaultValues: true });
+      // Move the date strip to the restored slot's day so the parent can
+      // see their previous selection without hunting through 14 chips.
+      if (typeof merged.preferred_datetime === "string" && /^\d{4}-\d{2}-\d{2} /.test(merged.preferred_datetime)) {
+        setViewedDateKey(merged.preferred_datetime.slice(0, 10));
+      }
+    }
+
     // Live-sync: if the parent changes the hero dropdown after the BottomForm
     // has already mounted, mirror it into the form field immediately.
     const onHeroAge = (e: Event) => {
@@ -3169,24 +3453,10 @@ function BottomForm() {
       }
     };
     window.addEventListener("cw:hero-age", onHeroAge);
-    try {
-      const raw = localStorage.getItem(FORM_DRAFT_KEY);
-      if (raw) {
-        const draft = JSON.parse(raw) as Partial<FormData>;
-        if (draft && typeof draft === "object") {
-          (Object.keys(draft) as (keyof FormData)[]).forEach((k) => {
-            const v = draft[k];
-            if (v !== undefined && v !== null && v !== "") {
-              setValue(k, v as FormData[typeof k], { shouldValidate: false, shouldDirty: false });
-            }
-          });
-        }
-      }
-    } catch { /* localStorage blocked or malformed — no-op */ }
     return () => {
       window.removeEventListener("cw:hero-age", onHeroAge);
     };
-  }, [setValue]);
+  }, [reset, setValue]);
 
   // Persist the in-progress form to localStorage so the parent doesn't lose
   // typed answers if the server rejects the submit, the tab closes, or they
@@ -3224,21 +3494,36 @@ function BottomForm() {
   };
 
   const onSubmit = async (data: FormData) => {
+    // Double-submit guard: synchronous ref beats React's async setStatus when
+    // the user mashes Enter or double-taps. Without this, two /api/leads POSTs
+    // can race and produce duplicate Zoho leads + two Meta CAPI Lead events.
+    if (submitInFlight.current) return;
+    submitInFlight.current = true;
+
     setSpamError("");
 
     /* Anti-spam: honeypot check */
-    if (data.website_url && data.website_url.length > 0) return;
+    if (data.website_url && data.website_url.length > 0) {
+      submitInFlight.current = false;
+      return;
+    }
 
     /* Anti-spam: time-gate — real parents take >8s to fill 8 fields */
     const elapsed = (Date.now() - formLoadedAt.current) / 1000;
     if (elapsed < 8) {
       setSpamError("You submitted too quickly. Please take a moment to fill in the form carefully.");
+      submitInFlight.current = false;
       return;
     }
 
     setStatus("sending");
     const { website_url: _hp, ...cleanData } = data;
     void _hp;
+    // Prepend the locked country code before sending. RHF stores only the
+    // 10-digit local number so the UI +91 prefix is never double-counted or
+    // typed twice; the worker + Zoho expect a fully-formatted E.164-ish
+    // string so we glue it on here.
+    cleanData.phone = cleanData.phone ? `+91 ${cleanData.phone}` : cleanData.phone;
 
     /*
      * Lead-delivery flow (single-source-of-truth):
@@ -3271,10 +3556,21 @@ function BottomForm() {
           attribution,
         }),
       });
-      leadSaved = res.ok;
       if (res.ok) {
-        const payload = await res.json().catch(() => ({} as { event_id?: string }));
+        // Worker returns { ok, stored, event_id, ... }. Treat the submit as
+        // saved ONLY when `stored` is true — otherwise the lead is dropped
+        // (all delivery integrations failed) and we must surface an error so
+        // the parent can retry rather than silently sending them to /thank-you.
+        const payload = await res.json().catch(() => ({} as { stored?: boolean; event_id?: string; error?: string }));
+        leadSaved = payload.stored === true;
         eventId = typeof payload.event_id === "string" ? payload.event_id : undefined;
+        if (!leadSaved) {
+          failureDetail = typeof payload.error === "string" ? payload.error : "not_stored";
+          if (import.meta.env.DEV) {
+            // eslint-disable-next-line no-console
+            console.warn("[lead] worker returned stored=false", payload);
+          }
+        }
       } else {
         const body = await res.json().catch(() => ({} as { error?: string }));
         failureDetail = typeof body?.error === "string" ? body.error : `http_${res.status}`;
@@ -3322,9 +3618,19 @@ function BottomForm() {
       "We couldn't save your details right now. Please try again in a moment — your answers are saved on this page, so nothing's lost."
     );
     void failureDetail;
+    // Release the in-flight guard so the retry button works.
+    submitInFlight.current = false;
   };
 
-  const inputCls = (hasError: boolean) => `w-full px-4 py-3 text-sm md:text-base border-2 rounded-xl bg-white text-slate-900 font-bold placeholder:text-slate-400 placeholder:font-medium focus:outline-none focus:ring-2 focus:ring-offset-0 transition-all shadow-sm ${hasError ? 'border-red-500 focus:ring-red-500' : 'border-slate-300 focus:border-blue-600 focus:ring-blue-600/20 hover:border-slate-400'}`;
+  // Mobile compliance notes:
+  //   • text-base (16px) on mobile prevents iOS Safari's auto-zoom-on-focus.
+  //   • min-h-[52px] gives a comfortable 52pt / 52dp target (Apple HIG ≥44,
+  //     Material 3 ≥48) even with small padding.
+  //   • focus ring uses a soft box-shadow (ring) + coloured border instead of
+  //     outline, per macOS HIG / Material 3 "focus indicator" guidance.
+  //   • touch-manipulation hints mobile browsers to suppress the 300ms tap
+  //     delay so interactions feel instant.
+  const inputCls = (hasError: boolean) => `w-full px-4 py-3 min-h-[52px] text-base md:text-[15px] border-2 rounded-xl bg-white text-slate-900 font-bold placeholder:text-slate-400 placeholder:font-medium focus:outline-none focus:ring-2 focus:ring-offset-0 transition-all shadow-sm touch-manipulation ${hasError ? 'border-red-500 focus:ring-red-500/30' : 'border-slate-300 focus:border-blue-600 focus:ring-blue-600/25 hover:border-slate-400'}`;
 
   const stepVariants = {
     hidden: { opacity: 0, x: 20 },
@@ -3413,8 +3719,8 @@ function BottomForm() {
                 <div className="flex items-center justify-between mb-6">
                   <h4 className="text-xl font-extrabold text-slate-900">
                     {step === 1 && "Tell us who your child is"}
-                    {step === 2 && "A few details (optional)"}
-                    {step === 3 && "Last bits (optional)"}
+                    {step === 2 && "A few details about your child"}
+                    {step === 3 && "Last bits"}
                   </h4>
                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest-gs">Step {step} of 3</span>
                 </div>
@@ -3430,21 +3736,82 @@ function BottomForm() {
                     <motion.div key="step1" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="flex flex-col gap-4 md:gap-5">
                       <div className="flex flex-col gap-1.5 md:gap-2">
                         <label htmlFor="bottom_parent_name" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">Parent's Full Name <span className="text-red-500">*</span></label>
-                        <input id="bottom_parent_name" {...register("parent_name")} type="text" autoComplete="name" className={inputCls(!!errors.parent_name)} placeholder="e.g. Rahul Sharma" />
-                        {errors.parent_name && <p className="text-[10px] text-red-500 font-bold mt-1">{errors.parent_name.message}</p>}
+                        <input id="bottom_parent_name" {...register("parent_name")} type="text" autoComplete="name" autoCapitalize="words" spellCheck={false} aria-invalid={!!errors.parent_name} aria-describedby={errors.parent_name ? "bottom_parent_name_err" : undefined} className={inputCls(!!errors.parent_name)} placeholder="e.g. Rahul Sharma" />
+                        {errors.parent_name && <p id="bottom_parent_name_err" className="text-[10px] text-red-500 font-bold mt-1">{errors.parent_name.message}</p>}
                       </div>
 
                       <div className="flex flex-col gap-1.5 md:gap-2">
                         <label htmlFor="bottom_phone" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">WhatsApp Number <span className="text-red-500">*</span></label>
-                        <input id="bottom_phone" {...register("phone")} type="tel" inputMode="tel" autoComplete="tel" className={inputCls(!!errors.phone)} placeholder="+91 98765 43210" />
-                        {errors.phone && <p className="text-[10px] text-red-500 font-bold mt-1">{errors.phone.message}</p>}
+                        {/* Locked country-code prefix + 10-digit input. +91 is
+                            rendered as an addon, not stored in the form value,
+                            and never counted toward the 10-digit length. */}
+                        <div
+                          className={`flex items-stretch min-h-[52px] border-2 rounded-xl bg-white overflow-hidden shadow-sm transition-all touch-manipulation ${
+                            errors.phone
+                              ? "border-red-500 focus-within:ring-2 focus-within:ring-red-500/30"
+                              : "border-slate-300 hover:border-slate-400 focus-within:border-blue-600 focus-within:ring-2 focus-within:ring-blue-600/25"
+                          }`}
+                        >
+                          <span
+                            aria-hidden="true"
+                            className="flex items-center gap-1.5 px-3.5 bg-slate-50 border-r-2 border-slate-200 text-slate-700 font-extrabold text-base md:text-[15px] select-none tabular-nums"
+                          >
+                            <span aria-hidden="true" className="text-base">🇮🇳</span>
+                            <span>+91</span>
+                          </span>
+                          <input
+                            id="bottom_phone"
+                            {...register("phone", {
+                              // Belt-and-braces: strip any non-digits the user
+                              // pastes (e.g. "98765 43210" or "+91-98765-43210")
+                              // before they hit the schema validator. maxLength
+                              // caps typed input to 10 chars — paste still needs
+                              // this transform to sanitize.
+                              setValueAs: (v: unknown) => {
+                                if (typeof v !== "string") return "";
+                                const digits = v.replace(/\D/g, "");
+                                const local =
+                                  digits.length === 12 && digits.startsWith("91") ? digits.slice(2) :
+                                  digits.length === 11 && digits.startsWith("0")  ? digits.slice(1) :
+                                  digits;
+                                return local.slice(0, 10);
+                              },
+                            })}
+                            type="tel"
+                            inputMode="numeric"
+                            autoComplete="tel-national"
+                            maxLength={10}
+                            pattern="[0-9]{10}"
+                            aria-invalid={!!errors.phone}
+                            aria-describedby={errors.phone ? "bottom_phone_err" : undefined}
+                            onInput={(e) => {
+                              // Live-strip non-digits in the native input so
+                              // users see instant feedback; RHF still runs
+                              // setValueAs on blur as a safety net.
+                              const el = e.currentTarget;
+                              const cleaned = el.value.replace(/\D/g, "").slice(0, 10);
+                              if (cleaned !== el.value) el.value = cleaned;
+                            }}
+                            className="flex-1 min-w-0 px-4 text-base md:text-[15px] bg-white text-slate-900 font-bold placeholder:text-slate-400 placeholder:font-medium focus:outline-none tabular-nums"
+                            placeholder="98765 43210"
+                          />
+                        </div>
+                        <p className="text-[10px] md:text-[11px] text-slate-500 font-medium mt-1">10-digit mobile number only — the +91 is already added.</p>
+                        {errors.phone && <p id="bottom_phone_err" className="text-[10px] text-red-500 font-bold mt-1">{errors.phone.message}</p>}
+                      </div>
+
+                      <div className="flex flex-col gap-1.5 md:gap-2">
+                        <label htmlFor="bottom_parent_email" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">Email Address <span className="text-red-500">*</span></label>
+                        <input id="bottom_parent_email" {...register("parent_email")} type="email" inputMode="email" autoComplete="email" autoCapitalize="off" autoCorrect="off" spellCheck={false} aria-invalid={!!errors.parent_email} aria-describedby={errors.parent_email ? "bottom_parent_email_err" : undefined} className={inputCls(!!errors.parent_email)} placeholder="e.g. rahul@gmail.com" />
+                        <p className="text-[10px] md:text-[11px] text-slate-500 font-medium mt-1">We'll send you a confirmation with your call details.</p>
+                        {errors.parent_email && <p id="bottom_parent_email_err" className="text-[10px] text-red-500 font-bold mt-1">{errors.parent_email.message}</p>}
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5">
                         <div className="flex flex-col gap-1.5 md:gap-2 min-w-0">
                           <label htmlFor="bottom_child_age_range" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">Child's Age <span className="text-red-500">*</span></label>
                           <div className="relative">
-                            <select id="bottom_child_age_range" {...register("child_age_range")} className={inputCls(!!errors.child_age_range) + " appearance-none cursor-pointer pr-10 truncate"}>
+                            <select id="bottom_child_age_range" {...register("child_age_range")} aria-invalid={!!errors.child_age_range} className={inputCls(!!errors.child_age_range) + " appearance-none cursor-pointer pr-10 truncate"}>
                               <option value="">Select age group</option>
                               <option value="4-6">4 - 6 Years</option>
                               <option value="7-9">7 - 9 Years</option>
@@ -3458,7 +3825,7 @@ function BottomForm() {
                         <div className="flex flex-col gap-1.5 md:gap-2 min-w-0">
                           <label htmlFor="bottom_child_level" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">Current Chess Level <span className="text-red-500">*</span></label>
                           <div className="relative">
-                            <select id="bottom_child_level" {...register("child_level")} className={inputCls(!!errors.child_level) + " appearance-none cursor-pointer pr-10 truncate"}>
+                            <select id="bottom_child_level" {...register("child_level")} aria-invalid={!!errors.child_level} className={inputCls(!!errors.child_level) + " appearance-none cursor-pointer pr-10 truncate"}>
                               <option value="">Select level</option>
                               <option value="never-played">Never played</option>
                               <option value="knows-rules">Knows the rules</option>
@@ -3473,7 +3840,7 @@ function BottomForm() {
                         </div>
                       </div>
 
-                      <Button type="button" onClick={() => handleNextStep(['parent_name', 'phone', 'child_age_range', 'child_level'])} className="w-full h-14 mt-2 text-base font-extrabold tracking-tight gs-btn gs-btn-primary rounded-xl shadow-lg">
+                      <Button type="button" onClick={() => handleNextStep(['parent_name', 'phone', 'parent_email', 'child_age_range', 'child_level'])} className="w-full h-14 mt-2 text-base font-extrabold tracking-tight gs-btn gs-btn-primary rounded-xl shadow-lg">
                         Continue to Next Step <ArrowRight className="ml-2 size-4" />
                       </Button>
                     </motion.div>
@@ -3482,14 +3849,14 @@ function BottomForm() {
                   {step === 2 && (
                     <motion.div key="step2" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="flex flex-col gap-4 md:gap-5">
                       <div className="flex flex-col gap-1.5 md:gap-2">
-                        <label htmlFor="bottom_child_name" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">Child's First Name</label>
-                        <input id="bottom_child_name" {...register("child_name")} type="text" className={inputCls(!!errors.child_name)} placeholder="e.g. Aarav" />
+                        <label htmlFor="bottom_child_name" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">Child's First Name <span className="text-red-500">*</span></label>
+                        <input id="bottom_child_name" {...register("child_name")} type="text" autoComplete="given-name" autoCapitalize="words" spellCheck={false} aria-invalid={!!errors.child_name} className={inputCls(!!errors.child_name)} placeholder="e.g. Aarav" />
                         {errors.child_name && <p className="text-[10px] text-red-500 font-bold mt-1">{errors.child_name.message}</p>}
                       </div>
 
                       <div className="flex flex-col gap-1.5 md:gap-2">
                         <label className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">
-                          What do you want chess to do for your child?
+                          What do you want chess to do for your child? <span className="text-red-500">*</span>
                         </label>
                         <p className="text-[10px] text-slate-400 font-medium -mt-0.5">Pick all that apply — our coach uses this to tailor the demo.</p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-1">
@@ -3501,11 +3868,13 @@ function BottomForm() {
                             { value: "confidence", label: "Build confidence & emotional resilience" },
                             { value: "exploring", label: "Just exploring — not sure yet" },
                           ].map((opt) => {
-                            const selected = (watch("parent_concern") ?? []).includes(opt.value);
+                            const rawConcerns = watch("parent_concern");
+                            const concerns = Array.isArray(rawConcerns) ? rawConcerns : [];
+                            const selected = concerns.includes(opt.value);
                             return (
                               <label
                                 key={opt.value}
-                                className={`flex items-start gap-2.5 p-3 rounded-xl border transition-all cursor-pointer ${
+                                className={`flex items-start gap-3 p-3.5 min-h-[56px] rounded-xl border-2 transition-all cursor-pointer touch-manipulation active:scale-[0.98] ${
                                   selected
                                     ? "border-blue-600 bg-blue-50 shadow-sm"
                                     : "border-slate-200 bg-slate-50 hover:bg-white hover:border-blue-300"
@@ -3515,7 +3884,7 @@ function BottomForm() {
                                   type="checkbox"
                                   value={opt.value}
                                   {...register("parent_concern")}
-                                  className="mt-0.5 size-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer shrink-0"
+                                  className="mt-0.5 size-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer shrink-0"
                                 />
                                 <span className="text-xs md:text-[13px] font-bold text-slate-800 leading-snug">
                                   {opt.label}
@@ -3528,9 +3897,9 @@ function BottomForm() {
                       </div>
 
                       <div className="flex flex-col gap-1.5 md:gap-2">
-                        <label htmlFor="bottom_commitment" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">What is your commitment level?</label>
+                        <label htmlFor="bottom_commitment" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">What is your commitment level? <span className="text-red-500">*</span></label>
                         <div className="relative">
-                          <select id="bottom_commitment" {...register("parent_commitment")} className={inputCls(!!errors.parent_commitment) + " appearance-none cursor-pointer pr-10"}>
+                          <select id="bottom_commitment" {...register("parent_commitment")} aria-invalid={!!errors.parent_commitment} className={inputCls(!!errors.parent_commitment) + " appearance-none cursor-pointer pr-10"}>
                             <option value="">Select commitment</option>
                             <option value="casual">Casual (Just want a fun hobby)</option>
                             <option value="serious">Serious (Looking for structured, long-term cognitive growth)</option>
@@ -3555,9 +3924,196 @@ function BottomForm() {
                   {step === 3 && (
                     <motion.div key="step3" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="flex flex-col gap-4 md:gap-5">
                       <div className="flex flex-col gap-1.5 md:gap-2">
-                        <label htmlFor="bottom_city" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">City</label>
-                        <input id="bottom_city" {...register("city")} type="text" autoComplete="address-level2" className={inputCls(!!errors.city)} placeholder="e.g. Bangalore" />
+                        <label htmlFor="bottom_city" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">City <span className="text-red-500">*</span></label>
+                        <input id="bottom_city" {...register("city")} type="text" autoComplete="address-level2" autoCapitalize="words" spellCheck={false} aria-invalid={!!errors.city} className={inputCls(!!errors.city)} placeholder="e.g. Bangalore" />
                         {errors.city && <p className="text-[10px] text-red-500 font-bold mt-1">{errors.city.message}</p>}
+                      </div>
+
+                      <div className="flex flex-col gap-3">
+                        <div className="flex items-baseline justify-between gap-2">
+                          <label className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">
+                            Pick a date &amp; 20-min window <span className="text-red-500">*</span>
+                          </label>
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest-gs">All times IST</span>
+                        </div>
+
+                        {/* Hidden input — RHF registration keeps the value inside watch()
+                            and the localStorage draft. Not user-interactive. */}
+                        <input type="hidden" {...register("preferred_datetime")} aria-invalid={!!errors.preferred_datetime} />
+
+                        {/* Date strip — iOS-Calendar-style chips, horizontal scroll with
+                            snap + scroll fade on both edges. Bigger targets (80×88) and
+                            a stronger filled-primary selection state per HIG / M3. */}
+                        <div className="relative -mx-1">
+                          <div
+                            role="tablist"
+                            aria-label="Choose a call date"
+                            className="flex gap-2.5 overflow-x-auto pb-2 px-1 snap-x snap-mandatory scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+                          >
+                            {dateOptions.map((d) => {
+                              const slotsHere = buildSlotsForDate(d.key, new Date());
+                              const anyOpen = slotsHere.some((s) => !s.disabled);
+                              const isViewed = d.key === viewedDateKey;
+                              const selectedDayKey = selectedDatetime ? selectedDatetime.slice(0, 10) : "";
+                              const hasSelection = selectedDayKey === d.key;
+                              return (
+                                <button
+                                  key={d.key}
+                                  type="button"
+                                  role="tab"
+                                  aria-selected={isViewed}
+                                  aria-label={`${d.short}${hasSelection ? " — selected" : ""}${!anyOpen ? " — fully booked" : ""}`}
+                                  onClick={() => setViewedDateKey(d.key)}
+                                  disabled={!anyOpen}
+                                  className={`relative snap-start shrink-0 flex flex-col items-center justify-center min-w-[80px] min-h-[88px] px-3 pt-2.5 pb-2 rounded-2xl border-2 transition-all touch-manipulation active:scale-[0.96] ${
+                                    !anyOpen
+                                      ? "border-slate-200 bg-slate-100/60 text-slate-400 cursor-not-allowed"
+                                      : isViewed
+                                        ? "border-blue-600 bg-blue-600 text-white shadow-[0_4px_12px_rgba(37,99,235,0.25)]"
+                                        : hasSelection
+                                          ? "border-emerald-500 bg-white text-slate-900"
+                                          : "border-slate-200 bg-white text-slate-900 hover:border-slate-300 active:bg-slate-50"
+                                  }`}
+                                >
+                                  <span className={`text-[10px] font-extrabold uppercase tracking-widest-gs ${
+                                    isViewed ? "text-white/85" : !anyOpen ? "text-slate-400" : d.isWeekend ? "text-amber-600" : "text-slate-500"
+                                  }`}>
+                                    {d.isToday ? "Today" : d.weekday}
+                                  </span>
+                                  <span className={`text-2xl font-extrabold leading-none mt-1 tabular-nums ${
+                                    isViewed ? "text-white" : "text-slate-900"
+                                  }`}>
+                                    {d.dayNum}
+                                  </span>
+                                  {hasSelection && !isViewed && (
+                                    <span className="absolute -top-1.5 -right-1.5 size-5 rounded-full bg-emerald-500 flex items-center justify-center ring-2 ring-white">
+                                      <Check className="size-3 text-white" aria-hidden="true" />
+                                    </span>
+                                  )}
+                                </button>
+                              );
+                            })}
+                          </div>
+                          {/* Right-edge fade + scroll hint */}
+                          <div className="pointer-events-none absolute right-0 top-0 bottom-2 w-10 bg-gradient-to-l from-white to-transparent rounded-r-2xl" aria-hidden="true" />
+                        </div>
+
+                        {/* Period tab bar — segmented control. On mobile only one period
+                            is visible at a time so the slot wall never exceeds one
+                            screen height. On desktop all three are one tap apart too,
+                            but the header anchors keep scanning fast. */}
+                        {hasAvailableSlots ? (
+                          <>
+                            <div role="tablist" aria-label="Time of day" className="grid grid-cols-3 gap-1 p-1 rounded-2xl bg-slate-100 border border-slate-200">
+                              {([
+                                { key: "morning" as const, label: "Morning", sub: "10 AM – 1 PM" },
+                                { key: "afternoon" as const, label: "Afternoon", sub: "1 – 5 PM" },
+                                { key: "evening" as const, label: "Evening", sub: "5 – 9 PM" },
+                              ]).map((p) => {
+                                const count = slotGroups[p.key].filter((s) => !s.disabled).length;
+                                const isActive = activePeriod === p.key;
+                                return (
+                                  <button
+                                    key={p.key}
+                                    type="button"
+                                    role="tab"
+                                    aria-selected={isActive}
+                                    onClick={() => setActivePeriod(p.key)}
+                                    disabled={count === 0}
+                                    className={`min-h-[52px] px-2 py-2 rounded-xl text-[12px] font-extrabold transition-all touch-manipulation active:scale-[0.97] ${
+                                      count === 0
+                                        ? "text-slate-400 cursor-not-allowed"
+                                        : isActive
+                                          ? "bg-white text-slate-900 shadow-sm ring-1 ring-slate-200"
+                                          : "text-slate-600 hover:text-slate-900"
+                                    }`}
+                                  >
+                                    <div className="flex flex-col items-center gap-0.5">
+                                      <span>{p.label}</span>
+                                      <span className={`text-[10px] font-bold ${
+                                        count === 0 ? "text-slate-400" : isActive ? "text-emerald-600" : "text-slate-500"
+                                      }`}>
+                                        {count === 0 ? "Fully booked" : `${count} slot${count === 1 ? "" : "s"}`}
+                                      </span>
+                                    </div>
+                                  </button>
+                                );
+                              })}
+                            </div>
+
+                            {/* Active period's slots — larger chips (h-12) and 3 cols
+                                fit cleanly on 360-wide phones (≈96px per chip) without
+                                cramping or needing a horizontal scroll. */}
+                            <div
+                              role="tabpanel"
+                              aria-label={`${activePeriod} slots`}
+                              className={`rounded-2xl border-2 p-3 md:p-4 ${errors.preferred_datetime ? "border-red-400 bg-red-50/40" : "border-slate-200 bg-white"}`}
+                            >
+                              {slotGroups[activePeriod].length === 0 ? (
+                                <p className="text-sm text-slate-500 font-medium text-center py-6">
+                                  No slots in this window. Try a different period or date.
+                                </p>
+                              ) : (
+                                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5">
+                                  {slotGroups[activePeriod].map((s) => {
+                                    const isSelected = selectedDatetime === s.value;
+                                    return (
+                                      <button
+                                        key={s.value}
+                                        type="button"
+                                        disabled={s.disabled}
+                                        onClick={() => handleSlotPick(s.value)}
+                                        aria-pressed={isSelected}
+                                        aria-label={`${s.label} ${isSelected ? "selected" : s.disabled ? "unavailable" : ""}`}
+                                        className={`h-12 rounded-xl border-2 text-[14px] font-extrabold tabular-nums transition-all touch-manipulation active:scale-[0.96] ${
+                                          s.disabled
+                                            ? "border-slate-200 bg-slate-50 text-slate-400 cursor-not-allowed line-through"
+                                            : isSelected
+                                              ? "border-blue-600 bg-blue-600 text-white shadow-[0_4px_12px_rgba(37,99,235,0.28)]"
+                                              : "border-slate-200 bg-white text-slate-800 hover:border-blue-400 hover:bg-blue-50"
+                                        }`}
+                                      >
+                                        {s.label}
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                              )}
+                            </div>
+                          </>
+                        ) : (
+                          <div className="rounded-2xl border-2 border-slate-200 bg-slate-50 p-6 text-center">
+                            <p className="text-sm text-slate-600 font-semibold">All slots for this date are past. Pick a later date above.</p>
+                          </div>
+                        )}
+
+                        {/* Selection summary — fixed visual weight so the parent can
+                            eyeball their pick before hitting submit. Includes an
+                            inline "Change" hint aligned to the right. */}
+                        {selectedDatetime ? (
+                          <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-emerald-50 border-2 border-emerald-200">
+                            <span className="size-9 rounded-xl bg-emerald-500 text-white flex items-center justify-center shrink-0">
+                              <Check className="size-5" aria-hidden="true" />
+                            </span>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-[10px] font-extrabold uppercase tracking-widest-gs text-emerald-700">Your slot</p>
+                              <p className="text-[13px] md:text-sm font-extrabold text-emerald-900 leading-snug truncate">{formatSlotLabel(selectedDatetime)}</p>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => setValue("preferred_datetime", "", { shouldValidate: true, shouldDirty: true })}
+                              className="text-[11px] font-extrabold uppercase tracking-widest-gs text-emerald-700 hover:text-emerald-900 px-2 py-1 rounded-lg hover:bg-emerald-100 transition-colors touch-manipulation shrink-0"
+                            >
+                              Change
+                            </button>
+                          </div>
+                        ) : (
+                          <p className="text-[11px] md:text-[12px] text-slate-500 font-medium">
+                            Our counsellor will confirm the exact time over WhatsApp.
+                          </p>
+                        )}
+
+                        {errors.preferred_datetime && <p className="text-[11px] text-red-500 font-bold">{errors.preferred_datetime.message}</p>}
                       </div>
 
                       <div className="flex flex-col gap-1.5 md:gap-2">
@@ -3889,7 +4445,8 @@ function MobileStickyCTA() {
           initial={{ y: 100 }} 
           animate={{ y: 0 }} 
           exit={{ y: 100 }}
-          className="fixed bottom-0 left-0 right-0 z-[100] glass-panel border-t border-white/40 p-4 shadow-[0_-10px_40px_rgba(0,0,0,0.15)] flex items-center justify-between lg:hidden"
+          className="fixed bottom-0 left-0 right-0 z-[100] glass-panel border-t border-white/40 px-4 pt-4 shadow-[0_-10px_40px_rgba(0,0,0,0.15)] flex items-center justify-between lg:hidden"
+          style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)" }}
         >
           <div className="absolute inset-0 bg-gradient-to-t from-white/95 to-white/75 pointer-events-none" />
           <div className="relative z-10 w-full flex gap-2">

@@ -55,6 +55,7 @@ interface LeadBody {
   city?: string;
   parent_concern?: string[] | string;
   parent_commitment?: string;
+  preferred_datetime?: string;
   referral_source?: string;
   // Honeypot
   website_url?: string;
@@ -123,6 +124,11 @@ function validateAttribution(raw: unknown): LeadAttribution | undefined {
   return Object.keys(out).length > 0 ? out : undefined;
 }
 
+// Conservative email regex — catches obvious bad input (spaces, missing @,
+// missing TLD) without tripping on valid addresses like `foo+bar@co.in`.
+// Not RFC5321-complete by design; Resend is the authoritative validator.
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
 function validateLead(raw: unknown): { ok: true; value: LeadBody } | { ok: false; reason: string } {
   if (!raw || typeof raw !== "object") return { ok: false, reason: "not_object" };
   const r = raw as Record<string, unknown>;
@@ -132,15 +138,24 @@ function validateLead(raw: unknown): { ok: true; value: LeadBody } | { ok: false
     return { ok: false, reason: "phone_required" };
   }
 
+  // Normalise email: trim, lower, and drop it entirely if it fails the
+  // shape check. Storing a malformed string in `parent_email` would let it
+  // leak into Resend's `to`/`reply_to` (silent 422) and Zoho's Email field.
+  const emailRaw = str(r.parent_email, 200);
+  const emailTrim = emailRaw?.trim().toLowerCase();
+  const emailOk = !!emailTrim && EMAIL_RE.test(emailTrim);
+  const parentEmail = emailOk ? emailTrim : undefined;
+
   const value: LeadBody = {
     phone,
     child_name: str(r.child_name, 120),
     child_age_range: str(r.child_age_range, 20),
     child_level: str(r.child_level, 40),
     parent_name: str(r.parent_name, 120),
-    parent_email: str(r.parent_email, 200),
+    parent_email: parentEmail,
     city: str(r.city, 80),
     parent_commitment: str(r.parent_commitment, 80),
+    preferred_datetime: str(r.preferred_datetime, 30),
     referral_source: str(r.referral_source, 80),
     parent_concern: Array.isArray(r.parent_concern) ? strArr(r.parent_concern) : str(r.parent_concern as unknown, 200),
     website_url: str(r.website_url, 200),
@@ -247,6 +262,7 @@ async function pushLeadToZoho(env: Env, body: LeadBody): Promise<{ ok: boolean; 
         `Child: ${body.child_name ?? ""} (age ${body.child_age_range ?? "?"}, level ${body.child_level ?? "?"})`,
         goals ? `Goals: ${goals}` : "",
         body.parent_commitment ? `Commitment: ${body.parent_commitment}` : "",
+        body.preferred_datetime ? `Preferred call slot: ${formatPreferredDatetime(body.preferred_datetime)}` : "",
         body.referral_source ? `Heard via: ${body.referral_source}` : "",
       ].filter(Boolean).join("\n"),
     }],
@@ -276,15 +292,18 @@ async function sendLeadEmail(env: Env, body: LeadBody): Promise<{ ok: boolean; r
   if (!resendConfigured(env)) return { ok: false, error: "resend_not_configured" };
 
   const goals = Array.isArray(body.parent_concern) ? body.parent_concern.join(", ") : body.parent_concern ?? "";
-  const subject = `🎯 New lead: ${body.parent_name ?? body.child_name ?? "Unknown"} (${body.city ?? "?"})`;
+  const slotLabel = formatPreferredDatetime(body.preferred_datetime);
+  const subject = `🎯 New lead: ${body.parent_name ?? body.child_name ?? "Unknown"} (${body.city ?? "?"})${slotLabel ? ` — ${slotLabel}` : ""}`;
   const html = `
 <!doctype html>
 <html><body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#0f172a;">
 <h2 style="color:#1d4ed8;">New demo booking from chesswize.in</h2>
 <table style="border-collapse:collapse;width:100%;max-width:600px;">
   <tr><td style="padding:6px;border-bottom:1px solid #e2e8f0;font-weight:600;width:160px;">Parent</td><td style="padding:6px;border-bottom:1px solid #e2e8f0;">${escapeHtml(body.parent_name ?? "")}</td></tr>
+  <tr><td style="padding:6px;border-bottom:1px solid #e2e8f0;font-weight:600;">Email</td><td style="padding:6px;border-bottom:1px solid #e2e8f0;">${body.parent_email ? `<a href="mailto:${escapeHtml(body.parent_email)}">${escapeHtml(body.parent_email)}</a>` : ""}</td></tr>
   <tr><td style="padding:6px;border-bottom:1px solid #e2e8f0;font-weight:600;">Phone / WhatsApp</td><td style="padding:6px;border-bottom:1px solid #e2e8f0;"><a href="https://wa.me/${escapeHtml(String(body.phone ?? "").replace(/[^+0-9]/g, ""))}">${escapeHtml(body.phone ?? "")}</a></td></tr>
   <tr><td style="padding:6px;border-bottom:1px solid #e2e8f0;font-weight:600;">City</td><td style="padding:6px;border-bottom:1px solid #e2e8f0;">${escapeHtml(body.city ?? "")}</td></tr>
+  <tr><td style="padding:6px;border-bottom:1px solid #e2e8f0;font-weight:600;">Preferred call slot</td><td style="padding:6px;border-bottom:1px solid #e2e8f0;font-weight:700;color:#1d4ed8;">${escapeHtml(slotLabel)}</td></tr>
   <tr><td style="padding:6px;border-bottom:1px solid #e2e8f0;font-weight:600;">Child</td><td style="padding:6px;border-bottom:1px solid #e2e8f0;">${escapeHtml(body.child_name ?? "")} · ${escapeHtml(body.child_age_range ?? "?")} · ${escapeHtml(body.child_level ?? "?")}</td></tr>
   <tr><td style="padding:6px;border-bottom:1px solid #e2e8f0;font-weight:600;">Goals</td><td style="padding:6px;border-bottom:1px solid #e2e8f0;">${escapeHtml(goals)}</td></tr>
   <tr><td style="padding:6px;border-bottom:1px solid #e2e8f0;font-weight:600;">Commitment</td><td style="padding:6px;border-bottom:1px solid #e2e8f0;">${escapeHtml(body.parent_commitment ?? "")}</td></tr>
@@ -292,6 +311,25 @@ async function sendLeadEmail(env: Env, body: LeadBody): Promise<{ ok: boolean; r
 </table>
 <p style="margin-top:24px;color:#64748b;font-size:12px;">Lead captured via chesswize.in worker @ ${new Date().toISOString()}</p>
 </body></html>`;
+
+  // Plaintext twin of the HTML above — required by most major spam filters
+  // (multipart/alternative expectation) and a fallback for plain-text mail
+  // readers in the counsellor's inbox.
+  const text = [
+    `New demo booking from chesswize.in`,
+    ``,
+    `Parent: ${body.parent_name ?? ""}`,
+    body.parent_email ? `Email: ${body.parent_email}` : "",
+    `Phone / WhatsApp: ${body.phone ?? ""}`,
+    `City: ${body.city ?? ""}`,
+    slotLabel ? `Preferred call slot: ${slotLabel}` : "",
+    `Child: ${body.child_name ?? ""} · ${body.child_age_range ?? "?"} · ${body.child_level ?? "?"}`,
+    goals ? `Goals: ${goals}` : "",
+    body.parent_commitment ? `Commitment: ${body.parent_commitment}` : "",
+    body.referral_source ? `Source: ${body.referral_source}` : "",
+    ``,
+    `Captured @ ${new Date().toISOString()}`,
+  ].filter(Boolean).join("\n");
 
   // Support comma-separated NOTIFY_EMAIL: send ONE email per recipient so a
   // single failing address (e.g. sandbox-restricted) doesn't block the rest.
@@ -316,7 +354,10 @@ async function sendLeadEmail(env: Env, body: LeadBody): Promise<{ ok: boolean; r
             to: [to],
             subject,
             html,
-            reply_to: body.parent_email,
+            text,
+            // Skip the header entirely when we have no valid parent email,
+            // otherwise Resend rejects the whole send with 422.
+            ...(body.parent_email ? { reply_to: body.parent_email } : {}),
           }),
         });
         if (!res.ok) {
@@ -332,6 +373,205 @@ async function sendLeadEmail(env: Env, body: LeadBody): Promise<{ ok: boolean; r
 
   const anyOk = results.some((r) => r.ok);
   return { ok: anyOk, recipients: results };
+}
+
+// WhatsApp contact the parent thank-you and counsellor emails link to. Keep
+// in sync with the value in src/lib/whatsapp.ts on the frontend.
+const COUNSELLOR_WHATSAPP = "917007578072";
+const COUNSELLOR_WHATSAPP_DISPLAY = "+91 70075 78072";
+
+// The frontend picker stores "YYYY-MM-DD HH:mm" (IST wall-clock). Render
+// that back into a human-readable string for the counsellor email + parent
+// confirmation, explicitly tagged IST so NRI parents reading in a different
+// tz don't mis-read. If the string doesn't match the expected format we
+// return it verbatim so we never drop data silently.
+function formatPreferredDatetime(v: string | undefined): string {
+  if (!v) return "";
+  const m = /^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2})$/.exec(v);
+  if (!m) return v;
+  const [, y, mo, d, hh, mm] = m;
+  const instant = new Date(`${y}-${mo}-${d}T${hh}:${mm}:00+05:30`);
+  if (Number.isNaN(instant.getTime())) return v;
+  try {
+    const label = new Intl.DateTimeFormat("en-IN", {
+      timeZone: "Asia/Kolkata",
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    }).format(instant);
+    return `${label} IST`;
+  } catch {
+    return v;
+  }
+}
+
+/**
+ * Parent-facing thank-you email. Kept separate from sendLeadEmail so a
+ * single bad notify-email address doesn't block the parent confirmation
+ * (and vice versa). Designed to:
+ *   • reinforce the booking promise the form made,
+ *   • echo back the time slot so the parent feels heard,
+ *   • surface the counsellor's WhatsApp as the primary next channel,
+ *   • set expectations (when the call happens + what to prepare),
+ *   • reinforce the 30-day growth guarantee + social proof,
+ *   • give a soft second-touchpoint if the counsellor's call is missed.
+ */
+async function sendParentThankYouEmail(env: Env, body: LeadBody): Promise<{ ok: boolean; error?: string }> {
+  if (!env.RESEND_API_KEY || !env.FROM_EMAIL) return { ok: false, error: "resend_not_configured" };
+  if (!body.parent_email) return { ok: false, error: "no_parent_email" };
+
+  const firstName = (body.parent_name ?? "").trim().split(/\s+/)[0] || "there";
+  const childName = (body.child_name ?? "").trim() || "your child";
+  const slotLabel = formatPreferredDatetime(body.preferred_datetime);
+  const waHref = `https://wa.me/${COUNSELLOR_WHATSAPP}?text=${encodeURIComponent(`Hi, I just booked a free chess evaluation on chesswize.in for ${childName}.`)}`;
+
+  const subject = `🎉 Your free chess evaluation is booked, ${firstName}`;
+
+  const html = `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>${escapeHtml(subject)}</title>
+</head>
+<body style="margin:0;padding:0;background:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;color:#0f172a;">
+  <center style="width:100%;background:#f1f5f9;padding:24px 12px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 8px 24px rgba(15,23,42,0.06);">
+      <tr>
+        <td style="background:linear-gradient(135deg,#1d4ed8 0%,#2563eb 50%,#0ea5e9 100%);padding:28px 28px 24px;color:#ffffff;">
+          <div style="font-size:12px;font-weight:800;letter-spacing:3px;text-transform:uppercase;opacity:0.9;">ChessWize</div>
+          <div style="font-size:24px;font-weight:800;line-height:1.25;margin-top:8px;">You're in, ${escapeHtml(firstName)}. 🎉</div>
+          <div style="font-size:14px;font-weight:500;line-height:1.5;margin-top:8px;opacity:0.95;">Your free 20-min chess evaluation for ${escapeHtml(childName)} is confirmed.</div>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:24px 28px 8px;">
+          <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:16px 18px;">
+            <div style="font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#1d4ed8;">Your preferred window</div>
+            <div style="font-size:16px;font-weight:700;color:#0f172a;margin-top:6px;">${escapeHtml(slotLabel || "Our counsellor will pick a time")}</div>
+            <div style="font-size:13px;color:#475569;margin-top:6px;line-height:1.5;">Our senior counsellor will WhatsApp you within <strong>24 hours</strong> (often much sooner) to lock the exact time.</div>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:16px 28px 8px;">
+          <div style="font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#64748b;">What happens next</div>
+          <ol style="font-size:14px;line-height:1.6;color:#0f172a;padding-left:20px;margin:12px 0 0;">
+            <li style="margin-bottom:8px;"><strong>We WhatsApp you</strong> on ${escapeHtml(body.phone ?? "the number you shared")} to confirm the slot.</li>
+            <li style="margin-bottom:8px;"><strong>20-min live evaluation</strong> with a FIDE-rated coach on Zoom — ${escapeHtml(childName)} plays a few positions, the coach reads the style.</li>
+            <li style="margin-bottom:8px;"><strong>Personalised growth plan</strong> — you get a written report on strengths, gaps, and a recommended 30-day track.</li>
+            <li><strong>No pressure to enrol.</strong> If the chemistry isn't right, we'll say so first.</li>
+          </ol>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:16px 28px 8px;">
+          <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:16px 18px;">
+            <div style="font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#64748b;">Quick prep — takes 2 minutes</div>
+            <ul style="font-size:13px;line-height:1.6;color:#334155;padding-left:18px;margin:10px 0 0;">
+              <li>A laptop or tablet with a working camera and mic.</li>
+              <li>A quiet 20 minutes when ${escapeHtml(childName)} is fresh, not tired.</li>
+              <li>Optional: a physical board nearby — some kids focus better with one.</li>
+              <li>Have any past tournament / rating details ready if applicable.</li>
+            </ul>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:20px 28px 8px;text-align:center;">
+          <a href="${waHref}" style="display:inline-block;background:#25D366;color:#ffffff;text-decoration:none;font-weight:800;font-size:15px;padding:14px 28px;border-radius:12px;box-shadow:0 6px 16px rgba(37,211,102,0.35);">💬 Message your counsellor on WhatsApp</a>
+          <div style="font-size:12px;color:#64748b;margin-top:10px;">Or save our number: <strong>${escapeHtml(COUNSELLOR_WHATSAPP_DISPLAY)}</strong></div>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:20px 28px;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              <td style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:14px 16px;">
+                <div style="font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#15803d;">30-day growth guarantee</div>
+                <div style="font-size:13px;line-height:1.55;color:#166534;margin-top:4px;">If ${escapeHtml(childName)} doesn't show visible improvement in focus, tactics, or game confidence in 30 days, we refund you — no questions.</div>
+              </td>
+            </tr>
+            <tr><td style="height:10px;line-height:10px;">&nbsp;</td></tr>
+            <tr>
+              <td style="background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:14px 16px;">
+                <div style="font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#b45309;">You're in good company</div>
+                <div style="font-size:13px;line-height:1.55;color:#92400e;margin-top:4px;">2,400+ Indian parents have put their kids through ChessWize. Average rating gain in the first cohort: <strong>+220 Elo in 90 days</strong>.</div>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:18px 28px 28px;border-top:1px solid #e2e8f0;background:#f8fafc;">
+          <div style="font-size:12px;line-height:1.6;color:#64748b;">
+            Questions before the call? Just reply to this email — a real human (not a bot) reads every message within 4 hours on weekdays.
+          </div>
+          <div style="font-size:11px;line-height:1.6;color:#94a3b8;margin-top:12px;">
+            ChessWize · India's fastest-growing online chess academy · <a href="https://chesswize.in" style="color:#94a3b8;text-decoration:underline;">chesswize.in</a>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </center>
+</body>
+</html>`;
+
+  const text = [
+    `Hi ${firstName},`,
+    ``,
+    `Your free 20-min chess evaluation for ${childName} is confirmed.`,
+    ``,
+    slotLabel ? `Preferred window: ${slotLabel}` : `Our counsellor will pick a time that works.`,
+    `We'll WhatsApp you within 24 hours on ${body.phone ?? "the number you shared"} to lock the exact slot.`,
+    ``,
+    `What happens next:`,
+    `  1. We WhatsApp you to confirm the slot.`,
+    `  2. 20-min live evaluation with a FIDE-rated coach on Zoom.`,
+    `  3. You receive a written growth plan for ${childName}.`,
+    `  4. Zero pressure to enrol.`,
+    ``,
+    `Quick prep:`,
+    `  • Laptop or tablet with working camera + mic`,
+    `  • A quiet 20 minutes when ${childName} is fresh`,
+    `  • Optional: a physical board`,
+    `  • Any past tournament / rating details if applicable`,
+    ``,
+    `Want to reach us directly? WhatsApp ${COUNSELLOR_WHATSAPP_DISPLAY}.`,
+    ``,
+    `30-day growth guarantee — if you don't see visible improvement in 30 days, we refund you.`,
+    ``,
+    `— Team ChessWize · chesswize.in`,
+  ].join("\n");
+
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${env.RESEND_API_KEY}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        from: env.FROM_EMAIL,
+        to: [body.parent_email],
+        subject,
+        html,
+        text,
+        reply_to: env.NOTIFY_EMAIL?.split(",")[0]?.trim() || env.FROM_EMAIL,
+      }),
+    });
+    if (!res.ok) {
+      const detail = await res.text().catch(() => "");
+      return { ok: false, error: `resend_${res.status}${detail ? ": " + detail.slice(0, 120) : ""}` };
+    }
+    return { ok: true };
+  } catch (e: any) {
+    return { ok: false, error: e?.message ?? "fetch_error" };
+  }
 }
 
 function escapeHtml(s: string): string {
@@ -390,13 +630,22 @@ async function handleLead(request: Request, env: Env, ctx: ExecutionContext): Pr
   // dedupes the two into a single Lead in the dashboard.
   const eventId = crypto.randomUUID();
 
-  const [zoho, email] = await Promise.allSettled([
+  const [zoho, email, parentEmail] = await Promise.allSettled([
     pushLeadToZoho(env, lead),
     sendLeadEmail(env, lead),
+    sendParentThankYouEmail(env, lead),
   ]);
 
   const zohoOk = zoho.status === "fulfilled" && zoho.value.ok;
   const emailOk = email.status === "fulfilled" && email.value.ok;
+
+  // Local-dev convenience: when *nothing* is configured (pure localhost
+  // wrangler without .dev.vars), treat the submit as stored so the frontend
+  // happy path — /thank-you navigation, Meta browser Lead, confirmation
+  // UI — can be exercised without provisioning real Zoho/Resend credentials.
+  // Prod always has at least one integration configured, so this bypass is
+  // inert outside of a clean dev environment.
+  const devMockStorage = !zohoConfigured(env) && !resendConfigured(env) && !capiConfigured(env);
 
   // Fire Meta CAPI without blocking the user response. ctx.waitUntil lets
   // the worker stay alive long enough to finish the Meta POST.
@@ -428,13 +677,23 @@ async function handleLead(request: Request, env: Env, ctx: ExecutionContext): Pr
     );
   }
 
-  return json({
-    ok: true,
-    stored: zohoOk || emailOk,
-    event_id: eventId,
-    zoho: zoho.status === "fulfilled" ? zoho.value : { ok: false, error: "rejected" },
-    email: email.status === "fulfilled" ? email.value : { ok: false, error: "rejected" },
-  });
+  const stored = zohoOk || emailOk || devMockStorage;
+
+  // When nothing persisted, return 502 so the frontend surfaces a retry
+  // instead of silently sending the parent to /thank-you. Body still carries
+  // the per-integration detail so ops can inspect what failed.
+  return json(
+    {
+      ok: stored,
+      stored,
+      event_id: eventId,
+      dev_mock: devMockStorage || undefined,
+      zoho: zoho.status === "fulfilled" ? zoho.value : { ok: false, error: "rejected" },
+      email: email.status === "fulfilled" ? email.value : { ok: false, error: "rejected" },
+      parent_email: parentEmail.status === "fulfilled" ? parentEmail.value : { ok: false, error: "rejected" },
+    },
+    stored ? {} : { status: 502 },
+  );
 }
 
 function handleHealth(env: Env): Response {
