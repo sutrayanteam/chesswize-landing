@@ -4297,7 +4297,7 @@ function Footer() {
               </li>
               <li className="flex items-center gap-3 text-slate-400">
                 <Mail className="size-3.5 text-slate-500 shrink-0" />
-                <a href="mailto:hello@chesswize.in" className="hover:text-white transition-colors">hello@chesswize.in</a>
+                <a href="mailto:support@chesswize.com" className="hover:text-white transition-colors">support@chesswize.com</a>
               </li>
               <li className="flex items-center gap-3 text-slate-400">
                 <MapPin className="size-3.5 text-slate-500 shrink-0" />

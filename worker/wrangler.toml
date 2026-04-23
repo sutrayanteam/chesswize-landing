@@ -33,7 +33,7 @@ enabled = true
 # Required for Resend email notifications:
 #   RESEND_API_KEY          — from resend.com/api-keys
 #   NOTIFY_EMAIL            — internal inbox that receives new-lead emails
-#   FROM_EMAIL              — verified sender, e.g. "ChessWize <noreply@chesswize.in>"
+#   FROM_EMAIL              — verified sender, e.g. "ChessWize <noreply@chesswize.com>"
 #
 # Required for Meta Conversions API (server-side Lead events):
 #   META_CAPI_TOKEN         — Events Manager → Pixel → Conversions API →
@@ -59,9 +59,9 @@ enabled = true
 # can ONLY deliver to the Resend account's own email (support@chesswize.com).
 # To unlock sending to any address:
 #   1) Create a new Resend API key with full access (not "send-only")
-#   2) Visit https://resend.com/domains, add chesswize.in, copy the DNS records
+#   2) Visit https://resend.com/domains, add chesswize.com, copy the DNS records
 #   3) Share DNS records with me → I'll wire them via Cloudflare API
-#   4) Once verified, switch FROM_EMAIL → "ChessWize <noreply@chesswize.in>"
+#   4) Once verified, switch FROM_EMAIL → "ChessWize <noreply@chesswize.com>"
 #      and NOTIFY_EMAIL → whatever inbox you want lead emails at
 FROM_EMAIL = "ChessWize <noreply@updates.chesswize.in>"
 # Comma-separated list — each recipient is sent in parallel as an independent

@@ -137,7 +137,7 @@ export function PrivacyPolicy() {
         <li>Request data portability.</li>
         <li>Lodge a complaint with a supervisory authority.</li>
       </ul>
-      <p>To exercise any of these rights, email us at <strong>hello@chesswize.in</strong> with the subject line "Privacy Request".</p>
+      <p>To exercise any of these rights, email us at <strong>support@chesswize.com</strong> with the subject line "Privacy Request".</p>
 
       <h3>9. International Data Transfers</h3>
       <p>Our servers and service providers may be located outside India. By using our Services, you consent to the transfer of your data to jurisdictions that may have different data protection laws. We ensure appropriate safeguards are in place for such transfers.</p>
@@ -148,7 +148,7 @@ export function PrivacyPolicy() {
       <h3>11. Contact Us</h3>
       <p>For privacy-related enquiries:</p>
       <ul>
-        <li><strong>Email:</strong> hello@chesswize.in</li>
+        <li><strong>Email:</strong> support@chesswize.com</li>
         <li><strong>Phone:</strong> +91-84009-79997</li>
         <li><strong>Address:</strong> Kanpur, Uttar Pradesh, India</li>
       </ul>
@@ -226,7 +226,7 @@ export function TermsOfService() {
       <h3>14. Contact</h3>
       <p>For questions about these Terms:</p>
       <ul>
-        <li><strong>Email:</strong> hello@chesswize.in</li>
+        <li><strong>Email:</strong> support@chesswize.com</li>
         <li><strong>Phone:</strong> +91-84009-79997</li>
       </ul>
     </LegalLayout>
@@ -247,7 +247,7 @@ export function RefundPolicy() {
       <h3>1. Refund on Unused Sessions</h3>
       <p>We only want you paying for sessions your child actually uses. If you decide to stop — at any point, for any reason — we refund the full amount for every session that has not yet been attended, subject to the following conditions:</p>
       <ul>
-        <li>Refund requests must be submitted in writing to <strong>hello@chesswize.in</strong> or via WhatsApp.</li>
+        <li>Refund requests must be submitted in writing to <strong>support@chesswize.com</strong> or via WhatsApp.</li>
         <li>Sessions that have already been attended, or that were missed with less than 24 hours' notice, are not eligible for a refund (see Section 2 on rescheduling).</li>
         <li>Refunds are calculated on the actual amount paid (net of any promotional discount applied at purchase).</li>
       </ul>
@@ -264,7 +264,7 @@ export function RefundPolicy() {
 
       <h3>3. Subscription Cancellations</h3>
       <ul>
-        <li>You may cancel your monthly subscription at any time by emailing <strong>hello@chesswize.in</strong> or contacting us via WhatsApp.</li>
+        <li>You may cancel your monthly subscription at any time by emailing <strong>support@chesswize.com</strong> or contacting us via WhatsApp.</li>
         <li>Cancellations take effect at the end of the current billing cycle. You will continue to have access to scheduled sessions until the cycle ends.</li>
         <li>Sessions already attended within the cycle are non-refundable; remaining unused sessions in that cycle are refunded in full on request.</li>
         <li>Annual or multi-month plans: cancellations are prorated on unused sessions, minus a 15% early-termination fee.</li>
@@ -293,7 +293,7 @@ export function RefundPolicy() {
         <li>The programme/plan you are enrolled in.</li>
         <li>Reason for the refund request.</li>
       </ul>
-      <p><strong>Email:</strong> hello@chesswize.in | <strong>Phone/WhatsApp:</strong> +91-84009-79997</p>
+      <p><strong>Email:</strong> support@chesswize.com | <strong>Phone/WhatsApp:</strong> +91-84009-79997</p>
     </LegalLayout>
   );
 }
@@ -361,7 +361,7 @@ export function CookiePolicy() {
       <p>We may update this Cookie Policy to reflect changes in technology or regulation. The "Last updated" date at the top will be revised accordingly.</p>
 
       <h3>6. Contact</h3>
-      <p>For questions about our use of cookies, contact us at <strong>hello@chesswize.in</strong>.</p>
+      <p>For questions about our use of cookies, contact us at <strong>support@chesswize.com</strong>.</p>
     </LegalLayout>
   );
 }
@@ -402,7 +402,7 @@ export function Disclaimer() {
       <p>Nothing on this Site constitutes professional, legal, financial, or medical advice. For specific concerns about your child's development, please consult a qualified professional.</p>
 
       <h3>9. Contact</h3>
-      <p>If you have questions about this Disclaimer, please contact us at <strong>hello@chesswize.in</strong>.</p>
+      <p>If you have questions about this Disclaimer, please contact us at <strong>support@chesswize.com</strong>.</p>
     </LegalLayout>
   );
 }
