@@ -163,10 +163,10 @@ export default function ThankYou() {
                   Message Priya on WhatsApp
                 </a>
                 <a
-                  href="tel:+917007578072"
+                  href="tel:+918400979997"
                   className="inline-flex items-center justify-center gap-2 h-14 px-5 rounded-2xl bg-white border-2 border-slate-200 hover:border-slate-300 active:scale-[0.98] text-slate-900 font-extrabold text-[15px] transition-all touch-manipulation"
                 >
-                  Call +91 70075 78072
+                  Call +91 84009 79997
                 </a>
               </div>
 
@@ -477,8 +477,8 @@ export default function ThankYou() {
               <div className="flex items-center gap-3 p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
                 <Shield className="size-6 text-emerald-600 shrink-0" aria-hidden="true" />
                 <div>
-                  <p className="text-[13px] md:text-sm font-extrabold text-emerald-900">30-day growth guarantee</p>
-                  <p className="text-[11px] md:text-xs text-emerald-700 font-medium">No visible improvement? Full refund.</p>
+                  <p className="text-[13px] md:text-sm font-extrabold text-emerald-900">Refund on unused sessions</p>
+                  <p className="text-[11px] md:text-xs text-emerald-700 font-medium">Cancel any time — unused money is refunded.</p>
                 </div>
               </div>
               <div className="flex items-center gap-3 p-4 rounded-2xl bg-blue-50 border border-blue-200">
@@ -498,7 +498,7 @@ export default function ThankYou() {
             </div>
 
             <p className="text-center text-xs md:text-sm text-slate-500 font-medium mt-8 max-w-[520px] mx-auto">
-              💡 <strong className="text-slate-700">Tip:</strong> Save <span className="font-bold text-slate-700">+91 70075 78072</span> to your contacts so Priya's WhatsApp message doesn't land in the Unknown folder.
+              💡 <strong className="text-slate-700">Tip:</strong> Save <span className="font-bold text-slate-700">+91 84009 79997</span> to your contacts so Priya's WhatsApp message doesn't land in the Unknown folder.
             </p>
           </div>
         </section>

@@ -6,7 +6,7 @@
 import { getAttribution } from "./attribution";
 import { trackContact } from "./tracking";
 
-const WA_NUMBER = "917007578072";
+const WA_NUMBER = "918400979997";
 const DEFAULT_TEXT = "Hi, I'd like to book a free demo for my child.";
 
 interface BuildOptions {

@@ -2619,7 +2619,7 @@ function ValueStack() {
               <Phone className="size-5 text-blue-600 shrink-0 mt-0.5" />
               <div>
                 <p className="font-extrabold text-slate-900 text-xs md:text-sm">Human counsellor</p>
-                <p className="text-[11px] md:text-xs text-slate-500 font-medium">Call <a href="tel:+917007578072" className="text-blue-600 font-bold">+91 70075 78072</a> or WhatsApp in &lt;10 min</p>
+                <p className="text-[11px] md:text-xs text-slate-500 font-medium">Call <a href="tel:+918400979997" className="text-blue-600 font-bold">+91 84009 79997</a> or WhatsApp in &lt;10 min</p>
               </div>
             </div>
           </div>
@@ -2993,7 +2993,7 @@ function FAQ() {
   const categories: { id: FaqCategory; label: string }[] = [
     { id: "fit", label: "Learning & Fit" },
     { id: "logistics", label: "Logistics" },
-    { id: "pricing", label: "Pricing & Guarantee" },
+    { id: "pricing", label: "Pricing & Refunds" },
   ];
 
   const faqs: { q: string; a: string; category: FaqCategory }[] = [
@@ -3044,8 +3044,8 @@ function FAQ() {
     },
     {
       category: "pricing",
-      q: "What exactly is the 30-day guarantee?",
-      a: "We guarantee visible growth. If, after 30 days of attending our sessions and doing the daily puzzles, you don't see noticeable improvement in your child's patience or focus, we refund 100% of your tuition. No questions asked. We track this objectively via dashboard metrics, so there's no ambiguity.",
+      q: "What's your refund policy?",
+      a: "If your child stops attending for any reason, we refund every unused session — no questions, no forms to fight. You can pause or cancel any time over email or WhatsApp, and the money for sessions you haven't used comes straight back to your original payment method within 5–10 business days.",
     },
   ];
 
@@ -4141,7 +4141,7 @@ function BottomForm() {
                       )}
                       {status === "error" && (
                         <div role="alert" className="p-4 text-sm bg-red-50 text-red-700 rounded-xl border border-red-200 font-bold">
-                          {submitErrorMsg ?? "We couldn't send your request. Please WhatsApp us directly at +91 70075 78072."}
+                          {submitErrorMsg ?? "We couldn't send your request. Please WhatsApp us directly at +91 84009 79997."}
                         </div>
                       )}
                       
@@ -4172,7 +4172,7 @@ function BottomForm() {
                       
                       <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 mt-4 text-slate-500">
                         <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest-gs text-slate-600">
-                          <Shield className="size-4 text-emerald-500" /> 30-Day Growth Guarantee
+                          <Shield className="size-4 text-emerald-500" /> Refund on unused sessions
                         </span>
                         <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest-gs">
                           <CheckCircle className="size-4 text-emerald-500" /> No Payment Required
@@ -4291,7 +4291,7 @@ function Footer() {
             <ul className="mt-6 space-y-2.5 text-sm font-medium">
               <li className="flex items-center gap-3 text-slate-400">
                 <Phone className="size-3.5 text-slate-500 shrink-0" />
-                <a href="tel:+917007578072" className="hover:text-white transition-colors">+91&nbsp;70075&nbsp;78072</a>
+                <a href="tel:+918400979997" className="hover:text-white transition-colors">+91&nbsp;84009&nbsp;79997</a>
                 <span className="text-slate-600">·</span>
                 <span className="text-slate-500 text-xs">10&nbsp;AM – 8&nbsp;PM IST</span>
               </li>

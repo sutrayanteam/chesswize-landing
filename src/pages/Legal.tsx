@@ -149,7 +149,7 @@ export function PrivacyPolicy() {
       <p>For privacy-related enquiries:</p>
       <ul>
         <li><strong>Email:</strong> hello@chesswize.in</li>
-        <li><strong>Phone:</strong> +91-70075-78072</li>
+        <li><strong>Phone:</strong> +91-84009-79997</li>
         <li><strong>Address:</strong> Kanpur, Uttar Pradesh, India</li>
       </ul>
     </LegalLayout>
@@ -197,7 +197,7 @@ export function TermsOfService() {
       </ul>
 
       <h3>5. Cancellations &amp; Refunds</h3>
-      <p>Please refer to our dedicated <Link to="/refund-policy"><strong>Refund Policy</strong></Link> for complete details on our 30-Day Cognitive Growth Guarantee, session rescheduling, and cancellation procedures.</p>
+      <p>Please refer to our dedicated <Link to="/refund-policy"><strong>Refund Policy</strong></Link> for complete details on our unused-session refund, session rescheduling, and cancellation procedures.</p>
 
       <h3>6. Intellectual Property</h3>
       <p>All content on the Site — including text, graphics, logos, curriculum materials, puzzle databases, the "ChessWize Programme" methodology, video recordings, and software — is the exclusive property of ChessWize or its licensors and is protected by copyright, trademark, and other intellectual property laws. You may not reproduce, distribute, modify, or create derivative works from any of our content without prior written consent.</p>
@@ -227,7 +227,7 @@ export function TermsOfService() {
       <p>For questions about these Terms:</p>
       <ul>
         <li><strong>Email:</strong> hello@chesswize.in</li>
-        <li><strong>Phone:</strong> +91-70075-78072</li>
+        <li><strong>Phone:</strong> +91-84009-79997</li>
       </ul>
     </LegalLayout>
   );
@@ -236,7 +236,7 @@ export function TermsOfService() {
 export function RefundPolicy() {
   useRouteMeta({
     title: "Refund Policy — ChessWize",
-    description: "ChessWize's 30-Day Cognitive Growth Guarantee, session rescheduling rules, and cancellation procedure.",
+    description: "ChessWize's unused-session refund policy, session rescheduling rules, and cancellation procedure.",
     path: "/refund-policy",
   });
   return (
@@ -244,12 +244,12 @@ export function RefundPolicy() {
       <p>Last updated: April 15, 2026</p>
       <p>At ChessWize, we are confident in the quality of our coaching. This Refund Policy outlines the conditions under which refunds, cancellations, and rescheduling are handled.</p>
 
-      <h3>1. 30-Day Cognitive Growth Guarantee</h3>
-      <p>We stand behind our methodology with a results-backed guarantee. If you are not satisfied with the measurable progress your child has made within the first 30 calendar days of beginning a paid program, you are eligible for a <strong>full refund</strong> of your initial month's tuition, subject to the following conditions:</p>
+      <h3>1. Refund on Unused Sessions</h3>
+      <p>We only want you paying for sessions your child actually uses. If you decide to stop — at any point, for any reason — we refund the full amount for every session that has not yet been attended, subject to the following conditions:</p>
       <ul>
-        <li>The student must have attended all scheduled sessions during the 30-day period.</li>
-        <li>The refund request must be submitted in writing to <strong>hello@chesswize.in</strong> within 7 days of the 30-day period ending.</li>
-        <li>This guarantee applies once per family and only to the first enrolment.</li>
+        <li>Refund requests must be submitted in writing to <strong>hello@chesswize.in</strong> or via WhatsApp.</li>
+        <li>Sessions that have already been attended, or that were missed with less than 24 hours' notice, are not eligible for a refund (see Section 2 on rescheduling).</li>
+        <li>Refunds are calculated on the actual amount paid (net of any promotional discount applied at purchase).</li>
       </ul>
 
       <h3>2. Session Rescheduling</h3>
@@ -266,8 +266,8 @@ export function RefundPolicy() {
       <ul>
         <li>You may cancel your monthly subscription at any time by emailing <strong>hello@chesswize.in</strong> or contacting us via WhatsApp.</li>
         <li>Cancellations take effect at the end of the current billing cycle. You will continue to have access to scheduled sessions until the cycle ends.</li>
-        <li>No prorated refunds are issued for mid-cycle cancellations after the initial 30-day guarantee period.</li>
-        <li>Annual or multi-month plans: Cancellations are subject to a pro-rata calculation minus a 15% early termination fee, applicable only after the 30-day guarantee window.</li>
+        <li>Sessions already attended within the cycle are non-refundable; remaining unused sessions in that cycle are refunded in full on request.</li>
+        <li>Annual or multi-month plans: cancellations are prorated on unused sessions, minus a 15% early-termination fee.</li>
       </ul>
 
       <h3>4. Diagnostic Evaluation</h3>
@@ -293,7 +293,7 @@ export function RefundPolicy() {
         <li>The programme/plan you are enrolled in.</li>
         <li>Reason for the refund request.</li>
       </ul>
-      <p><strong>Email:</strong> hello@chesswize.in | <strong>Phone/WhatsApp:</strong> +91-70075-78072</p>
+      <p><strong>Email:</strong> hello@chesswize.in | <strong>Phone/WhatsApp:</strong> +91-84009-79997</p>
     </LegalLayout>
   );
 }

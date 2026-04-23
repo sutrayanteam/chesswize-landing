@@ -525,8 +525,8 @@ async function sendLeadEmail(env: Env, body: LeadBody): Promise<{ ok: boolean; r
 
 // WhatsApp contact the parent thank-you and counsellor emails link to. Keep
 // in sync with the value in src/lib/whatsapp.ts on the frontend.
-const COUNSELLOR_WHATSAPP = "917007578072";
-const COUNSELLOR_WHATSAPP_DISPLAY = "+91 70075 78072";
+const COUNSELLOR_WHATSAPP = "918400979997";
+const COUNSELLOR_WHATSAPP_DISPLAY = "+91 84009 79997";
 
 // The frontend picker stores "YYYY-MM-DD HH:mm" (IST wall-clock). Render
 // that back into a human-readable string for the counsellor email + parent
@@ -597,7 +597,7 @@ function buildIcsForSlot(v: string | undefined, childName: string, eventId: stri
     `Your free 20-min chess evaluation with a ChessWize FIDE-rated coach.`,
     ``,
     `Our counsellor will WhatsApp you the Zoom link a few minutes before the call.`,
-    `If you need to reschedule, reply to the confirmation email or WhatsApp +91 70075 78072.`,
+    `If you need to reschedule, reply to the confirmation email or WhatsApp +91 84009 79997.`,
   ].join("\n"));
   // CRLF line endings per RFC 5545; keep lines < 75 octets when reasonable.
   return [
@@ -643,7 +643,7 @@ function toBase64(s: string): string {
  *   • echo back the picked slot + make it calendar-able,
  *   • surface the counsellor's WhatsApp as the primary next channel,
  *   • set expectations (what happens next + what to prepare),
- *   • reinforce the 30-day growth guarantee + social proof,
+ *   • reinforce the unused-sessions refund promise + social proof,
  *   • give a soft second-touchpoint if the counsellor's call is missed.
  */
 async function sendParentThankYouEmail(env: Env, body: LeadBody, eventId: string): Promise<{ ok: boolean; error?: string }> {
@@ -800,8 +800,8 @@ async function sendParentThankYouEmail(env: Env, body: LeadBody, eventId: string
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
           <tr>
             <td style="background:#ecfdf5;border:1px solid #a7f3d0;border-radius:12px;padding:14px 16px;">
-              <div style="font-size:10px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:#047857;">🛡️ 30-day growth guarantee</div>
-              <div style="font-size:13px;line-height:1.55;color:#065f46;margin-top:4px;">If ${escapeHtml(childName)} doesn't show visible improvement in focus, tactics, or game confidence in 30 days — we refund you, no questions.</div>
+              <div style="font-size:10px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:#047857;">🛡️ Refund on unused sessions</div>
+              <div style="font-size:13px;line-height:1.55;color:#065f46;margin-top:4px;">If ${escapeHtml(childName)} stops attending for any reason, we refund every session you haven't used — no questions, no forms to fight.</div>
             </td>
           </tr>
           <tr><td style="height:10px;line-height:10px;">&nbsp;</td></tr>
@@ -858,7 +858,7 @@ async function sendParentThankYouEmail(env: Env, body: LeadBody, eventId: string
     ``,
     `Want to reach us directly? WhatsApp ${COUNSELLOR_WHATSAPP_DISPLAY}.`,
     ``,
-    `30-day growth guarantee — if you don't see visible improvement in 30 days, we refund you.`,
+    `Refund on unused sessions — cancel any time and the money for sessions you haven't used comes back.`,
     ``,
     `— Team ChessWize · chesswize.in`,
   ].filter((l) => l !== undefined).join("\n");
