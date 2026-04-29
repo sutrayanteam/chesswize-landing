@@ -113,7 +113,14 @@ import {
 
 /* ─── Utility ─── */
 function scrollToForm() {
-  document.getElementById("book-evaluation")?.scrollIntoView({ behavior: "smooth" });
+  // Land directly on the form card ("Tell us who your child is"), not on
+  // the section intro copy above it. The card has `scroll-mt-24` so the
+  // fixed top nav doesn't cover the heading. Falls back to the section
+  // anchor if the card id is ever removed.
+  const target =
+    document.getElementById("demo-form-card") ??
+    document.getElementById("book-evaluation");
+  target?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 function scrollToSection(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
@@ -263,7 +270,7 @@ function Hero() {
             </h1>
 
             <p className="text-base md:text-lg lg:text-xl text-slate-600 font-medium leading-[1.6] max-w-2xl tracking-tight-gs">
-              Structured online chess coaching by FIDE-rated masters. Small batches of six, same coach every session, real improvement you can see on the dashboard.
+              Structured online chess coaching by tournament-trained coaches who&apos;ve produced FIDE-rated players. Small batches of six, the same coach every session, real improvement you can see on the dashboard.
             </p>
 
             <div className="bg-white p-5 md:p-6 rounded-2xl depth-panel mt-1 md:mt-2 max-w-xl relative overflow-hidden hover-lift">
@@ -2182,28 +2189,28 @@ function Mentors() {
               Coaches we&apos;d send our own <span className="text-blue-700">kids</span> to.
             </h3>
             <p className="text-base md:text-lg text-slate-600 font-medium leading-relaxed mb-5 md:mb-6">
-              Our head coaches hold official FIDE titles, have background-verified IDs, and train under our in-house teaching rubric before they ever take a live class.
+              Our head coaches are tournament players turned instructors, background-verified, and trained on our in-house teaching rubric before they ever take a live class.
             </p>
             <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mb-6 md:mb-8 text-[11px] md:text-xs font-bold text-slate-600">
               <span className="inline-flex items-center gap-1.5">
                 <Shield className="size-3.5 text-blue-600" /> Background-verified
               </span>
               <span className="inline-flex items-center gap-1.5">
-                <CheckCircle className="size-3.5 text-emerald-500" /> FIDE-titled only
+                <CheckCircle className="size-3.5 text-emerald-500" /> Tournament-trained
               </span>
               <span className="inline-flex items-center gap-1.5">
                 <PlayCircle className="size-3.5 text-blue-600" /> Classes recorded for parent review
               </span>
             </div>
-            
+
             <div className="flex flex-col gap-4">
                <div className="flex items-start gap-4">
                  <div className="mt-1 size-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0 border border-blue-200">
                     <span className="text-blue-700 font-extrabold text-xs">1</span>
                  </div>
                  <div>
-                   <h4 className="font-extrabold text-slate-900 text-sm md:text-base">FIDE Verified Ratings</h4>
-                   <p className="text-xs md:text-sm text-slate-600 font-medium mt-1">Coaches must have an internationally recognized rating proving their structural understanding of the game.</p>
+                   <h4 className="font-extrabold text-slate-900 text-sm md:text-base">Tournament-Tested Coaches</h4>
+                   <p className="text-xs md:text-sm text-slate-600 font-medium mt-1">Every head coach is an active or former competitive player — district, state, or international level — with verifiable tournament history.</p>
                  </div>
                </div>
                <div className="flex items-start gap-4">
@@ -2213,6 +2220,15 @@ function Mentors() {
                  <div>
                    <h4 className="font-extrabold text-slate-900 text-sm md:text-base">Teaching & Child-Safety Training</h4>
                    <p className="text-xs md:text-sm text-slate-600 font-medium mt-1">Every coach is background-verified and trained to teach patience, calculation, and emotional resilience — not just piece movements.</p>
+                 </div>
+               </div>
+               <div className="flex items-start gap-4">
+                 <div className="mt-1 size-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0 border border-blue-200">
+                    <span className="text-blue-700 font-extrabold text-xs">3</span>
+                 </div>
+                 <div>
+                   <h4 className="font-extrabold text-slate-900 text-sm md:text-base">FIDE-Rated Players Produced</h4>
+                   <p className="text-xs md:text-sm text-slate-600 font-medium mt-1">Our methodology has produced FIDE-rated players and tournament winners at the district, state, and international levels — including our youngest at age 6.</p>
                  </div>
                </div>
             </div>
@@ -2229,28 +2245,37 @@ function Mentors() {
             <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 md:p-8 lg:p-10 gs-shadow-xl relative overflow-hidden">
               <div className="absolute top-0 right-0 w-40 md:w-64 h-40 md:h-64 bg-amber-100/50 rounded-full blur-[40px] md:blur-[60px] pointer-events-none" />
               <div className="flex flex-col gap-6 relative z-10">
-                {/* Top: Image + Name side by side */}
+                {/* Top: Lead Coach + headline */}
                 <div className="flex items-center gap-5 md:gap-6">
                   <div className="relative shrink-0">
-                    <img loading="lazy" decoding="async" width={1920} height={1280} src="/young-man-deep-in-thought-while-playing-game-of-ch-2026-01-09-00-57-38-utc.webp" alt="Tarun R., Head Coach & Founder" className="size-40 md:size-48 rounded-2xl object-cover border-2 border-slate-200 gs-shadow-lg relative z-10" />
+                    <img loading="lazy" decoding="async" width={800} height={1067} src="/founder-hrdyansh-pandey.webp" alt="Hrdyansh Pandey, Co-Founder & Lead Coach at ChessWize" className="size-40 md:size-48 rounded-2xl object-cover border-2 border-slate-200 gs-shadow-lg relative z-10" />
                   </div>
                   <div>
-                    <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-200 border-0 rounded text-[9px] md:text-[10px] font-bold uppercase tracking-widest-gs mb-1.5 px-2 py-0.5">Head Coach & Founder</Badge>
-                    <h4 className="text-2xl md:text-3xl font-extrabold tracking-tighter-gs text-slate-900">Tarun R., Head Coach &amp; Founder</h4>
+                    <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-200 border-0 rounded text-[9px] md:text-[10px] font-bold uppercase tracking-widest-gs mb-1.5 px-2 py-0.5">Co-Founder & Lead Coach</Badge>
+                    <h4 className="text-2xl md:text-3xl font-extrabold tracking-tighter-gs text-slate-900">Hrdyansh Pandey</h4>
+                    <p className="text-xs md:text-sm font-bold text-slate-500 uppercase tracking-widest-gs mt-1">Heads Coaching at ChessWize</p>
                   </div>
                 </div>
-                
+
                 <Separator className="bg-slate-200" />
-                
-                {/* Credentials list */}
+
+                {/* Credentials list — sourced from "About Founders" doc */}
                 <div className="grid grid-cols-1 gap-y-3.5 text-xs md:text-sm font-bold text-slate-700">
-                  <div className="flex items-start gap-3"><CheckCircle className="size-4 text-emerald-500 shrink-0 mt-0.5" /> FIDE Rated &mdash; active tournament player &amp; certified arbiter <a href="https://ratings.fide.com/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700 underline underline-offset-2 ml-1 whitespace-nowrap">Verify FIDE profile →</a></div>
-                  <div className="flex items-start gap-3"><CheckCircle className="size-4 text-emerald-500 shrink-0 mt-0.5" /> 10+ years academic pedagogy &mdash; trained 200+ students across 3 countries</div>
-                  <div className="flex items-start gap-3"><CheckCircle className="size-4 text-emerald-500 shrink-0 mt-0.5" /> Designed the ChessWize Programme &mdash; a structured 48-week curriculum focused on thinking, not memorising</div>
-                  <div className="flex items-start gap-3"><CheckCircle className="size-4 text-emerald-500 shrink-0 mt-0.5" /> Students coached to 15+ state-level tournament podium finishes</div>
-                  <div className="flex items-start gap-3"><CheckCircle className="size-4 text-emerald-500 shrink-0 mt-0.5" /> Specialises in emotional resilience training across every skill level — from absolute beginner to tournament player</div>
-                  <div className="flex items-start gap-3"><CheckCircle className="size-4 text-emerald-500 shrink-0 mt-0.5" /> <span>Your child stays with the <strong>same coach</strong> for the entire programme — no rotation, no handoffs</span></div>
+                  <div className="flex items-start gap-3"><CheckCircle className="size-4 text-emerald-500 shrink-0 mt-0.5" /> 7+ years coaching &mdash; trained <strong>700+ students</strong> across the USA, UK, Singapore, Australia &amp; the Middle East</div>
+                  <div className="flex items-start gap-3"><CheckCircle className="size-4 text-emerald-500 shrink-0 mt-0.5" /> Conducted <strong>1,200+ demo sessions</strong> with a 75–80% conversion rate</div>
+                  <div className="flex items-start gap-3"><CheckCircle className="size-4 text-emerald-500 shrink-0 mt-0.5" /> Coaching has produced <strong>FIDE-rated players</strong> and national-level performers</div>
+                  <div className="flex items-start gap-3"><CheckCircle className="size-4 text-emerald-500 shrink-0 mt-0.5" /> Active tournament player &mdash; 5th in Kanpur District U-15, multiple top-10 finishes in CBSE &amp; inter-school events (2010–2019)</div>
+                  <div className="flex items-start gap-3"><CheckCircle className="size-4 text-emerald-500 shrink-0 mt-0.5" /> 100+ verified parent reviews &mdash; sessions are interactive, structured &amp; student-centric</div>
+                  <div className="flex items-start gap-3"><CheckCircle className="size-4 text-emerald-500 shrink-0 mt-0.5" /> <span>Your child stays with the <strong>same coach</strong> for the entire programme &mdash; no rotation, no handoffs</span></div>
                 </div>
+
+                <button
+                  type="button"
+                  onClick={() => scrollToSection("founders")}
+                  className="self-start text-xs md:text-sm font-bold text-blue-700 hover:text-blue-800 underline underline-offset-4 inline-flex items-center gap-1.5"
+                >
+                  Meet all three founders <ArrowRight className="size-3.5" />
+                </button>
               </div>
             </div>
           </div>
@@ -2272,7 +2297,7 @@ function MidPageCTA() {
           Ready to see the difference structured coaching makes?
         </h3>
         <p className="text-blue-100 text-sm md:text-base font-medium max-w-xl mx-auto mb-6 md:mb-8">
-          A 50-min demo class plus counseling with a FIDE-rated coach. Zero obligation. Parents are welcome to observe any class.
+          A 50-min demo class plus counseling with a tournament-trained coach. Zero obligation. Parents are welcome to observe any class.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 md:gap-4">
           <Button onClick={scrollToForm} size="lg" className="h-12 md:h-14 px-8 md:px-10 bg-white text-blue-700 hover:bg-blue-50 rounded-xl text-sm md:text-base font-bold shadow-xl shadow-blue-900/30 transition-all hover:shadow-2xl hover:scale-[1.02]">
@@ -2288,32 +2313,148 @@ function MidPageCTA() {
 }
 
 /* ════════════════════════════════════════════════
-   FOUNDER STORY
+   FOUNDERS — Meet the team behind ChessWize
    ════════════════════════════════════════════════ */
-function FounderStory() {
+const FOUNDERS = [
+  {
+    slug: "tarun",
+    name: "Tarun Gupta",
+    title: "Founder & CEO",
+    photo: "/founder-tarun-gupta.webp",
+    tag: "The Vision",
+    quote: "ChessWize didn't begin as a business idea — it started with a single 'yes' to a parent after a district win.",
+    bio: [
+      "After winning a district tournament, a parent asked if I'd teach their child. That single 'yes' turned into many, and one student became dozens.",
+      "Working across international academies, I noticed most kids don't struggle because chess is hard — they struggle because it isn't taught in a way they truly understand.",
+      "ChessWize is built to fix that: structured learning, clarity, and an engaging approach designed for young minds. Not just better players — better thinkers.",
+    ],
+    stats: [
+      { value: "10+", label: "yrs in chess" },
+      { value: "Int'l", label: "academy experience" },
+    ],
+  },
+  {
+    slug: "hrdyansh",
+    name: "Hrdyansh Pandey",
+    title: "Founder & CMO",
+    photo: "/founder-hrdyansh-pandey.webp",
+    tag: "The Coach",
+    quote: "Chess is a powerful life skill. My job is to teach kids how to think, not just how to move pieces.",
+    bio: [
+      "I represented my school at district and state level from 2010–2019, with multiple top-10 finishes in CBSE and inter-school competitions, and 5th in the Kanpur District U-15 Championship.",
+      "When I started coaching in 2019, what began as a passion turned into a mission — to nurture young minds through chess. Over 7+ years I've trained students across the USA, UK, Singapore, Australia, and the Middle East.",
+      "Every session is structured, interactive, and student-centric — built so children grow mentally and strategically, not just on the board.",
+    ],
+    stats: [
+      { value: "700+", label: "students trained" },
+      { value: "1,200+", label: "demo sessions" },
+      { value: "FIDE+", label: "rated players produced" },
+    ],
+  },
+  {
+    slug: "aryan",
+    name: "Aryan Pal",
+    title: "Founder & COO",
+    photo: "/founder-aryan-pal.webp",
+    tag: "The Builder",
+    quote: "We didn't want another casual class. We wanted structured curriculums, real progress, and concepts that actually stick.",
+    bio: [
+      "My chess story started at age 10 — a park match caught my eye on the way to cricket. My grandfather taught me the rules, and soon I was winning school tournaments and representing my university at nationals.",
+      "Coaching casually in college, I saw a huge gap: kids struggled with even the basics. COVID forced me online, and the unstructured lessons leaving children lost made the gap obvious.",
+      "ChessWize was born from that — structured curriculums, scheduled progress, and lessons designed so the love for the game actually sticks. A movement to get every child thinking like a champion.",
+    ],
+    stats: [
+      { value: "10+", label: "yrs playing" },
+      { value: "Nationals", label: "university level" },
+    ],
+  },
+] as const;
+
+function Founders() {
   return (
-    <section className="py-16 md:py-24 bg-slate-50 text-slate-900 border-b border-slate-200 relative overflow-hidden">
-      <div className="max-w-[1000px] mx-auto px-4 md:px-8 relative z-10">
-        <div className="bg-white/80 gs-shadow-xl backdrop-blur-xl rounded-3xl p-8 md:p-12 border border-slate-200 shadow-2xl flex flex-col md:flex-row gap-8 md:gap-12 items-center">
-          <div className="w-full md:w-1/3 shrink-0 relative">
-            <div className="absolute inset-0 bg-blue-500/20 blur-2xl rounded-full" />
-           <img loading="lazy" decoding="async" width={2816} height={1536} src="/2026-04-15-10-34-00-founder-tarun-portrait.webp" alt="Tarun R., Founder and Head Coach" className="w-full aspect-square object-cover rounded-2xl border border-slate-200 relative z-10 shadow-lg grayscale hover:grayscale-0 transition-all duration-700" />
-          </div>
-          <div className="w-full md:w-2/3 flex flex-col">
-            <h2 className="text-[10px] font-bold text-blue-600 uppercase tracking-widest-gs mb-3">A Note From The Founder</h2>
-            <h3 className="text-2xl md:text-3xl font-extrabold tracking-tighter-gs text-slate-900 mb-4 leading-tight">
-              "I built ChessWize because the casual system failed my students."
-            </h3>
-            <div className="space-y-4 text-sm md:text-base text-slate-700 font-medium leading-relaxed italic">
-              <p>For years, I watched brilliant children quit chess at 1000 Elo. They were taught to memorize openings and play fast, but when the board got complicated, they panicked and blundered.</p>
-              <p>We created ChessWize to fix this structural flaw. We don't just teach children how to move pieces—we mathematically rewire how they process complex problems, handle failure, and execute strategy.</p>
-              <p>If you're looking for a casual weekend hobby, we aren't the right fit. But if you want to build an emotionally resilient, analytical thinker, I invite you to book our diagnostic evaluation.</p>
-            </div>
-            <div className="mt-6 pt-6 border-t border-slate-200 flex flex-col">
-              <span className="font-extrabold text-slate-900 tracking-tight-gs text-lg">Tarun R.</span>
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-widest-gs mt-1">Founder & Head Coach</span>
-            </div>
-          </div>
+    <section id="founders" className="py-16 md:py-24 bg-gradient-to-b from-slate-50 to-white border-b border-slate-200 relative overflow-hidden">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-blue-100/30 rounded-full blur-[80px] pointer-events-none" />
+      <div className="max-w-[1400px] mx-auto px-4 md:px-8 relative z-10">
+        <div className="text-center mb-12 md:mb-16">
+          <h2 className="text-[10px] font-bold text-blue-600 uppercase tracking-widest-gs mb-3 flex items-center gap-2 justify-center">
+            <Users className="size-3" /> Meet the Founders
+          </h2>
+          <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tighter-gs mb-4 md:mb-6 text-slate-900 leading-tight max-w-3xl mx-auto">
+            Three coaches who saw the gap — and built the fix.
+          </h3>
+          <p className="text-base md:text-lg text-slate-600 font-medium leading-relaxed max-w-2xl mx-auto">
+            ChessWize wasn&apos;t built in a boardroom. It was built by tournament players who turned into coaches, then realized the casual system was failing the very kids it was meant to help.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+          {FOUNDERS.map((f) => (
+            <article
+              key={f.slug}
+              className="bg-white border border-slate-200 rounded-3xl p-6 md:p-7 gs-shadow-xl flex flex-col relative overflow-hidden group hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
+            >
+              <div className="absolute top-0 right-0 w-32 h-32 bg-amber-100/40 rounded-full blur-[40px] pointer-events-none" />
+
+              <div className="flex items-center gap-4 mb-5 relative z-10">
+                <img
+                  loading="lazy"
+                  decoding="async"
+                  width={800}
+                  height={1067}
+                  src={f.photo}
+                  alt={`${f.name}, ${f.title} of ChessWize`}
+                  className="size-20 md:size-24 rounded-2xl object-cover border-2 border-slate-200 gs-shadow-lg shrink-0"
+                />
+                <div className="min-w-0">
+                  <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200 border-0 rounded text-[9px] md:text-[10px] font-bold uppercase tracking-widest-gs mb-1.5 px-2 py-0.5">
+                    {f.tag}
+                  </Badge>
+                  <h4 className="text-xl md:text-2xl font-extrabold tracking-tighter-gs text-slate-900 leading-tight">
+                    {f.name}
+                  </h4>
+                  <p className="text-[11px] md:text-xs font-bold text-slate-500 uppercase tracking-widest-gs mt-1">
+                    {f.title}
+                  </p>
+                </div>
+              </div>
+
+              <blockquote className="border-l-2 border-blue-500 pl-3 mb-4 text-sm md:text-[15px] text-slate-700 font-medium italic leading-relaxed relative z-10">
+                &ldquo;{f.quote}&rdquo;
+              </blockquote>
+
+              <div className="space-y-3 text-xs md:text-sm text-slate-600 font-medium leading-relaxed mb-5 relative z-10">
+                {f.bio.map((p, i) => (
+                  <p key={i}>{p}</p>
+                ))}
+              </div>
+
+              <div className="mt-auto pt-4 border-t border-slate-100 grid grid-cols-3 gap-2 relative z-10">
+                {f.stats.map((s, i) => (
+                  <div key={i} className="text-center">
+                    <div className="text-base md:text-lg font-extrabold text-blue-700 tracking-tight-gs leading-none">
+                      {s.value}
+                    </div>
+                    <div className="text-[9px] md:text-[10px] font-bold text-slate-500 uppercase tracking-widest-gs mt-1 leading-tight">
+                      {s.label}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </article>
+          ))}
+        </div>
+
+        <div className="mt-10 md:mt-14 flex flex-col items-center gap-4">
+          <p className="text-sm text-slate-600 font-medium text-center max-w-xl">
+            Talk to one of us — or one of our hand-trained coaches — in a free 50-min demo class.
+          </p>
+          <Button
+            onClick={scrollToForm}
+            size="lg"
+            className="h-12 md:h-14 px-8 md:px-10 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm md:text-base font-bold shadow-xl shadow-blue-900/20 transition-all hover:shadow-2xl hover:scale-[1.02]"
+          >
+            Book Free Demo with a Founder-Trained Coach <ArrowRight className="ml-2 size-4" />
+          </Button>
         </div>
       </div>
     </section>
@@ -2336,11 +2477,11 @@ function CertificateSection() {
               Graduate with <span className="text-amber-600">Distinction.</span>
             </h3>
             <p className="text-base md:text-lg text-slate-600 font-medium leading-relaxed mb-6 md:mb-8">
-              Every student who completes a phase receives a verified Certificate of Excellence — signed by FIDE-titled masters and ready for school admission portfolios, extracurricular records, or a proud share on the family group.
+              Every student who completes a phase receives a verified Certificate of Excellence — signed by ChessWize&apos;s founding coaches and ready for school admission portfolios, extracurricular records, or a proud share on the family group.
             </p>
             <ul className="space-y-4">
               <li className="flex items-center gap-3 text-sm font-bold text-slate-700"><CheckCircle className="size-5 text-emerald-600 shrink-0" /> Validated skill progression with phase-by-phase milestones</li>
-              <li className="flex items-center gap-3 text-sm font-bold text-slate-700"><CheckCircle className="size-5 text-emerald-600 shrink-0" /> Signed by FIDE-titled masters with verifiable coach ID</li>
+              <li className="flex items-center gap-3 text-sm font-bold text-slate-700"><CheckCircle className="size-5 text-emerald-600 shrink-0" /> Signed by ChessWize founding coaches with verifiable coach ID</li>
               <li className="flex items-center gap-3 text-sm font-bold text-slate-700"><CheckCircle className="size-5 text-emerald-600 shrink-0" /> Strong academic profile &amp; school admissions signal</li>
               <li className="flex items-center gap-3 text-sm font-bold text-slate-700"><CheckCircle className="size-5 text-emerald-600 shrink-0" /> Digital + printable — share-ready for family WhatsApp &amp; LinkedIn</li>
             </ul>
@@ -2465,7 +2606,7 @@ function ValueStack() {
   ];
 
   const inclusions = [
-    "Live training with FIDE-rated coaches",
+    "Live training with tournament-trained coaches",
     "24×7 access to the ChessWize student platform",
     "Daily puzzle routines & homework tracking",
     "Mistake analysis & behavioural review",
@@ -2635,28 +2776,28 @@ function ValueStack() {
 function StarPerformers() {
   const performers = [
     {
-      name: "Saanvika",
-      hook: "Won her first rated tournament in month four.",
-      context: "Coach fixed a recurring rook-endgame leak with a targeted 6-week module. Broke 1000 Elo in month two, hit 1340 by month six.",
-      img: "/saanvika-tournament.webp",
-      tag: "800 → 1340 Elo",
-      duration: "6 Months"
+      name: "Rachit Seksaria",
+      hook: "Stuck at 1400–1500. Two months later, 2nd in his district tournament.",
+      context: "Came to us plateaued and prepping for a district event. The coach analysed his games to pinpoint weak links, then drilled them. Within 2 months his online rating climbed ~300 points and he finished 2nd (on tiebreaks) in the district tournament.",
+      img: "/student-rachit-1.webp",
+      tag: "+300 Online Rating",
+      duration: "2 Months"
     },
     {
-      name: "Mikaeel",
-      hook: "Stretched his focus from 5 minutes to 45 — without a single tantrum.",
-      context: "Joined as an absolute beginner who couldn't sit still. Puzzle solve rate went 30% → 76% in 8 weeks; crossed 1100 Elo in four months.",
-      img: "/mikaeel-portrait.webp",
-      tag: "0 → 1100 Elo",
-      duration: "4 Months"
+      name: "Gahan C",
+      hook: "Started chess at 3½. Became our youngest FIDE-rated player at 6.",
+      context: "His mother was understandably worried — would a 3-year-old learn online? She agreed to a 2-month trial. That was 2½ years ago. Gahan is still with us, has progressed from absolute beginner to a FIDE-rated player, and is the academy's youngest tournament-rated student.",
+      img: "/student-gahan-1.webp",
+      tag: "FIDE-Rated at 6",
+      duration: "2.5+ Years"
     },
     {
-      name: "Avyukt",
-      hook: "Promoted through two cohort levels in 10 weeks.",
-      context: "Coach flagged exceptional pattern recognition — spotting knight forks three moves ahead by week six. Puzzle accuracy now 91%.",
-      img: "/avyukt-portrait.webp",
-      tag: "Fast-Track Promotion",
-      duration: "10 Weeks"
+      name: "Jiyansh",
+      hook: "Built tournament focus from the very first cohort module.",
+      context: "Active student in our structured programme — works through the same Foundation → Tactical → Tournament pathway every ChessWize student does. Photos from his recent classroom and practice sessions.",
+      img: "/student-jiyansh-1.webp",
+      tag: "Active Programme Student",
+      duration: "In Programme"
     }
   ];
   return (
@@ -2670,7 +2811,7 @@ function StarPerformers() {
             Excellence is <span className="text-blue-600">engineered.</span>
           </h3>
           <p className="text-base md:text-lg text-slate-600 font-medium max-w-2xl mx-auto">
-            Meet the students who have fully embraced the ChessWize Programme and are dominating their local tournament circuits.
+            Real students from our programme. Verifiable results — district podiums, FIDE ratings, and tournament wins.
           </p>
         </div>
 
@@ -2705,6 +2846,133 @@ function StarPerformers() {
             </Suspense>
           ))}
         </div>      </div>
+    </section>
+  );
+}
+
+/* ════════════════════════════════════════════════
+   REAL MOMENTS — Live class screenshot + tournament gallery
+   ════════════════════════════════════════════════ */
+const TOURNAMENT_MOMENTS = [
+  {
+    img: "/tournament-gahan-rotary.webp",
+    student: "Gahan",
+    event: "Rotary Club Mysore West — Chess Championship",
+    note: "Trophy + certificate, alongside dignitaries",
+  },
+  {
+    img: "/tournament-gahan-karnataka.webp",
+    student: "Gahan",
+    event: "Karnataka State Under-Chess Championship",
+    note: "Medal + certificate at the state event",
+  },
+  {
+    img: "/tournament-jiyansh-edify.webp",
+    student: "Jiyansh",
+    event: "Edify World School Chess Tournament",
+    note: "Organised by Serah Chess Academy · April",
+  },
+  {
+    img: "/tournament-jiyansh-atfair.webp",
+    student: "Jiyansh",
+    event: "ATFAIR World School Invitational",
+    note: "Mid-tournament — chessboards in play behind",
+  },
+  {
+    img: "/tournament-jiyansh-saral.webp",
+    student: "Jiyansh",
+    event: "Saral Chess Academy Tournament",
+    note: "Participation certificate + medal",
+  },
+] as const;
+
+function RealMoments() {
+  return (
+    <section className="py-16 md:py-24 bg-white border-b border-slate-200 relative overflow-hidden">
+      <div className="absolute top-0 right-0 w-[600px] h-[400px] bg-amber-100/30 rounded-full blur-[80px] pointer-events-none" />
+      <div className="max-w-[1400px] mx-auto px-4 md:px-8 relative z-10">
+
+        {/* ── Live class screenshot ── */}
+        <div className="text-center mb-10 md:mb-14">
+          <h2 className="text-[10px] font-bold text-blue-600 uppercase tracking-widest-gs mb-3 flex items-center gap-2 justify-center">
+            <PlayCircle className="size-3" /> Inside a Live Class
+          </h2>
+          <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tighter-gs mb-4 md:mb-6 text-slate-900 leading-tight max-w-3xl mx-auto">
+            What a real ChessWize class looks like.
+          </h3>
+          <p className="text-base md:text-lg text-slate-600 font-medium leading-relaxed max-w-2xl mx-auto">
+            Small batches. Faces on. Coach right there. This is a live cohort session — every class is recorded so parents can watch back at any time.
+          </p>
+        </div>
+
+        <div className="max-w-[1100px] mx-auto mb-16 md:mb-24">
+          <div className="relative rounded-3xl overflow-hidden border border-slate-200 gs-shadow-xl bg-slate-900">
+            <img
+              loading="lazy"
+              decoding="async"
+              width={1400}
+              height={825}
+              src="/live-class-screenshot.webp"
+              alt="A live ChessWize cohort class on Google Meet — students Vivika, Payal, Shourya and Mikaeel in session with their coach"
+              className="w-full h-auto block"
+            />
+            <div className="absolute top-3 left-3 md:top-4 md:left-4 bg-red-600 text-white text-[10px] md:text-xs font-extrabold uppercase tracking-widest-gs px-2.5 md:px-3 py-1 rounded-md shadow-lg flex items-center gap-1.5">
+              <span className="size-1.5 md:size-2 rounded-full bg-white animate-pulse" />
+              Live · Cohort Class
+            </div>
+            <div className="absolute bottom-3 right-3 md:bottom-4 md:right-4 bg-white/95 backdrop-blur text-slate-900 text-[10px] md:text-xs font-bold px-2.5 md:px-3 py-1 rounded-md shadow-lg">
+              Max 6 students per class
+            </div>
+          </div>
+          <p className="text-center text-[11px] md:text-xs text-slate-500 font-medium mt-4 italic">
+            Real session screenshot — student faces visible with parent consent.
+          </p>
+        </div>
+
+        {/* ── Tournament gallery ── */}
+        <div className="text-center mb-10 md:mb-14">
+          <h2 className="text-[10px] font-bold text-amber-700 uppercase tracking-widest-gs mb-3 flex items-center gap-2 justify-center">
+            <Trophy className="size-3" /> Real Tournament Wins
+          </h2>
+          <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tighter-gs mb-4 md:mb-6 text-slate-900 leading-tight max-w-3xl mx-auto">
+            Off the dashboard. <span className="text-amber-600">Onto the podium.</span>
+          </h3>
+          <p className="text-base md:text-lg text-slate-600 font-medium leading-relaxed max-w-2xl mx-auto">
+            Our students don&apos;t just play online — they show up, sit across the board, and bring home the trophies. Verified moments from district, state and school-level events.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-5">
+          {TOURNAMENT_MOMENTS.map((m, i) => (
+            <figure
+              key={i}
+              className="group relative rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 gs-shadow-lg aspect-[3/4] cursor-default"
+            >
+              <img
+                loading="lazy"
+                decoding="async"
+                width={900}
+                height={1200}
+                src={m.img}
+                alt={`${m.student} at ${m.event}`}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/85 via-slate-900/30 to-transparent" />
+              <figcaption className="absolute bottom-0 left-0 right-0 p-3 md:p-4 text-white">
+                <div className="text-[10px] md:text-[11px] font-extrabold uppercase tracking-widest-gs text-amber-300 mb-1">
+                  {m.student}
+                </div>
+                <div className="text-[11px] md:text-sm font-extrabold leading-tight mb-1">
+                  {m.event}
+                </div>
+                <div className="text-[10px] md:text-[11px] font-medium text-white/80 leading-tight">
+                  {m.note}
+                </div>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
     </section>
   );
 }
@@ -3663,7 +3931,7 @@ function BottomForm() {
           </div>
         </div>
 
-        <div className="bg-white rounded-3xl p-6 sm:p-8 md:p-10 gs-border gs-shadow-2xl relative overflow-hidden flex flex-col justify-center">
+        <div id="demo-form-card" className="scroll-mt-24 md:scroll-mt-28 bg-white rounded-3xl p-6 sm:p-8 md:p-10 gs-border gs-shadow-2xl relative overflow-hidden flex flex-col justify-center">
           <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full blur-[60px] pointer-events-none" />
           
           <AnimatePresence mode="wait">
@@ -4284,7 +4552,7 @@ function Footer() {
               className="h-10 md:h-11 w-auto object-contain drop-shadow-[0_2px_8px_rgba(255,255,255,0.08)]"
             />
             <p className="mt-5 text-sm leading-relaxed text-slate-400 font-medium max-w-md">
-              Structured online chess coaching for children aged 5–14. Small cohorts, FIDE-titled coaches, and a parent dashboard that tells you exactly what your child practised each week.
+              Structured online chess coaching for children aged 5–14. Small cohorts, tournament-trained coaches who&apos;ve produced FIDE-rated players, and a parent dashboard that tells you exactly what your child practised each week.
             </p>
 
             {/* Contact line */}
@@ -4804,11 +5072,13 @@ function LandingPage() {
         {/* ── Consensus CRO order from Codex + Gemini + Claude 3-way audit ── */}
         <VideoShowcase />
         <StarPerformers />
+        <RealMoments />
         <WallOfLove />
         <TheProblem />
         <WhoIsThisFor />
         <HowItWorks />
         <Mentors />
+        <Founders />
         <ValueStack />
         <Platform />
         <CertificateSection />
