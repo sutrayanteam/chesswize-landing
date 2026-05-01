@@ -40,13 +40,17 @@ export function buildWhatsAppHref({ source, text }: BuildOptions): string {
 }
 
 /**
- * onClick factory — fire the Contact pixel event before the browser follows
- * the wa.me link. Attach to every WhatsApp anchor.
+ * onClick factory — fire the Contact pixel event AND a unified
+ * `whatsapp_click` analytics event before the browser follows the
+ * wa.me link. Attach to every WhatsApp anchor.
  *
  *   <a href={buildWhatsAppHref({source:'hero'})} onClick={onWhatsAppClick('hero')}>…</a>
  */
 export function onWhatsAppClick(source: string) {
   return () => {
     trackContact(source);
+    // Lazy import keeps the analytics module out of any bundle that
+    // doesn't already import it; in practice it's loaded on render.
+    void import("./analytics").then((m) => m.track("whatsapp_click", { source }));
   };
 }

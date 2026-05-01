@@ -93,6 +93,7 @@ import {
   trackLeadFormStart,
   trackLeadStep2,
 } from "@/src/lib/tracking";
+import { track, identifyUser, trackError } from "@/src/lib/analytics";
 import { buildWhatsAppHref, onWhatsAppClick } from "@/src/lib/whatsapp";
 // Cloudflare Turnstile was previously imported from "@/src/lib/turnstile".
 // It's been removed from the form because the widget was silently failing
@@ -117,8 +118,14 @@ import {
 // its data flow, validation, pixel events, calendar picker, success state,
 // API submission) is unchanged — only the surface that contains it.
 const CW_OPEN_DEMO_EVENT = "cw:open-demo";
-function scrollToForm() {
+// Accepts EITHER a string source ("hero", "sticky", etc.) for analytics
+// granularity OR a click event when wired directly as an onClick handler.
+// Anything that isn't a string is treated as "unknown" so dashboards
+// don't get React SyntheticEvent objects as the source field.
+function scrollToForm(maybeSourceOrEvent?: unknown) {
   if (typeof window !== "undefined") {
+    const source = typeof maybeSourceOrEvent === "string" ? maybeSourceOrEvent : "unknown";
+    track("demo_drawer_opened", { source });
     window.dispatchEvent(new CustomEvent(CW_OPEN_DEMO_EVENT));
   }
 }
@@ -182,7 +189,7 @@ function TopNav() {
             <span className="text-[10px] font-extrabold text-emerald-600 uppercase tracking-widest-gs">Limited Seats</span>
             <span className="text-xs font-bold text-slate-600">Book a Free Demo Class</span>
           </div>
-          <Button onClick={scrollToForm} className="gs-btn gs-btn-primary rounded-lg font-bold tracking-tight-gs px-4 md:px-6 h-9 md:h-11 text-xs md:text-sm shadow-md">
+          <Button onClick={() => scrollToForm("top_nav")} className="gs-btn gs-btn-primary rounded-lg font-bold tracking-tight-gs px-4 md:px-6 h-9 md:h-11 text-xs md:text-sm shadow-md">
             Book Free Demo
           </Button>
         </div>
@@ -3783,6 +3790,9 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
       shouldDirty: true,
       shouldTouch: true,
     });
+    // Slot pick is a high-intent signal — log the actual time string so
+    // PostHog/GA dashboards can show preferred-time distributions.
+    track("slot_selected", { slot: value });
     // Soft haptic on supported mobile browsers — 6ms is barely perceptible,
     // just enough to confirm the tap registered (HIG "tactile feedback").
     try { (navigator as Navigator & { vibrate?: (n: number) => void }).vibrate?.(6); } catch { /* ignore */ }
@@ -4032,7 +4042,20 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
       step2Fired.current = true;
       minViableLeadCapturedRef.current = true;
       trackLeadStep2();
+      // Identify the visitor in PostHog/GA the moment we have parent
+      // contact info. Lets us stitch their session across devices and
+      // see who actually completes the funnel vs who falls off where.
+      const v = watch();
+      identifyUser(leadSidRef.current, {
+        parent_name: v.parent_name,
+        email: v.parent_email,
+        phone: v.phone,
+      });
     }
+    track("form_step_completed", {
+      step,
+      lead_sid: leadSidRef.current || undefined,
+    });
     enqueuePartialSave();
     setStep((prev) => prev + 1);
   };
@@ -4145,6 +4168,7 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
     if (leadSaved && eventId) {
       // Happy path — clear the draft, reset the form, navigate to /thank-you
       // so browser+server Lead dedupe.
+      track("form_submit_success", { event_id: eventId, lead_sid: leadSidRef.current || undefined });
       try { localStorage.removeItem(FORM_DRAFT_KEY); } catch { /* no-op */ }
       try { sessionStorage.removeItem("cw.hero.age"); } catch { /* no-op */ }
       // Done — clear the partial-lead session so a future visit mints a
@@ -4182,7 +4206,8 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
     setSubmitErrorMsg(
       "We couldn't save your details right now. Please try again in a moment — your answers are saved on this page, so nothing's lost."
     );
-    void failureDetail;
+    track("form_submit_failed", { detail: failureDetail ?? "unknown", lead_sid: leadSidRef.current || undefined });
+    trackError(new Error(`form_submit_failed: ${failureDetail ?? "unknown"}`), { lead_sid: leadSidRef.current });
     // Release the in-flight guard so the retry button works.
     submitInFlight.current = false;
   };
