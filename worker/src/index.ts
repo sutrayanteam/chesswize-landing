@@ -63,6 +63,13 @@ export interface Env {
   // zoho_ids and falls back to KV lookup — slower (extra KV read) but
   // never insecure.
   LEAD_SECRET?: string;
+
+  // One-time bootstrap token used by /api/admin/init-audience to
+  // create a Resend Audience and persist its UUID to KV. Only useful
+  // during initial setup; once the audience exists you can rotate
+  // (or unset) this. Constant-time-compared against the request's
+  // X-Bootstrap-Token header.
+  BOOTSTRAP_TOKEN?: string;
 }
 
 interface LeadBody {
@@ -405,7 +412,24 @@ async function pushLeadToZoho(env: Env, body: LeadBody, existingId?: string | nu
 /* ─────────────────────────── Resend helpers ─────────────────────────── */
 
 const resendConfigured = (env: Env) => !!(env.RESEND_API_KEY && env.FROM_EMAIL && env.NOTIFY_EMAIL);
-const audienceConfigured = (env: Env) => !!(env.RESEND_API_KEY && env.RESEND_AUDIENCE_ID);
+
+// KV-backed audience id storage. Lets the worker self-bootstrap a
+// Resend Audience without needing the env var pre-populated (the
+// /api/admin/init-audience endpoint creates one and writes the UUID
+// here). Env var still wins if both are set.
+const AUDIENCE_KV_KEY = "resend_audience_id";
+
+async function getAudienceId(env: Env): Promise<string | null> {
+  if (env.RESEND_AUDIENCE_ID) return env.RESEND_AUDIENCE_ID;
+  if (!env.TOKEN_CACHE) return null;
+  return (await env.TOKEN_CACHE.get(AUDIENCE_KV_KEY)) || null;
+}
+
+// Sync helper that doesn't await KV — returns true only when env var
+// is set. Used in /api/health where a KV round-trip would slow the
+// healthcheck. The async addToResendAudience path uses getAudienceId
+// for full coverage.
+const audienceConfigured = (env: Env) => !!env.RESEND_API_KEY;
 
 /**
  * Add a parent to the Resend Audience for marketing campaigns later.
@@ -428,7 +452,9 @@ async function addToResendAudience(
   env: Env,
   body: LeadBody,
 ): Promise<{ ok: boolean; id?: string; error?: string; existed?: boolean }> {
-  if (!audienceConfigured(env)) return { ok: false, error: "audience_not_configured" };
+  if (!env.RESEND_API_KEY) return { ok: false, error: "resend_not_configured" };
+  const audienceId = await getAudienceId(env);
+  if (!audienceId) return { ok: false, error: "audience_id_unset" };
   const email = clean(body.parent_email);
   if (!email) return { ok: false, error: "no_email" };
 
@@ -441,7 +467,7 @@ async function addToResendAudience(
   const lastName = rest.join(" ");
 
   const res = await fetch(
-    `https://api.resend.com/audiences/${encodeURIComponent(env.RESEND_AUDIENCE_ID!)}/contacts`,
+    `https://api.resend.com/audiences/${encodeURIComponent(audienceId)}/contacts`,
     {
       method: "POST",
       headers: {
@@ -1307,6 +1333,82 @@ async function tickPartialRateLimit(env: Env, ip: string): Promise<{ ok: boolean
  * keyed by lead_sid (24h TTL) AND returned to the client so the next call
  * can carry it directly — KV is the cache, the client is the ground truth.
  */
+/**
+ * One-shot Resend Audience bootstrap. Creates an audience via Resend's
+ * API using the worker's existing RESEND_API_KEY (which we can't read
+ * back locally — Cloudflare worker secrets are write-only), then
+ * persists the resulting UUID to KV so subsequent /api/leads/partial
+ * and /api/leads calls auto-resolve it without needing a separate
+ * RESEND_AUDIENCE_ID env var.
+ *
+ * Auth: requires `X-Bootstrap-Token: <BOOTSTRAP_TOKEN>` header.
+ * Constant-time compare against the env secret so a timing attack
+ * can't leak the token. Idempotent — if KV already has an audience
+ * id, returns it without re-creating.
+ */
+async function handleInitAudience(request: Request, env: Env): Promise<Response> {
+  if (!env.BOOTSTRAP_TOKEN) {
+    return json({ ok: false, error: "bootstrap_disabled" }, { status: 403 });
+  }
+  const presented = request.headers.get("x-bootstrap-token") || "";
+  if (presented.length !== env.BOOTSTRAP_TOKEN.length) {
+    return json({ ok: false, error: "bad_token" }, { status: 401 });
+  }
+  let diff = 0;
+  for (let i = 0; i < presented.length; i++) {
+    diff |= presented.charCodeAt(i) ^ env.BOOTSTRAP_TOKEN.charCodeAt(i);
+  }
+  if (diff !== 0) {
+    return json({ ok: false, error: "bad_token" }, { status: 401 });
+  }
+
+  if (!env.RESEND_API_KEY) {
+    return json({ ok: false, error: "resend_api_key_missing" }, { status: 500 });
+  }
+
+  // Idempotent — if KV already has one, reuse it.
+  const existing = await getAudienceId(env);
+  if (existing) {
+    return json({ ok: true, audience_id: existing, existed: true });
+  }
+
+  let body: { name?: string } = {};
+  try { body = (await request.json<{ name?: string }>()) || {}; } catch { /* ignore */ }
+  const name = (typeof body.name === "string" && body.name.length > 0 && body.name.length <= 80)
+    ? body.name
+    : "ChessWize Leads";
+
+  const res = await fetch("https://api.resend.com/audiences", {
+    method: "POST",
+    headers: {
+      authorization: `Bearer ${env.RESEND_API_KEY}`,
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({ name }),
+  });
+
+  if (!res.ok) {
+    const errBody = await res.json<{ message?: string }>().catch(() => ({} as { message?: string }));
+    return json(
+      { ok: false, error: `resend_${res.status}`, detail: errBody.message ?? "unknown" },
+      { status: 502 },
+    );
+  }
+
+  const data = await res.json<{ id?: string; name?: string }>();
+  if (!data.id) {
+    return json({ ok: false, error: "no_id_in_response" }, { status: 502 });
+  }
+
+  if (env.TOKEN_CACHE) {
+    // No TTL — the audience is meant to live for the lifetime of the
+    // marketing list. Resend's UI is the place to delete it.
+    await env.TOKEN_CACHE.put(AUDIENCE_KV_KEY, data.id);
+  }
+
+  return json({ ok: true, audience_id: data.id, name: data.name, created: true });
+}
+
 async function handlePartialLead(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
   // Require an Origin header on this endpoint — unlike a typical fetch+JSON
   // POST (which is exempt from CORS preflight only when same-origin) the
@@ -1695,6 +1797,12 @@ export default {
         res.headers.set("vary", "origin");
       }
       return res;
+    }
+    // One-shot Resend Audience bootstrap. Auth via X-Bootstrap-Token
+    // header. Safe to leave deployed — it's idempotent and gated by a
+    // secret that can be unset/rotated after first use.
+    if (request.method === "POST" && url.pathname === "/api/admin/init-audience") {
+      return handleInitAudience(request, env);
     }
 
     return json({ ok: false, error: "not_found" }, { status: 404 });
