@@ -43,6 +43,18 @@ export interface Env {
 
   // KV used as an in-memory access-token cache across cold starts
   TOKEN_CACHE?: KVNamespace;
+
+  // HMAC secret used to sign the (lead_sid, zoho_id) tuple returned to the
+  // client on every successful partial-save response. The client echoes
+  // the signature back on subsequent requests; the worker re-derives it
+  // and refuses any client-supplied zoho_id whose signature doesn't
+  // match. This stops an attacker from POSTing /api/leads/partial with
+  // a guessed/known Zoho lead id and overwriting somebody else's record.
+  // Set with: `wrangler secret put LEAD_SECRET`.
+  // If unset (dev / not yet rotated): worker ignores all client-supplied
+  // zoho_ids and falls back to KV lookup — slower (extra KV read) but
+  // never insecure.
+  LEAD_SECRET?: string;
 }
 
 interface LeadBody {
@@ -1025,6 +1037,66 @@ async function readJsonBody(request: Request): Promise<unknown> {
   return JSON.parse(txt);
 }
 
+/* ───────── Partial-lead HMAC (auth for client-supplied zoho_id) ───────── */
+
+// HMAC-SHA256 over "lead_sid:zoho_id" returns a base64url signature. The
+// signature is opaque to the client — it just stores it and echoes it
+// back. Without the LEAD_SECRET an attacker can't forge it, which means
+// they can't claim ownership of a Zoho lead they didn't create.
+async function signZohoId(secret: string, leadSid: string, zohoId: string): Promise<string> {
+  const enc = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    "raw",
+    enc.encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+  const sig = await crypto.subtle.sign("HMAC", key, enc.encode(`${leadSid}:${zohoId}`));
+  // base64url, no padding — URL/header-safe.
+  let bin = "";
+  const bytes = new Uint8Array(sig);
+  for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+  return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+// Constant-time compare so a timing attack can't leak the secret one
+// character at a time.
+async function verifyZohoSignature(
+  secret: string,
+  leadSid: string,
+  zohoId: string,
+  presented: string,
+): Promise<boolean> {
+  const expected = await signZohoId(secret, leadSid, zohoId);
+  if (expected.length !== presented.length) return false;
+  let diff = 0;
+  for (let i = 0; i < expected.length; i++) {
+    diff |= expected.charCodeAt(i) ^ presented.charCodeAt(i);
+  }
+  return diff === 0;
+}
+
+// Resolve a trusted zoho_id for a given lead_sid. Trust order:
+//   1. Client-supplied zoho_id WITH valid HMAC signature.
+//   2. KV cache (server-side, can't be spoofed).
+//   3. null — caller will create a new Zoho lead.
+// Returns the resolved id (or null) plus whether KV was consulted, so
+// callers can write it back into KV if they end up creating fresh.
+async function resolveTrustedZohoId(
+  env: Env,
+  leadSid: string,
+  clientZohoId: string | undefined,
+  clientZohoSig: string | undefined,
+): Promise<string | null> {
+  if (clientZohoId && clientZohoSig && env.LEAD_SECRET) {
+    const ok = await verifyZohoSignature(env.LEAD_SECRET, leadSid, clientZohoId, clientZohoSig);
+    if (ok) return clientZohoId;
+  }
+  const cached = await readPartialState(env, leadSid);
+  return cached?.zoho_id ?? null;
+}
+
 const PARTIAL_KV_PREFIX = "partial:";
 const PARTIAL_TTL_SECONDS = 24 * 60 * 60; // 24h — matches client's LEAD_SID_TTL_MS
 
@@ -1063,8 +1135,12 @@ async function deletePartialState(env: Env, leadSid: string): Promise<void> {
  * can carry it directly — KV is the cache, the client is the ground truth.
  */
 async function handlePartialLead(request: Request, env: Env, _ctx: ExecutionContext): Promise<Response> {
+  // Require an Origin header on this endpoint — unlike a typical fetch+JSON
+  // POST (which is exempt from CORS preflight only when same-origin) the
+  // partial path also accepts text/plain sendBeacon. Bots can trivially
+  // POST text/plain with no Origin, so we lock to the allowlist.
   const origin = request.headers.get("origin");
-  if (origin && !originAllowed(env, origin)) {
+  if (!origin || !originAllowed(env, origin)) {
     return json({ ok: false, error: "origin_blocked" }, { status: 403 });
   }
 
@@ -1108,12 +1184,15 @@ async function handlePartialLead(request: Request, env: Env, _ctx: ExecutionCont
     return json({ ok: true, stored: false, note: "filtered" });
   }
 
-  // Resolve existing Zoho id: prefer client-supplied (it's the freshest
-  // ground truth), fall back to KV which may have caught a write from a
-  // sibling tab.
+  // Resolve a trusted existing Zoho id. We DO NOT trust a raw
+  // client-supplied id — an attacker could POST another customer's known
+  // Zoho lead id and overwrite their record. The client must echo back
+  // both `zoho_id` AND a HMAC signature `zoho_sig` we issued in the
+  // previous response. If LEAD_SECRET isn't set or the signature is
+  // missing/invalid we fall through to KV (server-side ground truth).
   const clientZohoId = str(r.zoho_id, 100);
-  const cached = await readPartialState(env, leadSid);
-  const existingZohoId = clientZohoId || cached?.zoho_id || null;
+  const clientZohoSig = str(r.zoho_sig, 200);
+  const existingZohoId = await resolveTrustedZohoId(env, leadSid, clientZohoId, clientZohoSig);
 
   // If Zoho isn't configured (dev) we still want to ack the beacon so the
   // frontend's tracking works; just don't try to upsert.
@@ -1124,10 +1203,26 @@ async function handlePartialLead(request: Request, env: Env, _ctx: ExecutionCont
   let result: { ok: boolean; id?: string; error?: string };
   if (existingZohoId) {
     result = await updateZohoLead(env, existingZohoId, lead, { partial: true });
-    // If the update fails because the record was deleted in Zoho between
-    // calls, fall through to a fresh create so we still capture the lead.
+    // 404: the record was deleted in Zoho between calls — recreate.
     if (!result.ok && result.error?.startsWith("zoho_404")) {
       result = await createZohoLead(env, lead, { partial: true });
+    }
+    // 401/403: the Zoho refresh token is missing the UPDATE scope. We
+    // can't enrich the existing record but the original draft is fine.
+    // Acknowledge the beacon with the cached id + a fresh signature so
+    // the client doesn't keep retrying. Once the deployer rotates the
+    // Zoho refresh token to include `ZohoCRM.modules.UPDATE`, updates
+    // will work without any code change.
+    if (!result.ok && (result.error?.startsWith("zoho_401") || result.error?.startsWith("zoho_403"))) {
+      const sig = env.LEAD_SECRET ? await signZohoId(env.LEAD_SECRET, leadSid, existingZohoId) : undefined;
+      return json({
+        ok: true,
+        stored: true,
+        degraded: "zoho_update_scope_missing",
+        lead_sid: leadSid,
+        zoho_id: existingZohoId,
+        zoho_sig: sig,
+      });
     }
   } else {
     result = await createZohoLead(env, lead, { partial: true });
@@ -1137,13 +1232,19 @@ async function handlePartialLead(request: Request, env: Env, _ctx: ExecutionCont
     return json({ ok: false, error: result.error ?? "zoho_failed", lead_sid: leadSid }, { status: 502 });
   }
 
+  const cached = await readPartialState(env, leadSid);
   await writePartialState(env, leadSid, {
     zoho_id: result.id,
     last_step: typeof r.step === "number" ? r.step : (cached?.last_step ?? 1),
     updated_at: Date.now(),
   });
 
-  return json({ ok: true, stored: true, lead_sid: leadSid, zoho_id: result.id });
+  // Sign the resolved zoho_id so the client can echo it back on the next
+  // call without us needing a KV round-trip and without an attacker
+  // being able to forge ownership.
+  const sig = env.LEAD_SECRET ? await signZohoId(env.LEAD_SECRET, leadSid, result.id) : undefined;
+
+  return json({ ok: true, stored: true, lead_sid: leadSid, zoho_id: result.id, zoho_sig: sig });
 }
 
 async function handleLead(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
@@ -1170,11 +1271,12 @@ async function handleLead(request: Request, env: Env, ctx: ExecutionContext): Pr
 
   // Capture the partial-lead reconciliation hints. Pull from the raw body
   // *before* validateLead strips them (validateLead doesn't whitelist these
-  // fields). Both are optional — older clients still work; we just create
-  // a fresh Zoho lead in that case.
+  // fields). All three are optional — older clients still work; we just
+  // create a fresh Zoho lead when no signed hint is provided.
   const rawBody = body as Record<string, unknown>;
   const leadSid = str(rawBody.lead_sid, 100);
   const partialZohoIdFromClient = str(rawBody.partial_zoho_id, 100);
+  const partialZohoSigFromClient = str(rawBody.partial_zoho_sig, 200);
 
   // Honeypot
   if (lead.website_url && lead.website_url.length > 0) {
@@ -1200,12 +1302,18 @@ async function handleLead(request: Request, env: Env, ctx: ExecutionContext): Pr
   const eventId = crypto.randomUUID();
 
   // Reconcile with any partial-lead Zoho draft created earlier in this
-  // session: prefer the client-supplied id (it's the freshest ground truth
-  // — KV reads are eventually consistent across CF colos), fall back to KV.
-  let reconciledZohoId: string | null = partialZohoIdFromClient || null;
-  if (!reconciledZohoId && leadSid) {
-    const cached = await readPartialState(env, leadSid);
-    reconciledZohoId = cached?.zoho_id ?? null;
+  // session. Same auth model as the partial endpoint: trust the client's
+  // zoho id only when it carries a valid HMAC signature; otherwise fall
+  // back to the KV record. Without LEAD_SECRET, we always fall back —
+  // safe but adds a KV read.
+  let reconciledZohoId: string | null = null;
+  if (leadSid) {
+    reconciledZohoId = await resolveTrustedZohoId(
+      env,
+      leadSid,
+      partialZohoIdFromClient,
+      partialZohoSigFromClient,
+    );
   }
 
   const [zoho, email, parentEmail] = await Promise.allSettled([

@@ -20,6 +20,16 @@ zone_name = "chesswize.in"
 [observability]
 enabled = true
 
+# KV namespace used for two unrelated things:
+#   1. Caching the Zoho OAuth access token across cold starts (without
+#      this, every request hits Zoho's refresh endpoint — which is rate
+#      limited and produces sporadic `no_token` errors).
+#   2. Storing the (lead_sid → zoho_id) mapping for partial-lead
+#      reconciliation, with a 24h TTL.
+[[kv_namespaces]]
+binding = "TOKEN_CACHE"
+id = "f88b7a2b450e420e89420f37468b9488"
+
 # ── Environment variables (set via `wrangler secret put <NAME>` in production) ──
 # Required for Zoho CRM integration. Absent values → worker falls back to
 # email-only notification or returns a neutral success (no CRM push).
