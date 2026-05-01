@@ -3753,7 +3753,13 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
   type PeriodKey = "morning" | "afternoon" | "evening";
   const [activePeriod, setActivePeriod] = useState<PeriodKey>("evening");
   useEffect(() => {
-    const order: PeriodKey[] = [activePeriod, "morning", "afternoon", "evening"];
+    // On date change, always restart from morning. Earlier we kept the
+    // previously-active period in the lookup order, but parents reading
+    // a calendar pick from the top down expect "Morning" first; jumping
+    // straight to "Evening" because that was the previous tab confused
+    // people. Falls through to afternoon/evening only if morning is
+    // booked out for the picked date.
+    const order: PeriodKey[] = ["morning", "afternoon", "evening"];
     const firstWithSlots = order.find((p) => slotGroups[p].some((s) => !s.disabled));
     if (firstWithSlots && firstWithSlots !== activePeriod) {
       setActivePeriod(firstWithSlots);
@@ -4552,13 +4558,13 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                   )}
 
                   {step === 4 && (
-                    <motion.div key="step4" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="flex flex-col flex-1 min-h-0 gap-2 md:gap-3">
-                      <div className="flex flex-col gap-2 md:gap-3">
+                    <motion.div key="step4" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="flex flex-col flex-1 min-h-0 gap-1.5 md:gap-3">
+                      <div className="flex flex-col gap-1.5 md:gap-3">
                         <div className="flex items-baseline justify-between gap-2">
                           <label className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">
                             Pick a date &amp; 20-min window <span className="text-red-500">*</span>
                           </label>
-                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest-gs">All times IST</span>
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest-gs hidden sm:inline">All times IST</span>
                         </div>
 
                         {/* Hidden input — RHF registration keeps the value inside watch()
@@ -4569,10 +4575,14 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                             snap + scroll fade on both edges. Bigger targets (80×88) and
                             a stronger filled-primary selection state per HIG / M3. */}
                         <div className="relative -mx-1">
+                          {/* pt-2 leaves room for the green check overlay
+                              (-top-1.5 on the chip) — overflow-x-auto on the
+                              strip implicitly clips overflow-y, so without
+                              this the tick gets cropped at the top. */}
                           <div
                             role="tablist"
                             aria-label="Choose a call date"
-                            className="flex gap-2.5 overflow-x-auto pb-2 px-1 snap-x snap-mandatory scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+                            className="flex gap-2.5 overflow-x-auto pt-2 pb-2 px-1 snap-x snap-mandatory scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
                           >
                             {dateOptions.map((d) => {
                               const slotsHere = buildSlotsForDate(d.key, new Date());
@@ -4589,7 +4599,7 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                                   aria-label={`${d.short}${hasSelection ? " — selected" : ""}${!anyOpen ? " — fully booked" : ""}`}
                                   onClick={() => setViewedDateKey(d.key)}
                                   disabled={!anyOpen}
-                                  className={`relative snap-start shrink-0 flex flex-col items-center justify-center min-w-[60px] md:min-w-[80px] min-h-[64px] md:min-h-[88px] px-2.5 md:px-3 pt-1.5 md:pt-2.5 pb-1.5 md:pb-2 rounded-xl md:rounded-2xl border-2 transition-all touch-manipulation active:scale-[0.96] ${
+                                  className={`relative snap-start shrink-0 flex flex-col items-center justify-center min-w-[60px] md:min-w-[80px] min-h-[60px] md:min-h-[88px] px-2.5 md:px-3 pt-1.5 md:pt-2.5 pb-1.5 md:pb-2 rounded-xl md:rounded-2xl border-2 transition-all touch-manipulation active:scale-[0.96] ${
                                     !anyOpen
                                       ? "border-slate-200 bg-slate-100/60 text-slate-400 cursor-not-allowed"
                                       : isViewed
@@ -4599,7 +4609,7 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                                           : "border-slate-200 bg-white text-slate-900 hover:border-slate-300 active:bg-slate-50"
                                   }`}
                                 >
-                                  <span className={`text-[9px] md:text-[10px] font-extrabold uppercase tracking-widest-gs ${
+                                  <span className={`text-[9px] md:text-[10px] font-extrabold uppercase tracking-widest-gs leading-none ${
                                     isViewed ? "text-white/85" : !anyOpen ? "text-slate-400" : d.isWeekend ? "text-amber-600" : "text-slate-500"
                                   }`}>
                                     {d.isToday ? "Today" : d.weekday}
@@ -4644,7 +4654,7 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                                     aria-selected={isActive}
                                     onClick={() => setActivePeriod(p.key)}
                                     disabled={count === 0}
-                                    className={`min-h-[44px] md:min-h-[52px] px-2 py-1.5 md:py-2 rounded-xl text-[11px] md:text-[12px] font-extrabold transition-all touch-manipulation active:scale-[0.97] ${
+                                    className={`min-h-[40px] md:min-h-[52px] px-2 py-1.5 md:py-2 rounded-xl text-[11px] md:text-[12px] font-extrabold transition-all touch-manipulation active:scale-[0.97] ${
                                       count === 0
                                         ? "text-slate-400 cursor-not-allowed"
                                         : isActive
@@ -4652,9 +4662,18 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                                           : "text-slate-600 hover:text-slate-900"
                                     }`}
                                   >
-                                    <div className="flex flex-col items-center gap-0 md:gap-0.5 leading-tight">
+                                    {/* Mobile: single line "Morning · 4" so the
+                                        period bar stays at 40px. Desktop keeps
+                                        the stacked label + count for clarity. */}
+                                    <span className="md:hidden inline-flex items-center gap-1 leading-none">
                                       <span>{p.label}</span>
-                                      <span className={`text-[9px] md:text-[10px] font-bold ${
+                                      <span className={count === 0 ? "text-slate-400" : isActive ? "text-emerald-600" : "text-slate-500"}>
+                                        · {count === 0 ? "0" : count}
+                                      </span>
+                                    </span>
+                                    <div className="hidden md:flex flex-col items-center gap-0.5 leading-tight">
+                                      <span>{p.label}</span>
+                                      <span className={`text-[10px] font-bold ${
                                         count === 0 ? "text-slate-400" : isActive ? "text-emerald-600" : "text-slate-500"
                                       }`}>
                                         {count === 0 ? "Fully booked" : `${count} slot${count === 1 ? "" : "s"}`}
@@ -4671,7 +4690,7 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                             <div
                               role="tabpanel"
                               aria-label={`${activePeriod} slots`}
-                              className={`rounded-2xl border-2 p-2 md:p-4 ${errors.preferred_datetime ? "border-red-400 bg-red-50/40" : "border-slate-200 bg-white"}`}
+                              className={`rounded-xl md:rounded-2xl border-2 p-2 md:p-4 ${errors.preferred_datetime ? "border-red-400 bg-red-50/40" : "border-slate-200 bg-white"}`}
                             >
                               {slotGroups[activePeriod].length === 0 ? (
                                 <p className="text-sm text-slate-500 font-medium text-center py-6">
@@ -4689,7 +4708,7 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                                         onClick={() => handleSlotPick(s.value)}
                                         aria-pressed={isSelected}
                                         aria-label={`${s.label} ${isSelected ? "selected" : s.disabled ? "unavailable" : ""}`}
-                                        className={`h-10 md:h-12 rounded-lg md:rounded-xl border-2 text-[13px] md:text-[14px] font-extrabold tabular-nums transition-all touch-manipulation active:scale-[0.96] ${
+                                        className={`h-10 md:h-12 rounded-lg md:rounded-xl border-2 text-[12px] md:text-[14px] font-extrabold tabular-nums transition-all touch-manipulation active:scale-[0.96] ${
                                           s.disabled
                                             ? "border-slate-200 bg-slate-50 text-slate-400 cursor-not-allowed line-through"
                                             : isSelected
@@ -4714,14 +4733,14 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                         {/* Selection summary — fixed visual weight so the parent can
                             eyeball their pick before hitting submit. Includes an
                             inline "Change" hint aligned to the right. */}
-                        {selectedDatetime ? (
-                          <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-emerald-50 border-2 border-emerald-200">
-                            <span className="size-9 rounded-xl bg-emerald-500 text-white flex items-center justify-center shrink-0">
-                              <Check className="size-5" aria-hidden="true" />
+                        {selectedDatetime && (
+                          <div className="flex items-center gap-2.5 md:gap-3 p-2 md:p-3.5 rounded-xl md:rounded-2xl bg-emerald-50 border-2 border-emerald-200">
+                            <span className="size-7 md:size-9 rounded-lg md:rounded-xl bg-emerald-500 text-white flex items-center justify-center shrink-0">
+                              <Check className="size-4 md:size-5" aria-hidden="true" />
                             </span>
                             <div className="min-w-0 flex-1">
-                              <p className="text-[10px] font-extrabold uppercase tracking-widest-gs text-emerald-700">Your slot</p>
-                              <p className="text-[13px] md:text-sm font-extrabold text-emerald-900 leading-snug truncate">{formatSlotLabel(selectedDatetime)}</p>
+                              <p className="text-[9px] md:text-[10px] font-extrabold uppercase tracking-widest-gs text-emerald-700 leading-none">Your slot</p>
+                              <p className="text-[12px] md:text-sm font-extrabold text-emerald-900 leading-snug truncate">{formatSlotLabel(selectedDatetime)}</p>
                             </div>
                             <button
                               type="button"
@@ -4731,51 +4750,40 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                               Change
                             </button>
                           </div>
-                        ) : (
-                          <p className="text-[11px] md:text-[12px] text-slate-500 font-medium">
-                            Our counsellor will confirm the exact time over WhatsApp.
-                          </p>
                         )}
 
                         {errors.preferred_datetime && <p className="text-[11px] text-red-500 font-bold">{errors.preferred_datetime.message}</p>}
                       </div>
 
-                      <div className="flex flex-col gap-1.5 md:gap-2">
-                        <label htmlFor="bottom_referral" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">How did you hear about us?</label>
-                        <div className="relative">
-                          <select id="bottom_referral" {...register("referral_source")} className={inputCls(!!errors.referral_source) + " appearance-none cursor-pointer pr-10"}>
-                            <option value="">Select one</option>
-                            <option value="instagram">Instagram</option>
-                            <option value="facebook">Facebook</option>
-                            <option value="google">Google Search</option>
-                            <option value="youtube">YouTube</option>
-                            <option value="friend">Friend / Word of Mouth</option>
-                            <option value="school">School / Teacher Recommendation</option>
-                            <option value="other">Other</option>
-                          </select>
-                          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-slate-400 pointer-events-none" />
-                        </div>
-                        {errors.referral_source && <p className="text-[10px] text-red-500 font-bold mt-1">{errors.referral_source.message}</p>}
+                      {/* referral_source kept registered (so RHF state still
+                          tracks it for any deep-link prefill) but rendered
+                          off-screen — the slot picker step needs the
+                          vertical room more than the optional-source select.
+                          Counsellor can ask on the WhatsApp follow-up. */}
+                      <div className="absolute -left-[9999px] opacity-0 h-0 overflow-hidden" aria-hidden="true">
+                        <select {...register("referral_source")} tabIndex={-1}>
+                          <option value="">unset</option>
+                        </select>
                       </div>
 
                       {spamError && (
-                        <div role="alert" className="p-4 text-sm bg-amber-50 text-amber-700 rounded-xl border border-amber-200 font-bold">
+                        <div role="alert" className="p-3 text-sm bg-amber-50 text-amber-700 rounded-xl border border-amber-200 font-bold">
                           {spamError}
                         </div>
                       )}
                       {status === "error" && (
-                        <div role="alert" className="p-4 text-sm bg-red-50 text-red-700 rounded-xl border border-red-200 font-bold">
+                        <div role="alert" className="p-3 text-sm bg-red-50 text-red-700 rounded-xl border border-red-200 font-bold">
                           {submitErrorMsg ?? "We couldn't send your request. Please WhatsApp us directly at +91 84009 79997."}
                         </div>
                       )}
-                      
-                      <div className="mt-2 p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-3">
-                        <AlertTriangle className="size-5 text-amber-600 shrink-0 mt-0.5" />
-                        <div>
-                          <p className="text-xs font-extrabold text-amber-900 uppercase tracking-widest-gs mb-1">Limited Cohort Slots</p>
-                          <p className="text-xs text-amber-800 font-medium">We cap cohorts at 6 students so each child gets real attention — limited slots, first come, first served.</p>
-                        </div>
-                      </div>
+
+                      {/* Compressed cohort notice — single line replaces the
+                          big amber callout that was eating ~120px of drawer
+                          height. Same message, fraction of the footprint. */}
+                      <p className="text-[11px] md:text-[12px] text-amber-700 font-medium flex items-start gap-1.5 leading-tight">
+                        <AlertTriangle className="size-3.5 md:size-4 text-amber-500 shrink-0 mt-0.5" aria-hidden="true" />
+                        <span>Cohorts capped at 6 — first come, first served.</span>
+                      </p>
 
                       <div className="flex-1 min-h-0" aria-hidden="true" />
 
