@@ -4181,7 +4181,11 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
   //     outline, per macOS HIG / Material 3 "focus indicator" guidance.
   //   • touch-manipulation hints mobile browsers to suppress the 300ms tap
   //     delay so interactions feel instant.
-  const inputCls = (hasError: boolean) => `w-full px-4 py-3 min-h-[52px] text-base md:text-[15px] border-2 rounded-xl bg-white text-slate-900 font-bold placeholder:text-slate-400 placeholder:font-medium focus:outline-none focus:ring-2 focus:ring-offset-0 transition-all shadow-sm touch-manipulation ${hasError ? 'border-red-500 focus:ring-red-500/30' : 'border-slate-300 focus:border-blue-600 focus:ring-blue-600/25 hover:border-slate-400'}`;
+  // Mobile-tight inputs: 48px min-height (still ≥44 HIG / 48 M3) and
+  // tighter horizontal padding so step 1 (3 stacked fields) fits a 720px
+  // mobile viewport without scrolling. md:text-[15px] is unchanged so
+  // desktop reads at the original density.
+  const inputCls = (hasError: boolean) => `w-full px-3.5 py-2.5 min-h-[48px] text-base md:text-[15px] border-2 rounded-xl bg-white text-slate-900 font-bold placeholder:text-slate-400 placeholder:font-medium focus:outline-none focus:ring-2 focus:ring-offset-0 transition-all shadow-sm touch-manipulation ${hasError ? 'border-red-500 focus:ring-red-500/30' : 'border-slate-300 focus:border-blue-600 focus:ring-blue-600/25 hover:border-slate-400'}`;
 
   const stepVariants = {
     hidden: { opacity: 0, x: 20 },
@@ -4283,11 +4287,11 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                   />
                 </div>
 
-                <div className="flex items-center justify-between mb-6">
-                  <h4 className="text-xl font-extrabold text-slate-900">
+                <div className="flex items-center justify-between mb-4 md:mb-5">
+                  <h4 className="text-lg md:text-xl font-extrabold text-slate-900">
                     {step === 1 && "Tell us who you are"}
                     {step === 2 && "About your child"}
-                    {step === 3 && "A few details about your child"}
+                    {step === 3 && "Your child’s goals"}
                     {step === 4 && "Last bits"}
                   </h4>
                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest-gs">Step {step} of 4</span>
@@ -4300,25 +4304,26 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                 </div>
 
                 <AnimatePresence mode="wait">
-                  {/* Step 1 — minimum-viable contact identity. Just name +
-                      phone. As soon as this validates we have enough to
-                      reach the parent on WhatsApp; that's the point at
-                      which we fire the partial-lead capture. */}
+                  {/* Step 1 — full parent contact (name + WhatsApp + email).
+                      Once this validates we have everything we need to
+                      follow up on WhatsApp AND email even if the parent
+                      never finishes the form; that's the point at which
+                      we fire the first partial-lead capture. */}
                   {step === 1 && (
-                    <motion.div key="step1" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="flex flex-col gap-4 md:gap-5">
-                      <div className="flex flex-col gap-1.5 md:gap-2">
-                        <label htmlFor="bottom_parent_name" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">Parent's Full Name <span className="text-red-500">*</span></label>
+                    <motion.div key="step1" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="flex flex-col gap-3 md:gap-4">
+                      <div className="flex flex-col gap-1 md:gap-1.5">
+                        <label htmlFor="bottom_parent_name" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">Parent&rsquo;s Full Name <span className="text-red-500">*</span></label>
                         <input id="bottom_parent_name" {...register("parent_name")} type="text" autoComplete="name" autoCapitalize="words" spellCheck={false} aria-invalid={!!errors.parent_name} aria-describedby={errors.parent_name ? "bottom_parent_name_err" : undefined} className={inputCls(!!errors.parent_name)} placeholder="e.g. Rahul Sharma" />
-                        {errors.parent_name && <p id="bottom_parent_name_err" className="text-[10px] text-red-500 font-bold mt-1">{errors.parent_name.message}</p>}
+                        {errors.parent_name && <p id="bottom_parent_name_err" className="text-[10px] text-red-500 font-bold mt-0.5">{errors.parent_name.message}</p>}
                       </div>
 
-                      <div className="flex flex-col gap-1.5 md:gap-2">
+                      <div className="flex flex-col gap-1 md:gap-1.5">
                         <label htmlFor="bottom_phone" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">WhatsApp Number <span className="text-red-500">*</span></label>
                         {/* Locked country-code prefix + 10-digit input. +91 is
                             rendered as an addon, not stored in the form value,
                             and never counted toward the 10-digit length. */}
                         <div
-                          className={`flex items-stretch min-h-[52px] border-2 rounded-xl bg-white overflow-hidden shadow-sm transition-all touch-manipulation ${
+                          className={`flex items-stretch min-h-[48px] border-2 rounded-xl bg-white overflow-hidden shadow-sm transition-all touch-manipulation ${
                             errors.phone
                               ? "border-red-500 focus-within:ring-2 focus-within:ring-red-500/30"
                               : "border-slate-300 hover:border-slate-400 focus-within:border-blue-600 focus-within:ring-2 focus-within:ring-blue-600/25"
@@ -4368,31 +4373,28 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                             placeholder="98765 43210"
                           />
                         </div>
-                        <p className="text-[10px] md:text-[11px] text-slate-500 font-medium mt-1">10-digit mobile number only — the +91 is already added.</p>
-                        {errors.phone && <p id="bottom_phone_err" className="text-[10px] text-red-500 font-bold mt-1">{errors.phone.message}</p>}
+                        {errors.phone && <p id="bottom_phone_err" className="text-[10px] text-red-500 font-bold mt-0.5">{errors.phone.message}</p>}
                       </div>
 
-                      <Button type="button" onClick={() => handleNextStep(['parent_name', 'phone'])} className="w-full h-14 mt-2 text-base font-extrabold tracking-tight gs-btn gs-btn-primary rounded-xl shadow-lg">
+                      <div className="flex flex-col gap-1 md:gap-1.5">
+                        <label htmlFor="bottom_parent_email" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">Email Address <span className="text-red-500">*</span></label>
+                        <input id="bottom_parent_email" {...register("parent_email")} type="email" inputMode="email" autoComplete="email" autoCapitalize="off" autoCorrect="off" spellCheck={false} aria-invalid={!!errors.parent_email} aria-describedby={errors.parent_email ? "bottom_parent_email_err" : undefined} className={inputCls(!!errors.parent_email)} placeholder="e.g. rahul@gmail.com" />
+                        {errors.parent_email && <p id="bottom_parent_email_err" className="text-[10px] text-red-500 font-bold mt-0.5">{errors.parent_email.message}</p>}
+                      </div>
+
+                      <Button type="button" onClick={() => handleNextStep(['parent_name', 'phone', 'parent_email'])} className="w-full h-12 md:h-14 mt-1 text-base font-extrabold tracking-tight gs-btn gs-btn-primary rounded-xl shadow-lg">
                         Continue <ArrowRight className="ml-2 size-4" />
                       </Button>
                     </motion.div>
                   )}
 
-                  {/* Step 2 — email + child basics. Was bundled into step 1
-                      as one long screen; split out so the first impression
-                      is just two fields. */}
+                  {/* Step 2 — child age + level. Just two selects so the
+                      step feels instant on mobile. */}
                   {step === 2 && (
-                    <motion.div key="step2-childinfo" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="flex flex-col gap-4 md:gap-5">
-                      <div className="flex flex-col gap-1.5 md:gap-2">
-                        <label htmlFor="bottom_parent_email" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">Email Address <span className="text-red-500">*</span></label>
-                        <input id="bottom_parent_email" {...register("parent_email")} type="email" inputMode="email" autoComplete="email" autoCapitalize="off" autoCorrect="off" spellCheck={false} aria-invalid={!!errors.parent_email} aria-describedby={errors.parent_email ? "bottom_parent_email_err" : undefined} className={inputCls(!!errors.parent_email)} placeholder="e.g. rahul@gmail.com" />
-                        <p className="text-[10px] md:text-[11px] text-slate-500 font-medium mt-1">We'll send you a confirmation with your call details.</p>
-                        {errors.parent_email && <p id="bottom_parent_email_err" className="text-[10px] text-red-500 font-bold mt-1">{errors.parent_email.message}</p>}
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5">
-                        <div className="flex flex-col gap-1.5 md:gap-2 min-w-0">
-                          <label htmlFor="bottom_child_age_range" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">Child's Age <span className="text-red-500">*</span></label>
+                    <motion.div key="step2-childinfo" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="flex flex-col gap-3 md:gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
+                        <div className="flex flex-col gap-1 md:gap-1.5 min-w-0">
+                          <label htmlFor="bottom_child_age_range" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">Child&rsquo;s Age <span className="text-red-500">*</span></label>
                           <div className="relative">
                             <select id="bottom_child_age_range" {...register("child_age_range")} aria-invalid={!!errors.child_age_range} className={inputCls(!!errors.child_age_range) + " appearance-none cursor-pointer pr-10 truncate"}>
                               <option value="">Select age group</option>
@@ -4403,9 +4405,9 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                             </select>
                             <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-slate-400 pointer-events-none" />
                           </div>
-                          {errors.child_age_range && <p className="text-[10px] text-red-500 font-bold mt-1">{errors.child_age_range.message}</p>}
+                          {errors.child_age_range && <p className="text-[10px] text-red-500 font-bold mt-0.5">{errors.child_age_range.message}</p>}
                         </div>
-                        <div className="flex flex-col gap-1.5 md:gap-2 min-w-0">
+                        <div className="flex flex-col gap-1 md:gap-1.5 min-w-0">
                           <label htmlFor="bottom_child_level" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">Current Chess Level <span className="text-red-500">*</span></label>
                           <div className="relative">
                             <select id="bottom_child_level" {...register("child_level")} aria-invalid={!!errors.child_level} className={inputCls(!!errors.child_level) + " appearance-none cursor-pointer pr-10 truncate"}>
@@ -4418,16 +4420,16 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                             </select>
                             <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-slate-400 pointer-events-none" />
                           </div>
-                          <p className="text-[10px] md:text-[11px] text-slate-500 font-medium mt-1">Not sure? Pick your best guess — the coach confirms on the demo call.</p>
-                          {errors.child_level && <p className="text-[10px] text-red-500 font-bold mt-1">{errors.child_level.message}</p>}
+                          {errors.child_level && <p className="text-[10px] text-red-500 font-bold mt-0.5">{errors.child_level.message}</p>}
                         </div>
                       </div>
+                      <p className="text-[10px] md:text-[11px] text-slate-500 font-medium -mt-1">Not sure about the level? Pick your best guess — the coach confirms on the demo call.</p>
 
-                      <div className="flex gap-3 mt-2">
-                        <Button type="button" onClick={() => setStep(1)} variant="outline" className="h-14 px-6 font-bold text-slate-600 border-slate-200 rounded-xl hover:bg-slate-50">
+                      <div className="flex gap-3 mt-1">
+                        <Button type="button" onClick={() => setStep(1)} variant="outline" className="h-12 md:h-14 px-6 font-bold text-slate-600 border-slate-200 rounded-xl hover:bg-slate-50">
                           <ArrowLeft className="size-4" />
                         </Button>
-                        <Button type="button" onClick={() => handleNextStep(['parent_email', 'child_age_range', 'child_level'])} className="flex-1 h-14 text-base font-extrabold tracking-tight gs-btn gs-btn-primary rounded-xl shadow-lg">
+                        <Button type="button" onClick={() => handleNextStep(['child_age_range', 'child_level'])} className="flex-1 h-12 md:h-14 text-base font-extrabold tracking-tight gs-btn gs-btn-primary rounded-xl shadow-lg">
                           Continue <ArrowRight className="ml-2 size-4" />
                         </Button>
                       </div>
@@ -4435,19 +4437,19 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                   )}
 
                   {step === 3 && (
-                    <motion.div key="step3" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="flex flex-col gap-4 md:gap-5">
-                      <div className="flex flex-col gap-1.5 md:gap-2">
-                        <label htmlFor="bottom_child_name" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">Child's First Name <span className="text-red-500">*</span></label>
+                    <motion.div key="step3" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="flex flex-col gap-3 md:gap-4">
+                      <div className="flex flex-col gap-1 md:gap-1.5">
+                        <label htmlFor="bottom_child_name" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">Child&rsquo;s First Name <span className="text-red-500">*</span></label>
                         <input id="bottom_child_name" {...register("child_name")} type="text" autoComplete="given-name" autoCapitalize="words" spellCheck={false} aria-invalid={!!errors.child_name} className={inputCls(!!errors.child_name)} placeholder="e.g. Aarav" />
-                        {errors.child_name && <p className="text-[10px] text-red-500 font-bold mt-1">{errors.child_name.message}</p>}
+                        {errors.child_name && <p className="text-[10px] text-red-500 font-bold mt-0.5">{errors.child_name.message}</p>}
                       </div>
 
-                      <div className="flex flex-col gap-1.5 md:gap-2">
+                      <div className="flex flex-col gap-1 md:gap-1.5">
                         <label className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">
                           What do you want chess to do for your child? <span className="text-red-500">*</span>
                         </label>
-                        <p className="text-[10px] text-slate-400 font-medium -mt-0.5">Pick all that apply — our coach uses this to tailor the demo.</p>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-1">
+                        <p className="text-[10px] text-slate-400 font-medium">Pick all that apply.</p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-0.5">
                           {[
                             { value: "focus", label: "Improve focus & attention span" },
                             { value: "math", label: "Boost math, logic & school performance" },
@@ -4462,7 +4464,7 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                             return (
                               <label
                                 key={opt.value}
-                                className={`flex items-start gap-3 p-3.5 min-h-[56px] rounded-xl border-2 transition-all cursor-pointer touch-manipulation active:scale-[0.98] ${
+                                className={`flex items-start gap-2.5 p-2.5 md:p-3 min-h-[48px] rounded-xl border-2 transition-all cursor-pointer touch-manipulation active:scale-[0.98] ${
                                   selected
                                     ? "border-blue-600 bg-blue-50 shadow-sm"
                                     : "border-slate-200 bg-slate-50 hover:bg-white hover:border-blue-300"
@@ -4472,38 +4474,38 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                                   type="checkbox"
                                   value={opt.value}
                                   {...register("parent_concern")}
-                                  className="mt-0.5 size-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer shrink-0"
+                                  className="mt-0.5 size-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer shrink-0"
                                 />
-                                <span className="text-xs md:text-[13px] font-bold text-slate-800 leading-snug">
+                                <span className="text-[12px] md:text-[13px] font-bold text-slate-800 leading-snug">
                                   {opt.label}
                                 </span>
                               </label>
                             );
                           })}
                         </div>
-                        {errors.parent_concern && <p className="text-[10px] text-red-500 font-bold mt-1">{(errors.parent_concern as any).message}</p>}
+                        {errors.parent_concern && <p className="text-[10px] text-red-500 font-bold mt-0.5">{(errors.parent_concern as any).message}</p>}
                       </div>
 
-                      <div className="flex flex-col gap-1.5 md:gap-2">
-                        <label htmlFor="bottom_commitment" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">What is your commitment level? <span className="text-red-500">*</span></label>
+                      <div className="flex flex-col gap-1 md:gap-1.5">
+                        <label htmlFor="bottom_commitment" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">Commitment level <span className="text-red-500">*</span></label>
                         <div className="relative">
                           <select id="bottom_commitment" {...register("parent_commitment")} aria-invalid={!!errors.parent_commitment} className={inputCls(!!errors.parent_commitment) + " appearance-none cursor-pointer pr-10"}>
                             <option value="">Select commitment</option>
-                            <option value="casual">Casual (Just want a fun hobby)</option>
-                            <option value="serious">Serious (Looking for structured, long-term cognitive growth)</option>
-                            <option value="competitive">Competitive (Aiming for FIDE rating / tournaments)</option>
+                            <option value="casual">Casual (just a fun hobby)</option>
+                            <option value="serious">Serious (long-term cognitive growth)</option>
+                            <option value="competitive">Competitive (FIDE / tournaments)</option>
                           </select>
                           <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-slate-400 pointer-events-none" />
                         </div>
-                        {errors.parent_commitment && <p className="text-[10px] text-red-500 font-bold mt-1">{errors.parent_commitment.message}</p>}
+                        {errors.parent_commitment && <p className="text-[10px] text-red-500 font-bold mt-0.5">{errors.parent_commitment.message}</p>}
                       </div>
 
-                      <div className="flex gap-3 mt-4">
-                        <Button type="button" onClick={() => setStep(2)} variant="outline" className="h-14 px-6 font-bold text-slate-600 border-slate-200 rounded-xl hover:bg-slate-50">
+                      <div className="flex gap-3 mt-1">
+                        <Button type="button" onClick={() => setStep(2)} variant="outline" className="h-12 md:h-14 px-6 font-bold text-slate-600 border-slate-200 rounded-xl hover:bg-slate-50">
                           <ArrowLeft className="size-4" />
                         </Button>
-                        <Button type="button" onClick={() => handleNextStep(['child_name', 'parent_concern', 'parent_commitment'])} className="flex-1 h-14 text-base font-extrabold tracking-tight gs-btn gs-btn-primary rounded-xl shadow-lg">
-                          Continue to Final Step <ArrowRight className="ml-2 size-4" />
+                        <Button type="button" onClick={() => handleNextStep(['child_name', 'parent_concern', 'parent_commitment'])} className="flex-1 h-12 md:h-14 text-base font-extrabold tracking-tight gs-btn gs-btn-primary rounded-xl shadow-lg">
+                          Continue <ArrowRight className="ml-2 size-4" />
                         </Button>
                       </div>
                     </motion.div>
@@ -5489,23 +5491,23 @@ function DemoDrawer() {
           >
             {/* Drag-handle / "grabber" — HIG sheet indicator. Decorative on
                 desktop, signals dismissibility on mobile. */}
-            <div className="flex justify-center pt-2.5 pb-1 md:hidden">
+            <div className="flex justify-center pt-2 pb-0.5 md:hidden">
               <span className="block w-10 h-1 rounded-full bg-slate-300" aria-hidden="true" />
             </div>
 
             {/* Header — title + close + (when known) step badge.
                 Drops a subtle shadow once the body is scrolled, iOS-style. */}
             <div
-              className={`flex items-center gap-3 px-5 md:px-8 pt-2 md:pt-7 pb-4 border-b transition-colors ${
+              className={`flex items-center gap-2 px-4 md:px-8 pt-2 md:pt-7 pb-3 md:pb-4 border-b transition-colors ${
                 scrolled ? "border-slate-200 shadow-[0_6px_18px_-12px_rgba(15,23,42,0.25)]" : "border-slate-100"
               }`}
             >
               <div className="flex-1 min-w-0">
-                <h2 className="text-lg md:text-xl font-extrabold tracking-tighter-gs text-slate-900 leading-tight">
+                <h2 className="text-base md:text-xl font-extrabold tracking-tighter-gs text-slate-900 leading-tight">
                   Book your free demo
                 </h2>
-                <p className="text-[11px] md:text-xs font-medium text-slate-500 mt-0.5 leading-tight">
-                  Reply on WhatsApp · usually within 4 hours
+                <p className="text-[10px] md:text-xs font-medium text-slate-500 mt-0.5 leading-tight">
+                  Reply on WhatsApp · within 4 hours
                 </p>
               </div>
               {step ? (
@@ -5530,12 +5532,14 @@ function DemoDrawer() {
             </div>
 
             {/* Body — sized to its content so the drawer hugs the current
-                step (no big empty area on a 2-field step). Capped at viewport
-                minus header so taller steps scroll inside. `dvh` so iOS
-                Safari address-bar shrinkage doesn't push the sheet offscreen. */}
+                step (no big empty area on a 2-field step). Capped at the
+                visible viewport minus the header so taller steps scroll
+                inside. `dvh` so iOS Safari address-bar shrinkage doesn't
+                push the sheet offscreen. Padding is tight on mobile to
+                fit the tallest step without scroll on a typical phone. */}
             <div
               ref={bodyRef}
-              className="overflow-y-auto px-5 md:px-8 py-5 md:py-7 overscroll-contain max-h-[calc(85dvh-120px)] md:max-h-[calc(85dvh-140px)]"
+              className="overflow-y-auto px-4 md:px-8 py-4 md:py-6 overscroll-contain max-h-[calc(90dvh-110px)] md:max-h-[calc(85dvh-140px)]"
             >
               <BottomForm compact />
               {/* iOS-style safe-area padding for mobile home indicator */}
