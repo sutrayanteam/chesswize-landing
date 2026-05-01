@@ -425,11 +425,19 @@ async function getAudienceId(env: Env): Promise<string | null> {
   return (await env.TOKEN_CACHE.get(AUDIENCE_KV_KEY)) || null;
 }
 
-// Sync helper that doesn't await KV — returns true only when env var
-// is set. Used in /api/health where a KV round-trip would slow the
-// healthcheck. The async addToResendAudience path uses getAudienceId
-// for full coverage.
-const audienceConfigured = (env: Env) => !!env.RESEND_API_KEY;
+// Truthful audience-bound check — does both the env var test AND the
+// KV read so the /api/health response can't lie when the API key is
+// set but the audience hasn't been bootstrapped yet. The KV round
+// trip is ~20ms and only runs on healthcheck calls, never on the
+// lead-submission hot path. (Gemini-flagged false-positive: the
+// previous synchronous version reported "configured" the moment
+// RESEND_API_KEY was set, even before /api/admin/init-audience was
+// hit, hiding a real misconfiguration from anyone watching ops.)
+const audienceConfigured = async (env: Env): Promise<boolean> => {
+  if (!env.RESEND_API_KEY) return false;
+  const id = await getAudienceId(env);
+  return !!id;
+};
 
 /**
  * Add a parent to the Resend Audience for marketing campaigns later.
@@ -1365,6 +1373,13 @@ async function handleInitAudience(request: Request, env: Env): Promise<Response>
   if (!env.RESEND_API_KEY) {
     return json({ ok: false, error: "resend_api_key_missing" }, { status: 500 });
   }
+  // Codex-flagged: without KV bound, we'd POST to Resend, create an
+  // audience, and return success — but never persist the id. The next
+  // call would create ANOTHER audience because getAudienceId returns
+  // null. Fail BEFORE the Resend call so we don't leave orphans.
+  if (!env.TOKEN_CACHE) {
+    return json({ ok: false, error: "kv_not_bound" }, { status: 500 });
+  }
 
   // Idempotent — if KV already has one, reuse it.
   const existing = await getAudienceId(env);
@@ -1400,11 +1415,11 @@ async function handleInitAudience(request: Request, env: Env): Promise<Response>
     return json({ ok: false, error: "no_id_in_response" }, { status: 502 });
   }
 
-  if (env.TOKEN_CACHE) {
-    // No TTL — the audience is meant to live for the lifetime of the
-    // marketing list. Resend's UI is the place to delete it.
-    await env.TOKEN_CACHE.put(AUDIENCE_KV_KEY, data.id);
-  }
+  // KV binding is guaranteed to exist here (we early-returned above
+  // if it was missing). No TTL — the audience is meant to live for
+  // the lifetime of the marketing list. Resend's UI is the place to
+  // delete it.
+  await env.TOKEN_CACHE!.put(AUDIENCE_KV_KEY, data.id);
 
   return json({ ok: true, audience_id: data.id, name: data.name, created: true });
 }
@@ -1547,7 +1562,7 @@ async function handlePartialLead(request: Request, env: Env, ctx: ExecutionConte
     // the moment the parent has given us a recoverable email AND
     // hasn't yet completed the booking, so the marketing list pick-up
     // catches every partial-fill (the most valuable retargeting cohort).
-    if (audienceConfigured(env) && lead.parent_email) {
+    if (lead.parent_email && (await audienceConfigured(env))) {
       ctx.waitUntil(
         addToResendAudience(env, lead).then((r) => {
           if (!r.ok) {
@@ -1670,7 +1685,7 @@ async function handleLead(request: Request, env: Env, ctx: ExecutionContext): Pr
   // later (re-engagement, newsletter, course launches). Idempotent —
   // a parent who already landed on the partial path won't be added a
   // second time. Non-blocking via ctx.waitUntil.
-  if (audienceConfigured(env) && lead.parent_email) {
+  if (lead.parent_email && (await audienceConfigured(env))) {
     ctx.waitUntil(
       addToResendAudience(env, lead).then((r) => {
         if (!r.ok) {
@@ -1738,14 +1753,16 @@ async function handleLead(request: Request, env: Env, ctx: ExecutionContext): Pr
   );
 }
 
-function handleHealth(env: Env): Response {
+async function handleHealth(env: Env): Promise<Response> {
   return json({
     ok: true,
     service: "chesswize-lead-api",
     integrations: {
       zoho: zohoConfigured(env) ? "configured" : "missing_env",
       resend: resendConfigured(env) ? "configured" : "missing_env",
-      resend_audience: audienceConfigured(env) ? "configured" : "missing_env",
+      // Truthful — does the KV round-trip too so this can't lie when
+      // the API key is set but the audience hasn't been bootstrapped.
+      resend_audience: (await audienceConfigured(env)) ? "configured" : "missing_env",
       meta_capi: capiConfigured(env) ? "configured" : "missing_env",
       turnstile: env.TURNSTILE_SECRET_KEY ? "configured" : "missing_env",
     },
@@ -1777,7 +1794,7 @@ export default {
     }
 
     if (request.method === "GET" && url.pathname === "/api/health") {
-      return handleHealth(env);
+      return await handleHealth(env);
     }
     if (request.method === "POST" && url.pathname === "/api/leads") {
       const res = await handleLead(request, env, ctx);
