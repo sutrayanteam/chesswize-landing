@@ -4181,11 +4181,11 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
   //     outline, per macOS HIG / Material 3 "focus indicator" guidance.
   //   • touch-manipulation hints mobile browsers to suppress the 300ms tap
   //     delay so interactions feel instant.
-  // Mobile-tight inputs: 48px min-height (still ≥44 HIG / 48 M3) and
-  // tighter horizontal padding so step 1 (3 stacked fields) fits a 720px
-  // mobile viewport without scrolling. md:text-[15px] is unchanged so
-  // desktop reads at the original density.
-  const inputCls = (hasError: boolean) => `w-full px-3.5 py-2.5 min-h-[48px] text-base md:text-[15px] border-2 rounded-xl bg-white text-slate-900 font-bold placeholder:text-slate-400 placeholder:font-medium focus:outline-none focus:ring-2 focus:ring-offset-0 transition-all shadow-sm touch-manipulation ${hasError ? 'border-red-500 focus:ring-red-500/30' : 'border-slate-300 focus:border-blue-600 focus:ring-blue-600/25 hover:border-slate-400'}`;
+  // Density: tight on mobile (48px min, 14px padding), generous on
+  // desktop (52px min, 16px padding). Apple HIG ≥44pt / Material 3 ≥48dp
+  // tap targets preserved. text-base on mobile prevents iOS Safari
+  // auto-zoom on focus.
+  const inputCls = (hasError: boolean) => `w-full px-3.5 md:px-4 py-2.5 md:py-3 min-h-[48px] md:min-h-[52px] text-base md:text-[15px] border-2 rounded-xl bg-white text-slate-900 font-bold placeholder:text-slate-400 placeholder:font-medium focus:outline-none focus:ring-2 focus:ring-offset-0 transition-all shadow-sm touch-manipulation ${hasError ? 'border-red-500 focus:ring-red-500/30' : 'border-slate-300 focus:border-blue-600 focus:ring-blue-600/25 hover:border-slate-400'}`;
 
   const stepVariants = {
     hidden: { opacity: 0, x: 20 },
@@ -4323,7 +4323,7 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                             rendered as an addon, not stored in the form value,
                             and never counted toward the 10-digit length. */}
                         <div
-                          className={`flex items-stretch min-h-[48px] border-2 rounded-xl bg-white overflow-hidden shadow-sm transition-all touch-manipulation ${
+                          className={`flex items-stretch min-h-[48px] md:min-h-[52px] border-2 rounded-xl bg-white overflow-hidden shadow-sm transition-all touch-manipulation ${
                             errors.phone
                               ? "border-red-500 focus-within:ring-2 focus-within:ring-red-500/30"
                               : "border-slate-300 hover:border-slate-400 focus-within:border-blue-600 focus-within:ring-2 focus-within:ring-blue-600/25"
@@ -4425,11 +4425,17 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                       </div>
                       <p className="text-[10px] md:text-[11px] text-slate-500 font-medium -mt-1">Not sure about the level? Pick your best guess — the coach confirms on the demo call.</p>
 
+                      <div className="flex flex-col gap-1 md:gap-1.5">
+                        <label htmlFor="bottom_city" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">City <span className="text-red-500">*</span></label>
+                        <input id="bottom_city" {...register("city")} type="text" autoComplete="address-level2" autoCapitalize="words" spellCheck={false} aria-invalid={!!errors.city} className={inputCls(!!errors.city)} placeholder="e.g. Bangalore" />
+                        {errors.city && <p className="text-[10px] text-red-500 font-bold mt-0.5">{errors.city.message}</p>}
+                      </div>
+
                       <div className="flex gap-3 mt-1">
                         <Button type="button" onClick={() => setStep(1)} variant="outline" className="h-12 md:h-14 px-6 font-bold text-slate-600 border-slate-200 rounded-xl hover:bg-slate-50">
                           <ArrowLeft className="size-4" />
                         </Button>
-                        <Button type="button" onClick={() => handleNextStep(['child_age_range', 'child_level'])} className="flex-1 h-12 md:h-14 text-base font-extrabold tracking-tight gs-btn gs-btn-primary rounded-xl shadow-lg">
+                        <Button type="button" onClick={() => handleNextStep(['child_age_range', 'child_level', 'city'])} className="flex-1 h-12 md:h-14 text-base font-extrabold tracking-tight gs-btn gs-btn-primary rounded-xl shadow-lg">
                           Continue <ArrowRight className="ml-2 size-4" />
                         </Button>
                       </div>
@@ -4512,14 +4518,8 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                   )}
 
                   {step === 4 && (
-                    <motion.div key="step4" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="flex flex-col gap-4 md:gap-5">
-                      <div className="flex flex-col gap-1.5 md:gap-2">
-                        <label htmlFor="bottom_city" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">City <span className="text-red-500">*</span></label>
-                        <input id="bottom_city" {...register("city")} type="text" autoComplete="address-level2" autoCapitalize="words" spellCheck={false} aria-invalid={!!errors.city} className={inputCls(!!errors.city)} placeholder="e.g. Bangalore" />
-                        {errors.city && <p className="text-[10px] text-red-500 font-bold mt-1">{errors.city.message}</p>}
-                      </div>
-
-                      <div className="flex flex-col gap-3">
+                    <motion.div key="step4" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="flex flex-col gap-2 md:gap-3">
+                      <div className="flex flex-col gap-2 md:gap-3">
                         <div className="flex items-baseline justify-between gap-2">
                           <label className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">
                             Pick a date &amp; 20-min window <span className="text-red-500">*</span>
@@ -4555,7 +4555,7 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                                   aria-label={`${d.short}${hasSelection ? " — selected" : ""}${!anyOpen ? " — fully booked" : ""}`}
                                   onClick={() => setViewedDateKey(d.key)}
                                   disabled={!anyOpen}
-                                  className={`relative snap-start shrink-0 flex flex-col items-center justify-center min-w-[80px] min-h-[88px] px-3 pt-2.5 pb-2 rounded-2xl border-2 transition-all touch-manipulation active:scale-[0.96] ${
+                                  className={`relative snap-start shrink-0 flex flex-col items-center justify-center min-w-[60px] md:min-w-[80px] min-h-[64px] md:min-h-[88px] px-2.5 md:px-3 pt-1.5 md:pt-2.5 pb-1.5 md:pb-2 rounded-xl md:rounded-2xl border-2 transition-all touch-manipulation active:scale-[0.96] ${
                                     !anyOpen
                                       ? "border-slate-200 bg-slate-100/60 text-slate-400 cursor-not-allowed"
                                       : isViewed
@@ -4565,12 +4565,12 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                                           : "border-slate-200 bg-white text-slate-900 hover:border-slate-300 active:bg-slate-50"
                                   }`}
                                 >
-                                  <span className={`text-[10px] font-extrabold uppercase tracking-widest-gs ${
+                                  <span className={`text-[9px] md:text-[10px] font-extrabold uppercase tracking-widest-gs ${
                                     isViewed ? "text-white/85" : !anyOpen ? "text-slate-400" : d.isWeekend ? "text-amber-600" : "text-slate-500"
                                   }`}>
                                     {d.isToday ? "Today" : d.weekday}
                                   </span>
-                                  <span className={`text-2xl font-extrabold leading-none mt-1 tabular-nums ${
+                                  <span className={`text-lg md:text-2xl font-extrabold leading-none mt-0.5 md:mt-1 tabular-nums ${
                                     isViewed ? "text-white" : "text-slate-900"
                                   }`}>
                                     {d.dayNum}
@@ -4610,7 +4610,7 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                                     aria-selected={isActive}
                                     onClick={() => setActivePeriod(p.key)}
                                     disabled={count === 0}
-                                    className={`min-h-[52px] px-2 py-2 rounded-xl text-[12px] font-extrabold transition-all touch-manipulation active:scale-[0.97] ${
+                                    className={`min-h-[44px] md:min-h-[52px] px-2 py-1.5 md:py-2 rounded-xl text-[11px] md:text-[12px] font-extrabold transition-all touch-manipulation active:scale-[0.97] ${
                                       count === 0
                                         ? "text-slate-400 cursor-not-allowed"
                                         : isActive
@@ -4618,9 +4618,9 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                                           : "text-slate-600 hover:text-slate-900"
                                     }`}
                                   >
-                                    <div className="flex flex-col items-center gap-0.5">
+                                    <div className="flex flex-col items-center gap-0 md:gap-0.5 leading-tight">
                                       <span>{p.label}</span>
-                                      <span className={`text-[10px] font-bold ${
+                                      <span className={`text-[9px] md:text-[10px] font-bold ${
                                         count === 0 ? "text-slate-400" : isActive ? "text-emerald-600" : "text-slate-500"
                                       }`}>
                                         {count === 0 ? "Fully booked" : `${count} slot${count === 1 ? "" : "s"}`}
@@ -4637,14 +4637,14 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                             <div
                               role="tabpanel"
                               aria-label={`${activePeriod} slots`}
-                              className={`rounded-2xl border-2 p-3 md:p-4 ${errors.preferred_datetime ? "border-red-400 bg-red-50/40" : "border-slate-200 bg-white"}`}
+                              className={`rounded-2xl border-2 p-2 md:p-4 ${errors.preferred_datetime ? "border-red-400 bg-red-50/40" : "border-slate-200 bg-white"}`}
                             >
                               {slotGroups[activePeriod].length === 0 ? (
                                 <p className="text-sm text-slate-500 font-medium text-center py-6">
                                   No slots in this window. Try a different period or date.
                                 </p>
                               ) : (
-                                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5">
+                                <div className="grid grid-cols-3 sm:grid-cols-4 gap-1.5 md:gap-2.5">
                                   {slotGroups[activePeriod].map((s) => {
                                     const isSelected = selectedDatetime === s.value;
                                     return (
@@ -4655,7 +4655,7 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                                         onClick={() => handleSlotPick(s.value)}
                                         aria-pressed={isSelected}
                                         aria-label={`${s.label} ${isSelected ? "selected" : s.disabled ? "unavailable" : ""}`}
-                                        className={`h-12 rounded-xl border-2 text-[14px] font-extrabold tabular-nums transition-all touch-manipulation active:scale-[0.96] ${
+                                        className={`h-10 md:h-12 rounded-lg md:rounded-xl border-2 text-[13px] md:text-[14px] font-extrabold tabular-nums transition-all touch-manipulation active:scale-[0.96] ${
                                           s.disabled
                                             ? "border-slate-200 bg-slate-50 text-slate-400 cursor-not-allowed line-through"
                                             : isSelected
@@ -5476,17 +5476,23 @@ function DemoDrawer() {
             className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm cursor-default"
           />
 
-          {/* Sheet container — sizes to current step's content (not full
-              viewport) so a short step like "name + phone" shows a small
-              drawer; long steps like the calendar slot picker scroll within
-              the body. The body's own max-height is the cap, not the sheet. */}
+          {/* Sheet container.
+              MOBILE: bounded between ~55dvh (so really short steps don't
+              shrink the drawer to a postage stamp) and 88dvh (so the
+              tallest step — the slot picker — has room without forcing
+              page scroll). Body centers content vertically inside this
+              range, so short steps look balanced (whitespace top + bottom)
+              and tall steps fill + scroll naturally.
+              DESKTOP: content-fit (h-auto) up to 85dvh — same generous
+              feel as before. */}
           <motion.div
             ref={sheetRef}
+            layout
             initial={reduceMotion ? { opacity: 0 } : { y: "100%" }}
             animate={reduceMotion ? { opacity: 1 } : { y: 0 }}
             exit={reduceMotion ? { opacity: 0 } : { y: "100%" }}
             transition={reduceMotion ? { duration: 0 } : { type: "spring", stiffness: 380, damping: 38 }}
-            className="relative w-full md:w-auto md:max-w-2xl md:mx-4 bg-white rounded-t-3xl md:rounded-3xl shadow-2xl flex flex-col overflow-hidden"
+            className="relative w-full md:w-auto md:max-w-2xl md:mx-4 min-h-[55dvh] max-h-[88dvh] md:min-h-0 md:h-auto md:max-h-[85dvh] bg-white rounded-t-3xl md:rounded-3xl shadow-2xl flex flex-col overflow-hidden"
             style={{ boxShadow: "0 -20px 60px -12px rgba(15, 23, 42, 0.35), 0 -8px 16px -8px rgba(15, 23, 42, 0.18)" }}
           >
             {/* Drag-handle / "grabber" — HIG sheet indicator. Decorative on
@@ -5531,15 +5537,17 @@ function DemoDrawer() {
               </button>
             </div>
 
-            {/* Body — sized to its content so the drawer hugs the current
-                step (no big empty area on a 2-field step). Capped at the
-                visible viewport minus the header so taller steps scroll
-                inside. `dvh` so iOS Safari address-bar shrinkage doesn't
-                push the sheet offscreen. Padding is tight on mobile to
-                fit the tallest step without scroll on a typical phone. */}
+            {/* Body.
+                MOBILE: flex-1 fills the remaining space inside the
+                fixed 90dvh sheet, so total drawer height is constant
+                across steps; tall content scrolls within the body.
+                DESKTOP: flex-1 with min-h-0 also caps via the sheet's
+                max-h-[85dvh], but the sheet shrinks to content because
+                desktop sheet is h-auto. Padding is tight on mobile,
+                generous on desktop. */}
             <div
               ref={bodyRef}
-              className="overflow-y-auto px-4 md:px-8 py-4 md:py-6 overscroll-contain max-h-[calc(90dvh-110px)] md:max-h-[calc(85dvh-140px)]"
+              className="flex-1 min-h-0 overflow-y-auto px-4 md:px-8 py-4 md:py-7 overscroll-contain"
             >
               <BottomForm compact />
               {/* iOS-style safe-area padding for mobile home indicator */}
