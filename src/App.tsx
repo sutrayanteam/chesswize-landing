@@ -3874,7 +3874,7 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
       try { sessionStorage.removeItem("cw.hero.age"); } catch { /* no-op */ }
       setDelivery({ leadSaved: true });
       setStatus("success");
-      setStep(4);
+      setStep(5);
       reset();
       return;
     }
@@ -3951,7 +3951,7 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
           {!compact && <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full blur-[60px] pointer-events-none" />}
           
           <AnimatePresence mode="wait">
-            {step === 4 ? (
+            {step === 5 ? (
               <motion.div
                 key="success"
                 initial="hidden"
@@ -3994,19 +3994,20 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                 <div className="w-full h-1.5 bg-slate-100 rounded-full mb-6 overflow-hidden">
                   <motion.div 
                     className="h-full bg-blue-600 rounded-full"
-                    initial={{ width: `${((step - 1) / 3) * 100}%` }}
-                    animate={{ width: `${(step / 3) * 100}%` }}
+                    initial={{ width: `${((step - 1) / 4) * 100}%` }}
+                    animate={{ width: `${(step / 4) * 100}%` }}
                     transition={{ duration: 0.3 }}
                   />
                 </div>
 
                 <div className="flex items-center justify-between mb-6">
                   <h4 className="text-xl font-extrabold text-slate-900">
-                    {step === 1 && "Tell us who your child is"}
-                    {step === 2 && "A few details about your child"}
-                    {step === 3 && "Last bits"}
+                    {step === 1 && "Tell us who you are"}
+                    {step === 2 && "About your child"}
+                    {step === 3 && "A few details about your child"}
+                    {step === 4 && "Last bits"}
                   </h4>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest-gs">Step {step} of 3</span>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest-gs">Step {step} of 4</span>
                 </div>
 
                 {/* Honeypot — invisible to humans, bots auto-fill */}
@@ -4016,6 +4017,10 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                 </div>
 
                 <AnimatePresence mode="wait">
+                  {/* Step 1 — minimum-viable contact identity. Just name +
+                      phone. As soon as this validates we have enough to
+                      reach the parent on WhatsApp; that's the point at
+                      which we fire the partial-lead capture. */}
                   {step === 1 && (
                     <motion.div key="step1" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="flex flex-col gap-4 md:gap-5">
                       <div className="flex flex-col gap-1.5 md:gap-2">
@@ -4084,6 +4089,17 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                         {errors.phone && <p id="bottom_phone_err" className="text-[10px] text-red-500 font-bold mt-1">{errors.phone.message}</p>}
                       </div>
 
+                      <Button type="button" onClick={() => handleNextStep(['parent_name', 'phone'])} className="w-full h-14 mt-2 text-base font-extrabold tracking-tight gs-btn gs-btn-primary rounded-xl shadow-lg">
+                        Continue <ArrowRight className="ml-2 size-4" />
+                      </Button>
+                    </motion.div>
+                  )}
+
+                  {/* Step 2 — email + child basics. Was bundled into step 1
+                      as one long screen; split out so the first impression
+                      is just two fields. */}
+                  {step === 2 && (
+                    <motion.div key="step2-childinfo" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="flex flex-col gap-4 md:gap-5">
                       <div className="flex flex-col gap-1.5 md:gap-2">
                         <label htmlFor="bottom_parent_email" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">Email Address <span className="text-red-500">*</span></label>
                         <input id="bottom_parent_email" {...register("parent_email")} type="email" inputMode="email" autoComplete="email" autoCapitalize="off" autoCorrect="off" spellCheck={false} aria-invalid={!!errors.parent_email} aria-describedby={errors.parent_email ? "bottom_parent_email_err" : undefined} className={inputCls(!!errors.parent_email)} placeholder="e.g. rahul@gmail.com" />
@@ -4124,14 +4140,19 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                         </div>
                       </div>
 
-                      <Button type="button" onClick={() => handleNextStep(['parent_name', 'phone', 'parent_email', 'child_age_range', 'child_level'])} className="w-full h-14 mt-2 text-base font-extrabold tracking-tight gs-btn gs-btn-primary rounded-xl shadow-lg">
-                        Continue to Next Step <ArrowRight className="ml-2 size-4" />
-                      </Button>
+                      <div className="flex gap-3 mt-2">
+                        <Button type="button" onClick={() => setStep(1)} variant="outline" className="h-14 px-6 font-bold text-slate-600 border-slate-200 rounded-xl hover:bg-slate-50">
+                          <ArrowLeft className="size-4" />
+                        </Button>
+                        <Button type="button" onClick={() => handleNextStep(['parent_email', 'child_age_range', 'child_level'])} className="flex-1 h-14 text-base font-extrabold tracking-tight gs-btn gs-btn-primary rounded-xl shadow-lg">
+                          Continue <ArrowRight className="ml-2 size-4" />
+                        </Button>
+                      </div>
                     </motion.div>
                   )}
 
-                  {step === 2 && (
-                    <motion.div key="step2" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="flex flex-col gap-4 md:gap-5">
+                  {step === 3 && (
+                    <motion.div key="step3" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="flex flex-col gap-4 md:gap-5">
                       <div className="flex flex-col gap-1.5 md:gap-2">
                         <label htmlFor="bottom_child_name" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">Child's First Name <span className="text-red-500">*</span></label>
                         <input id="bottom_child_name" {...register("child_name")} type="text" autoComplete="given-name" autoCapitalize="words" spellCheck={false} aria-invalid={!!errors.child_name} className={inputCls(!!errors.child_name)} placeholder="e.g. Aarav" />
@@ -4195,7 +4216,7 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                       </div>
 
                       <div className="flex gap-3 mt-4">
-                        <Button type="button" onClick={() => setStep(1)} variant="outline" className="h-14 px-6 font-bold text-slate-600 border-slate-200 rounded-xl hover:bg-slate-50">
+                        <Button type="button" onClick={() => setStep(2)} variant="outline" className="h-14 px-6 font-bold text-slate-600 border-slate-200 rounded-xl hover:bg-slate-50">
                           <ArrowLeft className="size-4" />
                         </Button>
                         <Button type="button" onClick={() => handleNextStep(['child_name', 'parent_concern', 'parent_commitment'])} className="flex-1 h-14 text-base font-extrabold tracking-tight gs-btn gs-btn-primary rounded-xl shadow-lg">
@@ -4205,8 +4226,8 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                     </motion.div>
                   )}
 
-                  {step === 3 && (
-                    <motion.div key="step3" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="flex flex-col gap-4 md:gap-5">
+                  {step === 4 && (
+                    <motion.div key="step4" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="flex flex-col gap-4 md:gap-5">
                       <div className="flex flex-col gap-1.5 md:gap-2">
                         <label htmlFor="bottom_city" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">City <span className="text-red-500">*</span></label>
                         <input id="bottom_city" {...register("city")} type="text" autoComplete="address-level2" autoCapitalize="words" spellCheck={false} aria-invalid={!!errors.city} className={inputCls(!!errors.city)} placeholder="e.g. Bangalore" />
@@ -4438,7 +4459,7 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                       </div>
 
                       <div className="flex gap-3 mt-2">
-                        <Button type="button" onClick={() => setStep(2)} variant="outline" className="h-16 px-6 font-bold text-slate-600 border-slate-200 rounded-xl hover:bg-slate-50">
+                        <Button type="button" onClick={() => setStep(3)} variant="outline" className="h-16 px-6 font-bold text-slate-600 border-slate-200 rounded-xl hover:bg-slate-50">
                           <ArrowLeft className="size-4" />
                         </Button>
                         <Button
@@ -5135,7 +5156,7 @@ function DemoDrawer() {
       if (!root) { setStep(null); return; }
       const labels = Array.from(root.querySelectorAll("span"));
       const match = labels
-        .map((el) => el.textContent?.match(/^Step\s+(\d)\s+of\s+3$/i))
+        .map((el) => el.textContent?.match(/^Step\s+(\d)\s+of\s+4$/i))
         .find(Boolean);
       setStep(match ? Number(match[1]) : null);
     };
@@ -5170,14 +5191,17 @@ function DemoDrawer() {
             className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm cursor-default"
           />
 
-          {/* Sheet container */}
+          {/* Sheet container — sizes to current step's content (not full
+              viewport) so a short step like "name + phone" shows a small
+              drawer; long steps like the calendar slot picker scroll within
+              the body. The body's own max-height is the cap, not the sheet. */}
           <motion.div
             ref={sheetRef}
             initial={reduceMotion ? { opacity: 0 } : { y: "100%" }}
             animate={reduceMotion ? { opacity: 1 } : { y: 0 }}
             exit={reduceMotion ? { opacity: 0 } : { y: "100%" }}
             transition={reduceMotion ? { duration: 0 } : { type: "spring", stiffness: 380, damping: 38 }}
-            className="relative w-full md:w-auto md:max-w-2xl md:mx-4 bg-white rounded-t-3xl md:rounded-3xl shadow-2xl flex flex-col overflow-hidden max-h-[92vh] md:max-h-[90vh]"
+            className="relative w-full md:w-auto md:max-w-2xl md:mx-4 bg-white rounded-t-3xl md:rounded-3xl shadow-2xl flex flex-col overflow-hidden"
             style={{ boxShadow: "0 -20px 60px -12px rgba(15, 23, 42, 0.35), 0 -8px 16px -8px rgba(15, 23, 42, 0.18)" }}
           >
             {/* Drag-handle / "grabber" — HIG sheet indicator. Decorative on
@@ -5204,10 +5228,10 @@ function DemoDrawer() {
               {step ? (
                 <div
                   className="hidden sm:flex shrink-0 items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 text-[10px] font-extrabold uppercase tracking-widest-gs"
-                  aria-label={`Step ${step} of 3`}
+                  aria-label={`Step ${step} of 4`}
                 >
                   <span className="size-1.5 rounded-full bg-blue-600" />
-                  Step {step}/3
+                  Step {step}/4
                 </div>
               ) : null}
               <button
@@ -5222,11 +5246,13 @@ function DemoDrawer() {
               </button>
             </div>
 
-            {/* Body — scrollable, contains the existing form. Natural flex
-                sizing so it inherits the sheet's bounded height. */}
+            {/* Body — sized to its content so the drawer hugs the current
+                step (no big empty area on a 2-field step). Capped at viewport
+                minus header so taller steps scroll inside. `dvh` so iOS
+                Safari address-bar shrinkage doesn't push the sheet offscreen. */}
             <div
               ref={bodyRef}
-              className="flex-1 min-h-0 overflow-y-auto px-5 md:px-8 py-5 md:py-7 overscroll-contain"
+              className="overflow-y-auto px-5 md:px-8 py-5 md:py-7 overscroll-contain max-h-[calc(85dvh-120px)] md:max-h-[calc(85dvh-140px)]"
             >
               <BottomForm compact />
               {/* iOS-style safe-area padding for mobile home indicator */}
