@@ -118,6 +118,11 @@ import {
 // its data flow, validation, pixel events, calendar picker, success state,
 // API submission) is unchanged — only the surface that contains it.
 const CW_OPEN_DEMO_EVENT = "cw:open-demo";
+// Fired the moment the drawer is closed in any way (X button, backdrop
+// tap, ESC). BottomForm listens and beacons the partial-lead state, so a
+// parent who fills step 1 and clicks the close X still lands as a Zoho
+// "Open – In Progress" lead + counsellor email — same as a tab close.
+const CW_CLOSE_DEMO_EVENT = "cw:close-demo";
 // Accepts EITHER a string source ("hero", "sticky", etc.) for analytics
 // granularity OR a click event when wired directly as an onClick handler.
 // Anything that isn't a string is treated as "unknown" so dashboards
@@ -4005,8 +4010,18 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
     // step-transition response, which populates the refs, before the
     // beacon's payload is built.
     const sendBeaconIfWorthIt = () => {
-      if (!minViableLeadCapturedRef.current) return;
       if (statusRef.current === "success") return;
+      // Lenient threshold: fire the beacon as soon as the parent has typed
+      // a valid phone OR email — even if they never clicked Continue. The
+      // worker's `validatePartialLead` requires one of the two anyway, so
+      // anything less is just noise. This catches the "filled fields but
+      // clicked the X before hitting Continue" case the original
+      // `minViableLeadCapturedRef` gate was missing.
+      const v = watch();
+      const phoneDigits = typeof v.phone === "string" ? v.phone.replace(/\D/g, "") : "";
+      const hasPhone = phoneDigits.length >= 10;
+      const hasEmail = typeof v.parent_email === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.parent_email);
+      if (!hasPhone && !hasEmail) return;
       partialChainRef.current = partialChainRef.current
         .catch(() => undefined)
         .then(() => {
@@ -4017,13 +4032,19 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
     };
     const onPageHide = () => sendBeaconIfWorthIt();
     const onVisibility = () => { if (document.visibilityState === "hidden") sendBeaconIfWorthIt(); };
+    // Drawer close (X / backdrop / ESC) also counts as "abandoning the
+    // form" — fire the beacon so a half-filled step-1 lead still gets
+    // a Zoho draft + counsellor email instead of being dropped.
+    const onDrawerClose = () => sendBeaconIfWorthIt();
     window.addEventListener("pagehide", onPageHide);
     document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener(CW_CLOSE_DEMO_EVENT, onDrawerClose as EventListener);
 
     return () => {
       window.removeEventListener("storage", onStorage);
       window.removeEventListener("pagehide", onPageHide);
       document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener(CW_CLOSE_DEMO_EVENT, onDrawerClose as EventListener);
     };
   // Listeners read state via refs (stepRef, statusRef) and via watch();
   // we want a single mount-time wire-up, so deps are intentionally [].
@@ -5537,7 +5558,15 @@ function DemoDrawer() {
     return () => obs.disconnect();
   }, [open]);
 
-  const close = () => setOpen(false);
+  const close = () => {
+    // Tell BottomForm the drawer is closing so it can fire its partial
+    // beacon — without this the X / backdrop / ESC paths drop the
+    // half-filled lead on the floor (only tab-close was beaconing).
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent(CW_CLOSE_DEMO_EVENT));
+    }
+    setOpen(false);
+  };
 
   return (
     <AnimatePresence>
