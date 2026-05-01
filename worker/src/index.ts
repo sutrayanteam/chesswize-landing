@@ -129,6 +129,44 @@ function validateAttribution(raw: unknown): LeadAttribution | undefined {
 // Not RFC5321-complete by design; Resend is the authoritative validator.
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
+/**
+ * Lenient partial-lead validator. Accepts whatever the client managed to
+ * collect so far; only requires *some* recoverable contact (phone OR
+ * email) so we never store unreachable orphan records. All field caps are
+ * enforced exactly like validateLead so a malicious actor can't pad the
+ * Zoho payload via the partial endpoint either.
+ */
+function validatePartialLead(raw: unknown): { ok: true; value: LeadBody } | { ok: false; reason: string } {
+  if (!raw || typeof raw !== "object") return { ok: false, reason: "not_object" };
+  const r = raw as Record<string, unknown>;
+
+  // Either field must look real. If both are missing, this is just noise.
+  const phoneRaw = str(r.phone, 40);
+  const phone = phoneRaw && phoneRaw.replace(/[^0-9]/g, "").length >= 10 ? phoneRaw : undefined;
+  const emailRaw = str(r.parent_email, 200);
+  const emailTrim = emailRaw?.trim().toLowerCase();
+  const emailOk = !!emailTrim && EMAIL_RE.test(emailTrim);
+  const parentEmail = emailOk ? emailTrim : undefined;
+  if (!phone && !parentEmail) return { ok: false, reason: "no_contact_field" };
+
+  const value: LeadBody = {
+    phone,
+    child_name: str(r.child_name, 120),
+    child_age_range: str(r.child_age_range, 20),
+    child_level: str(r.child_level, 40),
+    parent_name: str(r.parent_name, 120),
+    parent_email: parentEmail,
+    city: str(r.city, 80),
+    parent_commitment: str(r.parent_commitment, 80),
+    preferred_datetime: str(r.preferred_datetime, 30),
+    referral_source: str(r.referral_source, 80),
+    parent_concern: Array.isArray(r.parent_concern) ? strArr(r.parent_concern) : str(r.parent_concern as unknown, 200),
+    website_url: str(r.website_url, 200),
+    attribution: validateAttribution(r.attribution),
+  };
+  return { ok: true, value };
+}
+
 function validateLead(raw: unknown): { ok: true; value: LeadBody } | { ok: false; reason: string } {
   if (!raw || typeof raw !== "object") return { ok: false, reason: "not_object" };
   const r = raw as Record<string, unknown>;
@@ -244,28 +282,46 @@ async function getZohoAccessToken(env: Env): Promise<string | null> {
   return data.access_token;
 }
 
-async function pushLeadToZoho(env: Env, body: LeadBody): Promise<{ ok: boolean; id?: string; error?: string }> {
+/**
+ * Build the Zoho v7 record from a (possibly partial) LeadBody. Used by
+ * both the create and the update paths so a partial draft and a final
+ * submission render the exact same field shape — only Lead_Status differs.
+ */
+function buildZohoRecord(body: LeadBody, opts: { partial?: boolean } = {}): Record<string, unknown> {
+  const goals = Array.isArray(body.parent_concern) ? body.parent_concern.join(", ") : body.parent_concern ?? "";
+  const description = [
+    body.child_name || body.child_age_range || body.child_level
+      ? `Child: ${body.child_name ?? ""} (age ${body.child_age_range ?? "?"}, level ${body.child_level ?? "?"})`
+      : "",
+    goals ? `Goals: ${goals}` : "",
+    body.parent_commitment ? `Commitment: ${body.parent_commitment}` : "",
+    body.preferred_datetime ? `Preferred call slot: ${formatPreferredDatetime(body.preferred_datetime)}` : "",
+    body.referral_source ? `Heard via: ${body.referral_source}` : "",
+  ].filter(Boolean).join("\n");
+
+  return {
+    Last_Name: body.parent_name || body.child_name || "Unknown",
+    Phone: body.phone,
+    Email: body.parent_email,
+    City: body.city,
+    Lead_Source: "Website – chesswize.in",
+    // Distinct status so counsellors can filter "form abandoned" vs
+    // "completed booking" in their Zoho list views. The final submit path
+    // flips this back to "Not Contacted".
+    Lead_Status: opts.partial ? "Open – In Progress" : "Not Contacted",
+    Description: description,
+  };
+}
+
+/**
+ * Create a new Zoho Lead. Returns { id } on success.
+ */
+async function createZohoLead(env: Env, body: LeadBody, opts: { partial?: boolean } = {}): Promise<{ ok: boolean; id?: string; error?: string }> {
   const token = await getZohoAccessToken(env);
   if (!token) return { ok: false, error: "no_token" };
 
-  const goals = Array.isArray(body.parent_concern) ? body.parent_concern.join(", ") : body.parent_concern ?? "";
-
   const payload = {
-    data: [{
-      Last_Name: body.parent_name || body.child_name || "Unknown",
-      Phone: body.phone,
-      Email: body.parent_email,
-      City: body.city,
-      Lead_Source: "Website – chesswize.in",
-      Lead_Status: "Not Contacted",
-      Description: [
-        `Child: ${body.child_name ?? ""} (age ${body.child_age_range ?? "?"}, level ${body.child_level ?? "?"})`,
-        goals ? `Goals: ${goals}` : "",
-        body.parent_commitment ? `Commitment: ${body.parent_commitment}` : "",
-        body.preferred_datetime ? `Preferred call slot: ${formatPreferredDatetime(body.preferred_datetime)}` : "",
-        body.referral_source ? `Heard via: ${body.referral_source}` : "",
-      ].filter(Boolean).join("\n"),
-    }],
+    data: [buildZohoRecord(body, opts)],
     trigger: ["workflow"],
   };
 
@@ -282,6 +338,48 @@ async function pushLeadToZoho(env: Env, body: LeadBody): Promise<{ ok: boolean; 
   const rec = result.data?.[0];
   if (rec?.code !== "SUCCESS") return { ok: false, error: rec?.code ?? "unknown" };
   return { ok: true, id: rec.details?.id };
+}
+
+/**
+ * Update an existing Zoho Lead (used to upgrade a partial draft into a
+ * completed booking on final submit, and to incrementally enrich a draft
+ * across step transitions). PUT /crm/v7/Leads/{id} is a true update — no
+ * dedup-rule games like upsert would force.
+ */
+async function updateZohoLead(env: Env, id: string, body: LeadBody, opts: { partial?: boolean } = {}): Promise<{ ok: boolean; id?: string; error?: string }> {
+  const token = await getZohoAccessToken(env);
+  if (!token) return { ok: false, error: "no_token" };
+
+  const payload = {
+    data: [buildZohoRecord(body, opts)],
+    trigger: ["workflow"],
+  };
+
+  const res = await fetch(`${env.ZOHO_API_DOMAIN}/crm/v7/Leads/${encodeURIComponent(id)}`, {
+    method: "PUT",
+    headers: {
+      authorization: `Zoho-oauthtoken ${token}`,
+      "content-type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+  const result = await res.json<{ data?: Array<{ code?: string; details?: { id?: string } }> }>().catch(() => ({} as any));
+  if (!res.ok) return { ok: false, error: `zoho_${res.status}` };
+  const rec = result.data?.[0];
+  if (rec?.code !== "SUCCESS") return { ok: false, error: rec?.code ?? "unknown" };
+  return { ok: true, id: rec.details?.id ?? id };
+}
+
+/**
+ * Smart push — creates a new Zoho lead if `existingId` is missing, otherwise
+ * updates the existing one. Used by the final-submit path to reconcile with
+ * any partial draft created earlier in the session.
+ */
+async function pushLeadToZoho(env: Env, body: LeadBody, existingId?: string | null): Promise<{ ok: boolean; id?: string; error?: string }> {
+  if (existingId) {
+    return updateZohoLead(env, existingId, body);
+  }
+  return createZohoLead(env, body);
 }
 
 /* ─────────────────────────── Resend helpers ─────────────────────────── */
@@ -912,6 +1010,142 @@ function escapeHtml(s: string): string {
 
 /* ────────────────────────────── Handlers ────────────────────────────── */
 
+/**
+ * Read the request body as JSON regardless of whether the client used
+ * `Content-Type: application/json` (fetch + keepalive) or `text/plain`
+ * (sendBeacon Blob). text/plain dodges CORS preflight, which is why the
+ * frontend's pagehide path uses it.
+ */
+async function readJsonBody(request: Request): Promise<unknown> {
+  const ct = (request.headers.get("content-type") || "").toLowerCase();
+  if (ct.includes("application/json")) {
+    return request.json();
+  }
+  const txt = await request.text();
+  return JSON.parse(txt);
+}
+
+const PARTIAL_KV_PREFIX = "partial:";
+const PARTIAL_TTL_SECONDS = 24 * 60 * 60; // 24h — matches client's LEAD_SID_TTL_MS
+
+interface PartialState {
+  zoho_id: string;
+  last_step: number;
+  updated_at: number;
+}
+
+async function readPartialState(env: Env, leadSid: string): Promise<PartialState | null> {
+  if (!env.TOKEN_CACHE) return null;
+  const raw = await env.TOKEN_CACHE.get(`${PARTIAL_KV_PREFIX}${leadSid}`);
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw) as PartialState;
+    if (parsed && typeof parsed.zoho_id === "string") return parsed;
+  } catch { /* corrupted entry — ignore */ }
+  return null;
+}
+
+async function writePartialState(env: Env, leadSid: string, state: PartialState): Promise<void> {
+  if (!env.TOKEN_CACHE) return;
+  await env.TOKEN_CACHE.put(`${PARTIAL_KV_PREFIX}${leadSid}`, JSON.stringify(state), { expirationTtl: PARTIAL_TTL_SECONDS });
+}
+
+async function deletePartialState(env: Env, leadSid: string): Promise<void> {
+  if (!env.TOKEN_CACHE) return;
+  await env.TOKEN_CACHE.delete(`${PARTIAL_KV_PREFIX}${leadSid}`);
+}
+
+/**
+ * Handle a partial-lead beacon. Lenient validation, no emails fired, no
+ * Meta CAPI, no time-gate. Creates a draft Zoho lead on first valid call;
+ * subsequent calls update the same record by id. The id is stored in KV
+ * keyed by lead_sid (24h TTL) AND returned to the client so the next call
+ * can carry it directly — KV is the cache, the client is the ground truth.
+ */
+async function handlePartialLead(request: Request, env: Env, _ctx: ExecutionContext): Promise<Response> {
+  const origin = request.headers.get("origin");
+  if (origin && !originAllowed(env, origin)) {
+    return json({ ok: false, error: "origin_blocked" }, { status: 403 });
+  }
+
+  let body: unknown;
+  try {
+    body = await readJsonBody(request);
+  } catch {
+    return json({ ok: false, error: "bad_json" }, { status: 400 });
+  }
+
+  if (!body || typeof body !== "object") {
+    return json({ ok: false, error: "not_object" }, { status: 400 });
+  }
+  const r = body as Record<string, unknown>;
+
+  const leadSid = str(r.lead_sid, 100);
+  if (!leadSid) {
+    return json({ ok: false, error: "lead_sid_required" }, { status: 400 });
+  }
+
+  // Pull fields from either a top-level shape or a nested `fields` object —
+  // the frontend uses the nested shape, but accepting top-level too means
+  // simpler curl-based testing.
+  const fieldsObj = (r.fields && typeof r.fields === "object") ? r.fields : r;
+  const fieldsWithAttribution = {
+    ...(fieldsObj as Record<string, unknown>),
+    attribution: r.attribution ?? (fieldsObj as Record<string, unknown>).attribution,
+  };
+
+  const validation = validatePartialLead(fieldsWithAttribution);
+  if (validation.ok === false) {
+    // 200 with `stored: false` so a sendBeacon failure doesn't fill
+    // browser network panels with red — this isn't a "real" error from
+    // the user's perspective, just an empty draft.
+    return json({ ok: true, stored: false, reason: validation.reason });
+  }
+  const lead = validation.value;
+
+  // Honeypot — silently filter.
+  if (lead.website_url && lead.website_url.length > 0) {
+    return json({ ok: true, stored: false, note: "filtered" });
+  }
+
+  // Resolve existing Zoho id: prefer client-supplied (it's the freshest
+  // ground truth), fall back to KV which may have caught a write from a
+  // sibling tab.
+  const clientZohoId = str(r.zoho_id, 100);
+  const cached = await readPartialState(env, leadSid);
+  const existingZohoId = clientZohoId || cached?.zoho_id || null;
+
+  // If Zoho isn't configured (dev) we still want to ack the beacon so the
+  // frontend's tracking works; just don't try to upsert.
+  if (!zohoConfigured(env)) {
+    return json({ ok: true, stored: false, lead_sid: leadSid, zoho_id: existingZohoId, dev: true });
+  }
+
+  let result: { ok: boolean; id?: string; error?: string };
+  if (existingZohoId) {
+    result = await updateZohoLead(env, existingZohoId, lead, { partial: true });
+    // If the update fails because the record was deleted in Zoho between
+    // calls, fall through to a fresh create so we still capture the lead.
+    if (!result.ok && result.error?.startsWith("zoho_404")) {
+      result = await createZohoLead(env, lead, { partial: true });
+    }
+  } else {
+    result = await createZohoLead(env, lead, { partial: true });
+  }
+
+  if (!result.ok || !result.id) {
+    return json({ ok: false, error: result.error ?? "zoho_failed", lead_sid: leadSid }, { status: 502 });
+  }
+
+  await writePartialState(env, leadSid, {
+    zoho_id: result.id,
+    last_step: typeof r.step === "number" ? r.step : (cached?.last_step ?? 1),
+    updated_at: Date.now(),
+  });
+
+  return json({ ok: true, stored: true, lead_sid: leadSid, zoho_id: result.id });
+}
+
 async function handleLead(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
   const origin = request.headers.get("origin");
   if (origin && !originAllowed(env, origin)) {
@@ -933,6 +1167,14 @@ async function handleLead(request: Request, env: Env, ctx: ExecutionContext): Pr
     return json({ ok: false, error: "invalid_payload", detail: validation.reason }, { status: 400 });
   }
   const lead: LeadBody = validation.value;
+
+  // Capture the partial-lead reconciliation hints. Pull from the raw body
+  // *before* validateLead strips them (validateLead doesn't whitelist these
+  // fields). Both are optional — older clients still work; we just create
+  // a fresh Zoho lead in that case.
+  const rawBody = body as Record<string, unknown>;
+  const leadSid = str(rawBody.lead_sid, 100);
+  const partialZohoIdFromClient = str(rawBody.partial_zoho_id, 100);
 
   // Honeypot
   if (lead.website_url && lead.website_url.length > 0) {
@@ -957,14 +1199,30 @@ async function handleLead(request: Request, env: Env, ctx: ExecutionContext): Pr
   // dedupes the two into a single Lead in the dashboard.
   const eventId = crypto.randomUUID();
 
+  // Reconcile with any partial-lead Zoho draft created earlier in this
+  // session: prefer the client-supplied id (it's the freshest ground truth
+  // — KV reads are eventually consistent across CF colos), fall back to KV.
+  let reconciledZohoId: string | null = partialZohoIdFromClient || null;
+  if (!reconciledZohoId && leadSid) {
+    const cached = await readPartialState(env, leadSid);
+    reconciledZohoId = cached?.zoho_id ?? null;
+  }
+
   const [zoho, email, parentEmail] = await Promise.allSettled([
-    pushLeadToZoho(env, lead),
+    pushLeadToZoho(env, lead, reconciledZohoId),
     sendLeadEmail(env, lead),
     sendParentThankYouEmail(env, lead, eventId),
   ]);
 
   const zohoOk = zoho.status === "fulfilled" && zoho.value.ok;
   const emailOk = email.status === "fulfilled" && email.value.ok;
+
+  // Best-effort cleanup: drop the partial-lead KV record so a future visit
+  // doesn't try to attach to a fully-converted lead. Non-blocking — the
+  // 24h TTL would handle this anyway, but eager cleanup keeps the KV tidy.
+  if (leadSid && env.TOKEN_CACHE) {
+    ctx.waitUntil(deletePartialState(env, leadSid));
+  }
 
   // Local-dev convenience: when *nothing* is configured (pure localhost
   // wrangler without .dev.vars), treat the submit as stored so the frontend
@@ -1066,6 +1324,15 @@ export default {
     if (request.method === "POST" && url.pathname === "/api/leads") {
       const res = await handleLead(request, env, ctx);
       // If cross-origin allow it
+      const origin = request.headers.get("origin");
+      if (origin && originAllowed(env, origin)) {
+        res.headers.set("access-control-allow-origin", origin);
+        res.headers.set("vary", "origin");
+      }
+      return res;
+    }
+    if (request.method === "POST" && url.pathname === "/api/leads/partial") {
+      const res = await handlePartialLead(request, env, ctx);
       const origin = request.headers.get("origin");
       if (origin && originAllowed(env, origin)) {
         res.headers.set("access-control-allow-origin", origin);

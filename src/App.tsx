@@ -3401,6 +3401,104 @@ type Delivery = { leadSaved: boolean };
 const FORM_DRAFT_KEY = "cw.form.draft";
 
 /* ═════════════════════════════════════════════════════════════
+   Lead session id — partial-fill capture
+   ═════════════════════════════════════════════════════════════
+   Each fresh form visit mints a UUID (`lead_sid`) and stores it in
+   localStorage. Every step transition fires a fire-and-forget POST to
+   `/api/leads/partial` carrying the cumulative form state so the worker
+   can create/update a Zoho lead even if the parent never reaches the
+   final submit. On `pagehide` we also fire a sendBeacon — survives tab
+   close and bfcache where `fetch` does not. The final `/api/leads` POST
+   carries the same `lead_sid` so the worker reconciles to a single
+   Zoho record (no duplicates).
+
+   Notes:
+   - 24h TTL on the persisted sid; older sids get re-minted so a parent
+     who returns days later isn't tied to a stale Zoho draft.
+   - `zoho_id` returned by the first partial response is cached on the
+     client; the audit recommends carrying it on every subsequent call
+     so the worker doesn't need a KV round-trip (KV is the cache, the
+     client is the ground truth).
+   - sendBeacon body is text/plain Blob to dodge CORS preflight. The
+     worker accepts both content-types on the partial endpoint. */
+const LEAD_SID_KEY = "cw.lead_sid";
+const LEAD_SID_TTL_MS = 24 * 60 * 60 * 1000;
+
+type LeadSidRecord = { sid: string; created_at: number; zoho_id?: string };
+
+function readLeadSid(): LeadSidRecord | null {
+  try {
+    const raw = localStorage.getItem(LEAD_SID_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as LeadSidRecord;
+    if (!parsed?.sid || !parsed?.created_at) return null;
+    if (Date.now() - parsed.created_at > LEAD_SID_TTL_MS) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function writeLeadSid(rec: LeadSidRecord) {
+  try { localStorage.setItem(LEAD_SID_KEY, JSON.stringify(rec)); } catch { /* no-op */ }
+}
+
+function clearLeadSid() {
+  try { localStorage.removeItem(LEAD_SID_KEY); } catch { /* no-op */ }
+}
+
+function loadOrMintLeadSid(): LeadSidRecord {
+  const existing = readLeadSid();
+  if (existing) return existing;
+  const sid =
+    typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
+  const rec: LeadSidRecord = { sid, created_at: Date.now() };
+  writeLeadSid(rec);
+  return rec;
+}
+
+type PartialPayload = {
+  lead_sid: string;
+  zoho_id?: string | null;
+  step: number;
+  fields: Record<string, unknown>;
+  attribution?: ReturnType<typeof getAttribution> | null;
+};
+
+// Fire-and-forget partial save. `keepalive: true` lets the request
+// outlive the page if the user navigates away mid-flight. We never block
+// the UI on this — race conditions with the final submit are reconciled
+// server-side by lead_sid lookup in KV.
+function firePartialSave(payload: PartialPayload): Promise<{ zoho_id?: string }> {
+  return fetch("/api/leads/partial", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(payload),
+    keepalive: true,
+  })
+    .then((res) => (res.ok ? res.json() : null))
+    .then((data: { zoho_id?: string } | null) => data ?? {})
+    .catch(() => ({}));
+}
+
+// Beacon variant for pagehide / visibilitychange — sendBeacon doesn't
+// return a result, but it's the most reliable way to land a final write
+// when the user is closing the tab. text/plain dodges CORS preflight.
+function firePartialBeacon(payload: PartialPayload): boolean {
+  try {
+    if (typeof navigator === "undefined" || typeof navigator.sendBeacon !== "function") {
+      return false;
+    }
+    const blob = new Blob([JSON.stringify(payload)], { type: "text/plain" });
+    return navigator.sendBeacon("/api/leads/partial", blob);
+  } catch {
+    return false;
+  }
+}
+
+/* ═════════════════════════════════════════════════════════════
    Calendar + 20-min slot picker helpers (IST business hours)
    - Business window: 10:00 – 21:00 IST, 20-min increments.
    - Show next 14 days. Exclude slots < 60 min from now to give
@@ -3564,6 +3662,17 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
   const jsToken = useRef(Math.random().toString(36).slice(2) + Date.now().toString(36));
   const leadStartFired = useRef(false);
   const step2Fired = useRef(false);
+  // Lead session id — minted on first render, persisted in localStorage so
+  // a refresh keeps the same id. The Zoho id returned from the first
+  // partial-save response is cached client-side so we don't depend on KV
+  // for subsequent partial updates (KV reads are eventually consistent
+  // across CF colos; the client is the ground truth).
+  const leadSidRef = useRef<string>("");
+  const partialZohoIdRef = useRef<string | null>(null);
+  // Tracks whether step 1 ever validated. The pagehide beacon only fires
+  // if true — no point sending an empty-fields beacon on a tab close
+  // before the parent typed anything.
+  const minViableLeadCapturedRef = useRef(false);
   // In-flight guard so a double-tap / Enter-key burst can't fire POST twice.
   // setStatus("sending") still drives the button disabled state for the UX;
   // this ref short-circuits onSubmit synchronously — setStatus is async and
@@ -3748,17 +3857,101 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
     trackLeadFormStart();
   };
 
+  // Mint (or recover) the lead session id once on mount, and wire a
+  // pagehide listener that beacons a final partial-save when the user
+  // navigates away mid-form. We also fire on `visibilitychange === hidden`
+  // because iOS Safari often skips pagehide on app-switch.
+  useEffect(() => {
+    const rec = loadOrMintLeadSid();
+    leadSidRef.current = rec.sid;
+    if (rec.zoho_id) partialZohoIdRef.current = rec.zoho_id;
+
+    const sendBeaconIfWorthIt = () => {
+      if (!minViableLeadCapturedRef.current) return;
+      if (status === "success") return;
+      const v = watch();
+      const payload: PartialPayload = {
+        lead_sid: leadSidRef.current,
+        zoho_id: partialZohoIdRef.current,
+        step,
+        fields: {
+          parent_name: v.parent_name,
+          phone: v.phone,
+          parent_email: v.parent_email,
+          child_age_range: v.child_age_range,
+          child_level: v.child_level,
+          child_name: v.child_name,
+          parent_concern: v.parent_concern,
+          parent_commitment: v.parent_commitment,
+          city: v.city,
+          referral_source: v.referral_source,
+          preferred_datetime: v.preferred_datetime,
+        },
+        attribution: getAttribution() ?? null,
+      };
+      firePartialBeacon(payload);
+    };
+
+    const onPageHide = () => sendBeaconIfWorthIt();
+    const onVisibility = () => { if (document.visibilityState === "hidden") sendBeaconIfWorthIt(); };
+    window.addEventListener("pagehide", onPageHide);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      window.removeEventListener("pagehide", onPageHide);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  // status + step intentionally omitted — listener reads them via closures
+  // through refs/watch, and we want a single mount-time wire-up.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleNextStep = async (fieldsToValidate: (keyof FormData)[]) => {
     const isValid = await trigger(fieldsToValidate);
-    if (isValid) {
-      // When advancing past step 1 the user has completed the minimum-viable
-      // lead fields — fire the LeadStep2 custom event (for retargeting) once.
-      if (step === 1 && !step2Fired.current) {
-        step2Fired.current = true;
-        trackLeadStep2();
-      }
-      setStep((prev) => prev + 1);
+    if (!isValid) return;
+    // When step 1 first validates we have parent name + WhatsApp number —
+    // the minimum-viable lead identity. Mark that the pagehide beacon is
+    // now worth sending, fire the LeadStep2 retargeting custom event, and
+    // POST a partial-lead update so Zoho gets the record before the parent
+    // even finishes the form.
+    if (step === 1 && !step2Fired.current) {
+      step2Fired.current = true;
+      minViableLeadCapturedRef.current = true;
+      trackLeadStep2();
     }
+    // Fire-and-forget partial save with cumulative form state. We don't
+    // await — UX advances immediately. The race condition with the final
+    // submit is reconciled server-side by lead_sid lookup.
+    if (leadSidRef.current && minViableLeadCapturedRef.current) {
+      const v = watch();
+      const payload: PartialPayload = {
+        lead_sid: leadSidRef.current,
+        zoho_id: partialZohoIdRef.current,
+        step,
+        fields: {
+          parent_name: v.parent_name,
+          phone: v.phone,
+          parent_email: v.parent_email,
+          child_age_range: v.child_age_range,
+          child_level: v.child_level,
+          child_name: v.child_name,
+          parent_concern: v.parent_concern,
+          parent_commitment: v.parent_commitment,
+          city: v.city,
+          referral_source: v.referral_source,
+          preferred_datetime: v.preferred_datetime,
+        },
+        attribution: getAttribution() ?? null,
+      };
+      firePartialSave(payload).then((res) => {
+        if (res.zoho_id) {
+          partialZohoIdRef.current = res.zoho_id;
+          // Persist the zoho_id so a page refresh mid-form still has it.
+          const existing = readLeadSid();
+          if (existing) writeLeadSid({ ...existing, zoho_id: res.zoho_id });
+        }
+      });
+    }
+    setStep((prev) => prev + 1);
   };
 
   const onSubmit = async (data: FormData) => {
@@ -3822,6 +4015,12 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
           // turnstile_token intentionally omitted — server allows token-less
           // submits now that TURNSTILE_SECRET_KEY is unset on the Worker.
           attribution,
+          // Reconciles to the partial-lead Zoho record if one was created
+          // earlier in this session — worker uses these to PUT the existing
+          // record instead of POSTing a duplicate. Both fields are optional
+          // server-side, so older clients and older workers keep working.
+          lead_sid: leadSidRef.current || undefined,
+          partial_zoho_id: partialZohoIdRef.current || undefined,
         }),
       });
       if (res.ok) {
@@ -3861,6 +4060,12 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
       // so browser+server Lead dedupe.
       try { localStorage.removeItem(FORM_DRAFT_KEY); } catch { /* no-op */ }
       try { sessionStorage.removeItem("cw.hero.age"); } catch { /* no-op */ }
+      // Done — clear the partial-lead session so a future visit mints a
+      // fresh sid (otherwise the next form fill would attach to a stale
+      // Zoho record from this session).
+      clearLeadSid();
+      partialZohoIdRef.current = null;
+      minViableLeadCapturedRef.current = false;
       reset();
       navigate(`/thank-you?eid=${encodeURIComponent(eventId)}`);
       return;
@@ -3872,6 +4077,9 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
       // cleared and show the success UI.
       try { localStorage.removeItem(FORM_DRAFT_KEY); } catch { /* no-op */ }
       try { sessionStorage.removeItem("cw.hero.age"); } catch { /* no-op */ }
+      clearLeadSid();
+      partialZohoIdRef.current = null;
+      minViableLeadCapturedRef.current = false;
       setDelivery({ leadSaved: true });
       setStatus("success");
       setStep(5);
