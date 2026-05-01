@@ -2760,7 +2760,7 @@ function ValueStack() {
               <Phone className="size-5 text-blue-600 shrink-0 mt-0.5" />
               <div>
                 <p className="font-extrabold text-slate-900 text-xs md:text-sm">Human counsellor</p>
-                <p className="text-[11px] md:text-xs text-slate-500 font-medium">Call <a href="tel:+918400979997" className="text-blue-600 font-bold">+91 84009 79997</a> or WhatsApp in &lt;10 min</p>
+                <p className="text-[11px] md:text-xs text-slate-500 font-medium">Call <a href="tel:+918400979997" className="text-blue-600 font-bold">+91 84009 79997</a> or WhatsApp · reply in 4 hrs</p>
               </div>
             </div>
           </div>
@@ -4198,12 +4198,12 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
       id="book-evaluation"
       className={
         compact
-          ? "relative"
+          ? "relative h-full flex flex-col"
           : "py-16 md:py-24 bg-slate-50 border-t border-slate-200 gs-grid-pattern relative overflow-hidden"
       }
     >
       {!compact && <div className="absolute top-0 left-0 w-full h-1 bg-blue-600" />}
-      <div className={compact ? "max-w-3xl mx-auto relative z-10" : "max-w-3xl mx-auto px-4 md:px-8 relative z-10"}>
+      <div className={compact ? "max-w-3xl mx-auto relative z-10 flex flex-col flex-1 min-h-0 w-full" : "max-w-3xl mx-auto px-4 md:px-8 relative z-10"}>
         {!compact && (
           <div className="text-center mb-10 md:mb-12">
             <h2 className="text-[10px] font-bold text-blue-600 uppercase tracking-widest-gs mb-2 md:mb-3">Take the next step</h2>
@@ -4231,7 +4231,7 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
           id="demo-form-card"
           className={
             compact
-              ? "relative"
+              ? "relative flex flex-col flex-1 min-h-0 w-full"
               : "scroll-mt-24 md:scroll-mt-28 bg-white rounded-3xl p-6 sm:p-8 md:p-10 gs-border gs-shadow-2xl relative overflow-hidden flex flex-col justify-center"
           }
         >
@@ -4275,10 +4275,10 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                 </a>
               </motion.div>
             ) : (
-              <motion.form key="form" initial="hidden" animate="visible" exit="exit" variants={stepVariants} onSubmit={handleSubmit(onSubmit)} onFocus={fireLeadStartOnce} onInput={fireLeadStartOnce} className="flex flex-col relative z-10 w-full">
-                
+              <motion.form key="form" initial="hidden" animate="visible" exit="exit" variants={stepVariants} onSubmit={handleSubmit(onSubmit)} onFocus={fireLeadStartOnce} onInput={fireLeadStartOnce} className={`flex flex-col relative z-10 w-full ${compact ? "flex-1 min-h-0" : ""}`}>
+
                 {/* Progress Bar */}
-                <div className="w-full h-1.5 bg-slate-100 rounded-full mb-6 overflow-hidden">
+                <div className="w-full h-1.5 bg-slate-100 rounded-full mb-4 md:mb-6 overflow-hidden">
                   <motion.div 
                     className="h-full bg-blue-600 rounded-full"
                     initial={{ width: `${((step - 1) / 4) * 100}%` }}
@@ -4303,6 +4303,11 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                   <input id="website_url" {...register("website_url")} type="text" autoComplete="off" tabIndex={-1} />
                 </div>
 
+                {/* Step content — grows to fill the drawer body so each
+                    step's Continue button is pinned to the bottom. The
+                    flex-1 here pairs with `flex flex-col flex-1` on each
+                    step's motion.div below. */}
+                <div className={compact ? "flex-1 min-h-0 flex flex-col" : ""}>
                 <AnimatePresence mode="wait">
                   {/* Step 1 — full parent contact (name + WhatsApp + email).
                       Once this validates we have everything we need to
@@ -4310,7 +4315,7 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                       never finishes the form; that's the point at which
                       we fire the first partial-lead capture. */}
                   {step === 1 && (
-                    <motion.div key="step1" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="flex flex-col gap-3 md:gap-4">
+                    <motion.div key="step1" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="flex flex-col flex-1 min-h-0 gap-3 md:gap-4">
                       <div className="flex flex-col gap-1 md:gap-1.5">
                         <label htmlFor="bottom_parent_name" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">Parent&rsquo;s Full Name <span className="text-red-500">*</span></label>
                         <input id="bottom_parent_name" {...register("parent_name")} type="text" autoComplete="name" autoCapitalize="words" spellCheck={false} aria-invalid={!!errors.parent_name} aria-describedby={errors.parent_name ? "bottom_parent_name_err" : undefined} className={inputCls(!!errors.parent_name)} placeholder="e.g. Rahul Sharma" />
@@ -4382,6 +4387,31 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                         {errors.parent_email && <p id="bottom_parent_email_err" className="text-[10px] text-red-500 font-bold mt-0.5">{errors.parent_email.message}</p>}
                       </div>
 
+                      {/* What-happens-next reassurance fills the empty
+                          space between the 3 fields and the bottom-pinned
+                          Continue button on shorter mobile drawers. On
+                          desktop (h-auto) the spacer collapses so this
+                          block sits right above the button. */}
+                      <div className="mt-1 rounded-xl border border-blue-100 bg-blue-50/60 p-3 md:p-4">
+                        <p className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-blue-700 uppercase mb-2">What happens next</p>
+                        <ol className="flex flex-col gap-1.5 text-[12px] md:text-[13px] font-medium text-slate-700">
+                          <li className="flex items-start gap-2">
+                            <span className="mt-0.5 size-4 shrink-0 rounded-full bg-blue-600 text-white text-[10px] font-extrabold flex items-center justify-center">1</span>
+                            <span>WhatsApp confirmation from our counsellor within 4 hours.</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="mt-0.5 size-4 shrink-0 rounded-full bg-blue-600 text-white text-[10px] font-extrabold flex items-center justify-center">2</span>
+                            <span>Your coach reviews the answers and prepares a tailored 30-min demo.</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="mt-0.5 size-4 shrink-0 rounded-full bg-blue-600 text-white text-[10px] font-extrabold flex items-center justify-center">3</span>
+                            <span>Live demo + counseling on a slot you pick. Parents can sit in.</span>
+                          </li>
+                        </ol>
+                      </div>
+
+                      <div className="flex-1 min-h-0" aria-hidden="true" />
+
                       <Button type="button" onClick={() => handleNextStep(['parent_name', 'phone', 'parent_email'])} className="w-full h-12 md:h-14 mt-1 text-base font-extrabold tracking-tight gs-btn gs-btn-primary rounded-xl shadow-lg">
                         Continue <ArrowRight className="ml-2 size-4" />
                       </Button>
@@ -4391,7 +4421,7 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                   {/* Step 2 — child age + level. Just two selects so the
                       step feels instant on mobile. */}
                   {step === 2 && (
-                    <motion.div key="step2-childinfo" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="flex flex-col gap-3 md:gap-4">
+                    <motion.div key="step2-childinfo" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="flex flex-col flex-1 min-h-0 gap-3 md:gap-4">
                       <div className="flex flex-col gap-1 md:gap-1.5">
                         <label htmlFor="bottom_child_name" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">Child&rsquo;s First Name <span className="text-red-500">*</span></label>
                         <input id="bottom_child_name" {...register("child_name")} type="text" autoComplete="given-name" autoCapitalize="words" spellCheck={false} aria-invalid={!!errors.child_name} className={inputCls(!!errors.child_name)} placeholder="e.g. Aarav" />
@@ -4437,6 +4467,8 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                         {errors.city && <p className="text-[10px] text-red-500 font-bold mt-0.5">{errors.city.message}</p>}
                       </div>
 
+                      <div className="flex-1 min-h-0" aria-hidden="true" />
+
                       <div className="flex gap-3 mt-1">
                         <Button type="button" onClick={() => setStep(1)} variant="outline" className="h-12 md:h-14 px-6 font-bold text-slate-600 border-slate-200 rounded-xl hover:bg-slate-50">
                           <ArrowLeft className="size-4" />
@@ -4449,7 +4481,7 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                   )}
 
                   {step === 3 && (
-                    <motion.div key="step3" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="flex flex-col gap-3 md:gap-4">
+                    <motion.div key="step3" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="flex flex-col flex-1 min-h-0 gap-3 md:gap-4">
                       <div className="flex flex-col gap-1 md:gap-1.5">
                         <label className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">
                           What do you want chess to do for your child? <span className="text-red-500">*</span>
@@ -4506,6 +4538,8 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                         {errors.parent_commitment && <p className="text-[10px] text-red-500 font-bold mt-0.5">{errors.parent_commitment.message}</p>}
                       </div>
 
+                      <div className="flex-1 min-h-0" aria-hidden="true" />
+
                       <div className="flex gap-3 mt-1">
                         <Button type="button" onClick={() => setStep(2)} variant="outline" className="h-12 md:h-14 px-6 font-bold text-slate-600 border-slate-200 rounded-xl hover:bg-slate-50">
                           <ArrowLeft className="size-4" />
@@ -4518,7 +4552,7 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                   )}
 
                   {step === 4 && (
-                    <motion.div key="step4" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="flex flex-col gap-2 md:gap-3">
+                    <motion.div key="step4" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="flex flex-col flex-1 min-h-0 gap-2 md:gap-3">
                       <div className="flex flex-col gap-2 md:gap-3">
                         <div className="flex items-baseline justify-between gap-2">
                           <label className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">
@@ -4743,14 +4777,16 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                         </div>
                       </div>
 
-                      <div className="flex gap-3 mt-2">
-                        <Button type="button" onClick={() => setStep(3)} variant="outline" className="h-16 px-6 font-bold text-slate-600 border-slate-200 rounded-xl hover:bg-slate-50">
+                      <div className="flex-1 min-h-0" aria-hidden="true" />
+
+                      <div className="flex gap-3 mt-1">
+                        <Button type="button" onClick={() => setStep(3)} variant="outline" className="h-12 md:h-14 px-6 font-bold text-slate-600 border-slate-200 rounded-xl hover:bg-slate-50">
                           <ArrowLeft className="size-4" />
                         </Button>
                         <Button
                           type="submit"
                           disabled={status === "sending"}
-                          className="flex-1 h-16 text-lg font-extrabold tracking-tight gs-btn gs-btn-primary rounded-xl shadow-xl hover:shadow-2xl hover-lift active:scale-[0.98]"
+                          className="flex-1 h-12 md:h-14 text-base md:text-lg font-extrabold tracking-tight gs-btn gs-btn-primary rounded-xl shadow-xl hover:shadow-2xl hover-lift active:scale-[0.98]"
                         >
                           {status === "sending" ? (
                             <><Loader2 className="size-5 animate-spin mr-2" /> Processing...</>
@@ -4759,22 +4795,29 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                           )}
                         </Button>
                       </div>
-                      
-                      <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 mt-4 text-slate-500">
-                        <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest-gs text-slate-600">
-                          <Shield className="size-4 text-emerald-500" /> Refund on unused sessions
-                        </span>
-                        <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest-gs">
-                          <CheckCircle className="size-4 text-emerald-500" /> No Payment Required
-                        </span>
-                      </div>
-
-                      <p className="text-[10px] text-slate-400 font-medium text-center mt-2 leading-relaxed">
-                        By submitting, you agree to our <Link to="/privacy-policy" className="underline hover:text-blue-600">Privacy Policy</Link>.
-                      </p>
                     </motion.div>
                   )}
                 </AnimatePresence>
+                </div>
+
+                {/* Persistent trust strip — pinned at the bottom of the
+                    drawer body so the parent sees the same reassurance on
+                    every step (refund + no-payment + privacy). Was buried
+                    inside step 4 only, so steps 1-3 had a blank empty
+                    bottom. */}
+                <div className="mt-3 md:mt-4 pt-3 md:pt-4 border-t border-slate-100">
+                  <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-slate-500">
+                    <span className="flex items-center gap-1.5 text-[10px] md:text-xs font-bold uppercase tracking-widest-gs text-slate-600">
+                      <Shield className="size-3.5 md:size-4 text-emerald-500" /> Refund on unused sessions
+                    </span>
+                    <span className="flex items-center gap-1.5 text-[10px] md:text-xs font-bold uppercase tracking-widest-gs text-slate-600">
+                      <CheckCircle className="size-3.5 md:size-4 text-emerald-500" /> No payment required
+                    </span>
+                  </div>
+                  <p className="text-[10px] text-slate-400 font-medium text-center mt-2 leading-relaxed">
+                    By submitting, you agree to our <Link to="/privacy-policy" className="underline hover:text-blue-600">Privacy Policy</Link>.
+                  </p>
+                </div>
               </motion.form>
             )}
           </AnimatePresence>
@@ -4813,7 +4856,7 @@ function WhatsAppWidget() {
       <div className="flex flex-col leading-tight pr-1">
         <span className="text-[11px] font-bold uppercase tracking-widest-gs text-emerald-100">Academic Counselor</span>
         <span className="text-sm font-extrabold">Chat on WhatsApp</span>
-        <span className="text-[10px] font-bold text-emerald-100">Replies in &lt;10 min</span>
+        <span className="text-[10px] font-bold text-emerald-100">Replies in &lt;4 hrs</span>
       </div>
     </a>
   );
@@ -5502,18 +5545,35 @@ function DemoDrawer() {
             </div>
 
             {/* Header — title + close + (when known) step badge.
-                Drops a subtle shadow once the body is scrolled, iOS-style. */}
+                Drops a subtle shadow once the body is scrolled, iOS-style.
+                Priya's avatar gives the form a real face — same image
+                used in the hero block and on the thank-you page. */}
             <div
-              className={`flex items-center gap-2 px-4 md:px-8 pt-2 md:pt-7 pb-3 md:pb-4 border-b transition-colors ${
+              className={`flex items-center gap-3 px-4 md:px-8 pt-2 md:pt-7 pb-3 md:pb-4 border-b transition-colors ${
                 scrolled ? "border-slate-200 shadow-[0_6px_18px_-12px_rgba(15,23,42,0.25)]" : "border-slate-100"
               }`}
             >
+              <div className="relative shrink-0">
+                <img
+                  src="/counselor-avatar.webp"
+                  alt="Priya Sharma, your academic counsellor"
+                  width={40}
+                  height={40}
+                  decoding="async"
+                  className="size-10 md:size-11 rounded-full object-cover border-2 border-white shadow-sm bg-slate-100"
+                />
+                {/* Online dot */}
+                <span
+                  aria-label="Online now"
+                  className="absolute -bottom-0.5 -right-0.5 size-3 rounded-full bg-emerald-500 ring-2 ring-white"
+                />
+              </div>
               <div className="flex-1 min-w-0">
                 <h2 className="text-base md:text-xl font-extrabold tracking-tighter-gs text-slate-900 leading-tight">
                   Book your free demo
                 </h2>
                 <p className="text-[10px] md:text-xs font-medium text-slate-500 mt-0.5 leading-tight">
-                  Reply on WhatsApp · within 4 hours
+                  <span className="font-bold text-slate-700">Priya</span> replies on WhatsApp · within 4 hrs
                 </p>
               </div>
               {step ? (

@@ -42,7 +42,7 @@ export default function ThankYou() {
   useRouteMeta({
     title: "Thank you — ChessWize demo booking received",
     description:
-      "Your free demo request is in. Priya Sharma, our academic counsellor, will reach out on WhatsApp within 10 minutes (10 AM – 8 PM IST).",
+      "Your free demo request is in. Priya Sharma, our academic counsellor, will reach out on call or WhatsApp within 4 hours (10 AM – 8 PM IST).",
     path: "/thank-you",
     noIndex: true,
   });
@@ -144,8 +144,8 @@ export default function ThankYou() {
                 You're in. Priya is <span className="text-emerald-600">on it</span>.
               </h1>
               <p className="text-base md:text-lg text-slate-600 font-medium leading-relaxed mb-6 max-w-[520px] mx-auto lg:mx-0">
-                Your free 20-min chess evaluation is booked. Our senior counsellor will WhatsApp you within
-                <span className="font-extrabold text-slate-900"> 10 minutes</span> (10 AM – 8 PM IST) to lock the exact time.
+                Your free 30-min chess evaluation is booked. Our senior counsellor will call or WhatsApp you within
+                <span className="font-extrabold text-slate-900"> 4 hours</span> (10 AM – 8 PM IST) to lock the exact time.
               </p>
 
               {/* Primary CTA — generous 56dp tap target, safe-area not needed because it's inline */}
@@ -213,7 +213,7 @@ export default function ThankYou() {
                 <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-md rounded-xl px-3 py-2 shadow-md border border-white">
                   <div className="flex items-center gap-1.5">
                     <Clock className="size-3.5 text-blue-600" aria-hidden="true" />
-                    <span className="text-[11px] font-extrabold text-slate-800">~10 min reply</span>
+                    <span className="text-[11px] font-extrabold text-slate-800">Reply in 4 hours</span>
                   </div>
                 </div>
               </div>
@@ -255,7 +255,7 @@ export default function ThankYou() {
                     <CheckCircle2 className="size-3" aria-hidden="true" /> Online now
                   </span>
                   <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-blue-50 border border-blue-100 text-[11px] font-extrabold text-blue-700">
-                    <Clock className="size-3" aria-hidden="true" /> Replies in ~10 min
+                    <Clock className="size-3" aria-hidden="true" /> Replies in ~4 hours
                   </span>
                   <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-50 border border-amber-100 text-[11px] font-extrabold text-amber-700">
                     <Star className="size-3 fill-amber-500 stroke-amber-600" aria-hidden="true" /> 4.9 parent rating
@@ -281,8 +281,8 @@ export default function ThankYou() {
                 {
                   icon: MessageCircle,
                   img: "/counselor-avatar.webp",
-                  eyebrow: "Within 10 min",
-                  title: "Priya WhatsApps you",
+                  eyebrow: "Within 4 hours",
+                  title: "Priya calls or WhatsApps you",
                   body: "She'll confirm the exact day + time of your evaluation slot and share a Zoom link.",
                   accent: "from-emerald-500 to-emerald-600",
                   ring: "ring-emerald-100",
