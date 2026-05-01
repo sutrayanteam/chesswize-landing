@@ -4009,33 +4009,48 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
     // zoho_id=null and both call createZohoLead. The chain awaits the
     // step-transition response, which populates the refs, before the
     // beacon's payload is built.
-    const sendBeaconIfWorthIt = () => {
-      if (statusRef.current === "success") return;
-      // Lenient threshold: fire the beacon as soon as the parent has typed
-      // a valid phone OR email — even if they never clicked Continue. The
-      // worker's `validatePartialLead` requires one of the two anyway, so
-      // anything less is just noise. This catches the "filled fields but
-      // clicked the X before hitting Continue" case the original
-      // `minViableLeadCapturedRef` gate was missing.
+    // Lenient threshold: fire the beacon as soon as the parent has typed
+    // a valid phone OR email — even if they never clicked Continue. The
+    // worker's `validatePartialLead` requires one of the two anyway, so
+    // anything less is just noise.
+    const beaconWorthIt = () => {
+      if (statusRef.current === "success") return false;
       const v = watch();
       const phoneDigits = typeof v.phone === "string" ? v.phone.replace(/\D/g, "") : "";
       const hasPhone = phoneDigits.length >= 10;
       const hasEmail = typeof v.parent_email === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.parent_email);
-      if (!hasPhone && !hasEmail) return;
+      return hasPhone || hasEmail;
+    };
+
+    // SYNC variant — for `pagehide` / `visibilitychange` where the
+    // browser (especially iOS Safari) terminates the JS execution
+    // context aggressively. A promise-chained beacon would queue a
+    // microtask that never runs after termination, dropping the lead
+    // on the floor. Call sendBeacon directly inside the unload handler.
+    const sendBeaconSync = () => {
+      if (!beaconWorthIt()) return;
+      firePartialBeacon(buildPartialPayload());
+    };
+
+    // ASYNC variant — for the drawer-close path (X / backdrop / ESC)
+    // where the page is still alive. Chains onto partialChainRef so
+    // a Continue-then-X tap waits for the previous response to land
+    // (so we have the freshest zoho_id) before beaconing again.
+    const sendBeaconQueued = () => {
+      if (!beaconWorthIt()) return;
       partialChainRef.current = partialChainRef.current
         .catch(() => undefined)
         .then(() => {
-          // buildPartialPayload reads the (now-fresh) refs, so the beacon
-          // carries the latest zoho_id/zoho_sig from the previous response.
           firePartialBeacon(buildPartialPayload());
         });
     };
-    const onPageHide = () => sendBeaconIfWorthIt();
-    const onVisibility = () => { if (document.visibilityState === "hidden") sendBeaconIfWorthIt(); };
-    // Drawer close (X / backdrop / ESC) also counts as "abandoning the
-    // form" — fire the beacon so a half-filled step-1 lead still gets
-    // a Zoho draft + counsellor email instead of being dropped.
-    const onDrawerClose = () => sendBeaconIfWorthIt();
+    const onPageHide = () => sendBeaconSync();
+    const onVisibility = () => { if (document.visibilityState === "hidden") sendBeaconSync(); };
+    // Drawer close (X / backdrop / ESC) — page is still alive so we
+    // can serialize the beacon through the partial-chain queue and
+    // pick up the latest zoho_id/zoho_sig from a recently-completed
+    // Continue tap. Tab-close uses sendBeaconSync above instead.
+    const onDrawerClose = () => sendBeaconQueued();
     window.addEventListener("pagehide", onPageHide);
     document.addEventListener("visibilitychange", onVisibility);
     window.addEventListener(CW_CLOSE_DEMO_EVENT, onDrawerClose as EventListener);
