@@ -5222,26 +5222,25 @@ function DemoDrawer() {
               </button>
             </div>
 
-            {/* Body — scrollable, contains the existing form. Wrapped in a
-                relative container so we can layer a bottom fade hint. */}
-            <div className="relative flex-1 min-h-0">
-              <div
-                ref={bodyRef}
-                className="absolute inset-0 overflow-y-auto px-5 md:px-8 py-5 md:py-7 overscroll-contain"
-              >
-                <BottomForm compact />
-                {/* iOS-style safe-area padding for mobile home indicator */}
-                <div className="h-[env(safe-area-inset-bottom,0px)]" aria-hidden="true" />
-              </div>
-              {/* Bottom fade hint — fades out when scrolled to the end so it
-                  doesn't sit on top of trailing content like the submit button. */}
-              <div
-                aria-hidden="true"
-                className={`pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-white to-transparent transition-opacity duration-200 ${
-                  atBottom ? "opacity-0" : "opacity-100"
-                }`}
-              />
+            {/* Body — scrollable, contains the existing form. Natural flex
+                sizing so it inherits the sheet's bounded height. */}
+            <div
+              ref={bodyRef}
+              className="flex-1 min-h-0 overflow-y-auto px-5 md:px-8 py-5 md:py-7 overscroll-contain"
+            >
+              <BottomForm compact />
+              {/* iOS-style safe-area padding for mobile home indicator */}
+              <div className="h-[env(safe-area-inset-bottom,0px)]" aria-hidden="true" />
             </div>
+            {/* Bottom fade hint — sibling of the body, positioned absolutely
+                against the sheet so it never affects layout. Fades out at the
+                scroll-end so it doesn't sit on top of the submit button. */}
+            <div
+              aria-hidden="true"
+              className={`pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-white to-transparent transition-opacity duration-200 ${
+                atBottom ? "opacity-0" : "opacity-100"
+              }`}
+            />
           </motion.div>
         </div>
       )}
