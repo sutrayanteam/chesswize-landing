@@ -479,14 +479,25 @@ async function sendLeadEmail(
   const slotLabel = formatPreferredDatetime(body.preferred_datetime);
   const priority = leadPriority(body);
 
-  const subjectSuffix = city ? ` · ${city}` : "";
+  // RFC 5322 header injection defence: strip CR/LF from any field that
+  // lands in the Subject. A malicious parent_name like "Foo\r\nBcc:
+  // attacker@evil.com" would otherwise inject extra headers via Resend.
+  // Also clamp length so an absurdly long name doesn't break the
+  // inbox preview pane.
+  const safeSubjectField = (s: string, max = 80) =>
+    s.replace(/[\r\n]+/g, " ").slice(0, max);
+  const safeParentName = safeSubjectField(parentName);
+  const safeCity = safeSubjectField(city, 40);
+  const safeSlot = safeSubjectField(slotLabel, 60);
+
+  const subjectSuffix = safeCity ? ` · ${safeCity}` : "";
   // Subject prefix differentiates the inbox view: "🟡 PARTIAL" reads as
   // "started but didn't finish" — counsellors can sort/filter on it.
   // For partials we don't include slotLabel because the parent hasn't
   // picked a slot yet at that point.
   const subject = opts.partial
-    ? `🟡 [PARTIAL] Lead in progress: ${parentName}${subjectSuffix}`
-    : `🎯 New lead: ${parentName}${subjectSuffix}${slotLabel ? ` · ${slotLabel}` : ""}`;
+    ? `🟡 [PARTIAL] Lead in progress: ${safeParentName}${subjectSuffix}`
+    : `🎯 New lead: ${safeParentName}${subjectSuffix}${safeSlot ? ` · ${safeSlot}` : ""}`;
   // Step labels keyed by the step number the user has just *completed*
   // (the partial fires on the transition leaving that step).
   const STEP_LABELS: Record<number, string> = {
@@ -521,9 +532,13 @@ async function sendLeadEmail(
     </tr>`;
   };
 
+  // Properly URI-encode the email's local-part for the mailto: href so a
+  // crafted parent_email like `foo@bar"><script>` can't break out of the
+  // attribute. encodeURIComponent escapes &, <, >, ", ' for us.
+  const safeEmailForMailto = parentEmail ? encodeURIComponent(parentEmail) : "";
   const waHref = phoneRaw ? `https://wa.me/${phoneRaw}?text=${encodeURIComponent(`Hi ${parentName.split(" ")[0]}! This is ChessWize calling about your chess evaluation booking for ${childName || "your child"}.`)}` : "";
   const telHref = phoneRaw ? `tel:+${phoneRaw}` : "";
-  const mailtoHref = parentEmail ? `mailto:${parentEmail}?subject=${encodeURIComponent("Your ChessWize evaluation booking")}` : "";
+  const mailtoHref = safeEmailForMailto ? `mailto:${safeEmailForMailto}?subject=${encodeURIComponent("Your ChessWize evaluation booking")}` : "";
 
   const html = `<!doctype html>
 <html lang="en">
@@ -1159,6 +1174,54 @@ async function deletePartialState(env: Env, leadSid: string): Promise<void> {
   await env.TOKEN_CACHE.delete(`${PARTIAL_KV_PREFIX}${leadSid}`);
 }
 
+// Tombstone written by the final-submit handler so a late partial POST
+// (e.g., a pagehide beacon firing milliseconds after the parent hit the
+// final submit) doesn't email staff a "lead in progress" notice for a
+// session that has already converted. 1h TTL is enough — partial saves
+// after that are noise.
+const FINAL_TOMBSTONE_PREFIX = "final:";
+const FINAL_TOMBSTONE_TTL_SECONDS = 3600;
+
+async function markSessionFinalized(env: Env, leadSid: string): Promise<void> {
+  if (!env.TOKEN_CACHE) return;
+  await env.TOKEN_CACHE.put(`${FINAL_TOMBSTONE_PREFIX}${leadSid}`, "1", {
+    expirationTtl: FINAL_TOMBSTONE_TTL_SECONDS,
+  });
+}
+
+async function isSessionFinalized(env: Env, leadSid: string): Promise<boolean> {
+  if (!env.TOKEN_CACHE) return false;
+  return (await env.TOKEN_CACHE.get(`${FINAL_TOMBSTONE_PREFIX}${leadSid}`)) === "1";
+}
+
+// Cheap KV-counter rate limiter for /api/leads/partial. Bots can forge
+// `Origin: https://chesswize.in` and pour traffic into Resend (free tier
+// is 100/day). Bucket per IP per hour. Capped at 30 partial saves /
+// IP / hour — comfortably above any legit parent's traffic (a real form
+// fill emits 1-3 partials) and well below any abuse pattern.
+const PARTIAL_RATE_LIMIT_PREFIX = "rl:partial:";
+const PARTIAL_RATE_LIMIT_PER_HOUR = 30;
+const PARTIAL_RATE_LIMIT_TTL_SECONDS = 3700; // hour + 100s slack
+
+async function tickPartialRateLimit(env: Env, ip: string): Promise<{ ok: boolean; count: number }> {
+  if (!env.TOKEN_CACHE || !ip) return { ok: true, count: 0 };
+  const bucket = Math.floor(Date.now() / (60 * 60 * 1000));
+  const key = `${PARTIAL_RATE_LIMIT_PREFIX}${ip}:${bucket}`;
+  const raw = await env.TOKEN_CACHE.get(key);
+  const count = raw ? parseInt(raw, 10) || 0 : 0;
+  if (count >= PARTIAL_RATE_LIMIT_PER_HOUR) {
+    return { ok: false, count };
+  }
+  // KV is eventually consistent — concurrent writers can both undercount.
+  // That's fine for a soft rate limit: the rare doubled count just means
+  // an attacker gets a few extra requests, not infinite. For strict
+  // single-writer semantics we'd need Durable Objects.
+  await env.TOKEN_CACHE.put(key, String(count + 1), {
+    expirationTtl: PARTIAL_RATE_LIMIT_TTL_SECONDS,
+  });
+  return { ok: true, count: count + 1 };
+}
+
 /**
  * Handle a partial-lead beacon. Lenient validation, no emails fired, no
  * Meta CAPI, no time-gate. Creates a draft Zoho lead on first valid call;
@@ -1174,6 +1237,14 @@ async function handlePartialLead(request: Request, env: Env, ctx: ExecutionConte
   const origin = request.headers.get("origin");
   if (!origin || !originAllowed(env, origin)) {
     return json({ ok: false, error: "origin_blocked" }, { status: 403 });
+  }
+
+  // Per-IP rate limit — Origin can be forged, so this is the actual
+  // line of defence against burning Resend's free-tier daily quota.
+  const remoteIp = request.headers.get("cf-connecting-ip") || request.headers.get("x-real-ip") || "";
+  const rl = await tickPartialRateLimit(env, remoteIp);
+  if (!rl.ok) {
+    return json({ ok: false, error: "rate_limit", count: rl.count }, { status: 429 });
   }
 
   let body: unknown;
@@ -1269,14 +1340,20 @@ async function handlePartialLead(request: Request, env: Env, ctx: ExecutionConte
 
   // ──────────────── One-shot partial-lead email ────────────────
   // Fire a "lead in progress" email to the counsellor inbox the FIRST
-  // time we see a partial save for this session. Deduped via the
-  // KV `email_sent` flag so subsequent step transitions for the same
-  // parent silently update Zoho without flooding the inbox.
+  // time we see a partial save for this session. Deduped via:
+  //   - KV `email_sent` flag (per-session, so 3 step transitions for
+  //     the same parent only emit one staff email).
+  //   - The "session finalized" tombstone written by handleLead — a
+  //     pagehide beacon that lands milliseconds after the parent's
+  //     final submit must NOT email staff for an already-converted
+  //     session (that would land "🟡 PARTIAL" in the inbox AFTER
+  //     "🎯 New lead" → confusing).
   // Per parent: at most 1 partial email + 1 final email.
   // ctx.waitUntil keeps the worker alive long enough to finish the
   // Resend POST without blocking the client response.
   let emailJustSent = cached?.email_sent ?? false;
-  if (!emailJustSent && resendConfigured(env)) {
+  const sessionDone = await isSessionFinalized(env, leadSid);
+  if (!emailJustSent && !sessionDone && resendConfigured(env)) {
     emailJustSent = true;
     ctx.waitUntil(
       sendLeadEmail(env, lead, { partial: true, lastStep }).then((r) => {
@@ -1382,10 +1459,17 @@ async function handleLead(request: Request, env: Env, ctx: ExecutionContext): Pr
   const emailOk = email.status === "fulfilled" && email.value.ok;
 
   // Best-effort cleanup: drop the partial-lead KV record so a future visit
-  // doesn't try to attach to a fully-converted lead. Non-blocking — the
-  // 24h TTL would handle this anyway, but eager cleanup keeps the KV tidy.
+  // doesn't try to attach to a fully-converted lead. Also write a
+  // 1h "session finalized" tombstone so a partial POST that arrives
+  // shortly after the final submit (pagehide beacon, slow keepalive
+  // fetch, etc.) skips its staff-email branch and doesn't leave a
+  // confusing "🟡 PARTIAL" notice in the inbox after the "🎯 New lead".
+  // Non-blocking — the 24h TTL would handle the cleanup anyway.
   if (leadSid && env.TOKEN_CACHE) {
-    ctx.waitUntil(deletePartialState(env, leadSid));
+    ctx.waitUntil((async () => {
+      await markSessionFinalized(env, leadSid);
+      await deletePartialState(env, leadSid);
+    })());
   }
 
   // Local-dev convenience: when *nothing* is configured (pure localhost

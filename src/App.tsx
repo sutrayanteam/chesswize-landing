@@ -167,7 +167,11 @@ function TopNav() {
           <img src="/logo-side-black-v2.svg" alt="ChessWize Logo" className="h-7 md:h-9 w-auto object-contain" />
         </button>
         <nav className="hidden lg:flex items-center gap-8">
-          {["Programs", "Mentors", "Testimonials", "Methodology", "Tuition"].map((item) => (
+          {/* "Programs" was here but the Curriculum section that owned
+              `id="programs"` was removed in the consensus cuts — the link
+              was a dead anchor. Replaced with "Founders" which deep-links
+              into the new founders block. */}
+          {["Founders", "Mentors", "Testimonials", "Methodology", "Tuition"].map((item) => (
             <button key={item} onClick={() => scrollToSection(item.toLowerCase().replace(' ', '-'))} className="text-[13px] font-bold text-slate-500 hover:text-slate-900 uppercase tracking-widest-gs transition-colors">
               {item}
             </button>
@@ -2248,7 +2252,7 @@ function Mentors() {
                 {/* Top: Lead Coach + headline */}
                 <div className="flex items-center gap-5 md:gap-6">
                   <div className="relative shrink-0">
-                    <img loading="lazy" decoding="async" width={800} height={1067} src="/founder-hrdyansh-pandey.webp" alt="Hrdyansh Pandey, Co-Founder & Lead Coach at ChessWize" className="size-40 md:size-48 rounded-2xl object-cover border-2 border-slate-200 gs-shadow-lg relative z-10" />
+                    <img loading="lazy" decoding="async" width={800} height={1067} src="/founder-hrdyansh-pandey.webp" alt="Hrdyansh Pandey, Co-Founder & Lead Coach at ChessWize" className="size-40 md:size-48 rounded-2xl object-cover object-top border-2 border-slate-200 gs-shadow-lg relative z-10" />
                   </div>
                   <div>
                     <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-200 border-0 rounded text-[9px] md:text-[10px] font-bold uppercase tracking-widest-gs mb-1.5 px-2 py-0.5">Co-Founder & Lead Coach</Badge>
@@ -2336,7 +2340,7 @@ const FOUNDERS = [
   {
     slug: "hrdyansh",
     name: "Hrdyansh Pandey",
-    title: "Founder & CMO",
+    title: "Founder, CMO & Lead Coach",
     photo: "/founder-hrdyansh-pandey.webp",
     tag: "The Coach",
     quote: "Chess is a powerful life skill. My job is to teach kids how to think, not just how to move pieces.",
@@ -2396,6 +2400,10 @@ function Founders() {
               <div className="absolute top-0 right-0 w-32 h-32 bg-amber-100/40 rounded-full blur-[40px] pointer-events-none" />
 
               <div className="flex items-center gap-4 mb-5 relative z-10">
+                {/* Portrait photos are 3:4 — square crop with the default
+                    object-position:center cut the top of the head off.
+                    object-top anchors the crop to the top of the frame so
+                    the face + headroom is preserved. */}
                 <img
                   loading="lazy"
                   decoding="async"
@@ -2403,7 +2411,7 @@ function Founders() {
                   height={1067}
                   src={f.photo}
                   alt={`${f.name}, ${f.title} of ChessWize`}
-                  className="size-20 md:size-24 rounded-2xl object-cover border-2 border-slate-200 gs-shadow-lg shrink-0"
+                  className="size-20 md:size-24 rounded-2xl object-cover object-top border-2 border-slate-200 gs-shadow-lg shrink-0"
                 />
                 <div className="min-w-0">
                   <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200 border-0 rounded text-[9px] md:text-[10px] font-bold uppercase tracking-widest-gs mb-1.5 px-2 py-0.5">
@@ -4535,9 +4543,9 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                         <div className="relative">
                           <select id="bottom_commitment" {...register("parent_commitment")} aria-invalid={!!errors.parent_commitment} className={inputCls(!!errors.parent_commitment) + " appearance-none cursor-pointer pr-10"}>
                             <option value="">Select commitment</option>
-                            <option value="casual">Casual (just a fun hobby)</option>
-                            <option value="serious">Serious (long-term cognitive growth)</option>
-                            <option value="competitive">Competitive (FIDE / tournaments)</option>
+                            <option value="casual">Just exploring for now</option>
+                            <option value="serious">Serious — long-term cognitive growth</option>
+                            <option value="competitive">Competitive — FIDE / tournaments</option>
                           </select>
                           <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-slate-400 pointer-events-none" />
                         </div>
@@ -4799,7 +4807,7 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                           {status === "sending" ? (
                             <><Loader2 className="size-5 animate-spin mr-2" /> Processing...</>
                           ) : (
-                            <>Lock In Your Evaluation <ArrowRight className="ml-2 size-5" /></>
+                            <>Book My Free Demo <ArrowRight className="ml-2 size-5" /></>
                           )}
                         </Button>
                       </div>
