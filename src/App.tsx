@@ -2297,7 +2297,7 @@ function MidPageCTA() {
           Ready to see the difference structured coaching makes?
         </h3>
         <p className="text-blue-100 text-sm md:text-base font-medium max-w-xl mx-auto mb-6 md:mb-8">
-          A 50-min demo class plus counseling with a tournament-trained coach. Zero obligation. Parents are welcome to observe any class.
+          A 30-min demo class plus counseling with a tournament-trained coach. Zero obligation. Parents are welcome to observe any class.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 md:gap-4">
           <Button onClick={scrollToForm} size="lg" className="h-12 md:h-14 px-8 md:px-10 bg-white text-blue-700 hover:bg-blue-50 rounded-xl text-sm md:text-base font-bold shadow-xl shadow-blue-900/30 transition-all hover:shadow-2xl hover:scale-[1.02]">
@@ -2446,7 +2446,7 @@ function Founders() {
 
         <div className="mt-10 md:mt-14 flex flex-col items-center gap-4">
           <p className="text-sm text-slate-600 font-medium text-center max-w-xl">
-            Talk to one of us — or one of our hand-trained coaches — in a free 50-min demo class.
+            Talk to one of us — or one of our hand-trained coaches — in a free 30-min demo class.
           </p>
           <Button
             onClick={scrollToForm}
@@ -3139,14 +3139,14 @@ function HowItWorks() {
     {
       num: "01",
       title: "Free Demo & Counseling",
-      desc: "A 50-minute 1-on-1 virtual session where our coach maps your child's calculation depth, attention span, emotional response to losing, and opening knowledge — and you get a personalised plan from a counselor.",
+      desc: "A 30-minute 1-on-1 virtual session where our coach maps your child's calculation depth, attention span, emotional response to losing, and opening knowledge — and you get a personalised plan from a counselor.",
       bullets: [
         "Personalised diagnostic — not a generic quiz",
         "Written report delivered within 24 hours",
         "Specific data points, not vague praise",
       ],
       icon: Target,
-      detail: "50 min · 1-on-1 · Written report included",
+      detail: "30 min · 1-on-1 · Written report included",
       color: "blue",
     },
     {
@@ -3928,7 +3928,7 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
             </p>
             <div className="mt-5 md:mt-6 flex flex-wrap justify-center gap-2 md:gap-3">
               <span className="inline-flex items-center gap-1.5 text-[11px] md:text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-full px-3 py-1.5 shadow-sm">
-                <CheckCircle className="size-3.5 text-emerald-500" /> 50-min demo + counseling
+                <CheckCircle className="size-3.5 text-emerald-500" /> 30-min demo + counseling
               </span>
               <span className="inline-flex items-center gap-1.5 text-[11px] md:text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-full px-3 py-1.5 shadow-sm">
                 <CheckCircle className="size-3.5 text-emerald-500" /> Parents welcome to observe any class
@@ -4531,7 +4531,7 @@ function Footer() {
             <div className="max-w-xl">
               <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest-gs mb-3">Still have questions?</p>
               <h3 className="text-2xl md:text-3xl lg:text-4xl font-extrabold tracking-tighter-gs text-white leading-[1.15]">
-                Your child&rsquo;s next great move starts with a <span className="text-blue-400">50-minute conversation</span>.
+                Your child&rsquo;s next great move starts with a <span className="text-blue-400">30-minute conversation</span>.
               </h3>
               <p className="mt-3 text-sm md:text-base text-slate-400 font-medium leading-relaxed">
                 Book a free demo or message our counsellor on WhatsApp — she replies in under ten minutes.
@@ -5068,8 +5068,12 @@ function SyllabusExplorer() {
    ════════════════════════════════════════════════ */
 function DemoDrawer() {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [atBottom, setAtBottom] = useState(false);
+  const [step, setStep] = useState<number | null>(null);
   const reduceMotion = useReducedMotion();
-  const containerRef = useRef<HTMLDivElement | null>(null);
+  const sheetRef = useRef<HTMLDivElement | null>(null);
+  const bodyRef = useRef<HTMLDivElement | null>(null);
 
   // Listen for the global open signal dispatched by every Book Free Demo CTA.
   useEffect(() => {
@@ -5106,7 +5110,43 @@ function DemoDrawer() {
     };
   }, [open]);
 
-  // Close handler used by backdrop clicks, X button, and ESC.
+  // Track scroll-shadow + bottom-fade visibility inside the drawer body.
+  useEffect(() => {
+    if (!open) return;
+    const el = bodyRef.current;
+    if (!el) return;
+    const update = () => {
+      setScrolled(el.scrollTop > 4);
+      setAtBottom(Math.abs(el.scrollHeight - el.clientHeight - el.scrollTop) < 4);
+    };
+    update();
+    el.addEventListener("scroll", update, { passive: true });
+    return () => el.removeEventListener("scroll", update);
+  }, [open]);
+
+  // Mirror the form's internal step state into the drawer header by reading
+  // the "Step X of 3" indicator the form already renders. Pure observation,
+  // no coupling — if the form's step text format ever changes, header just
+  // falls back to no step badge.
+  useEffect(() => {
+    if (!open) return;
+    const update = () => {
+      const root = sheetRef.current;
+      if (!root) { setStep(null); return; }
+      const labels = Array.from(root.querySelectorAll("span"));
+      const match = labels
+        .map((el) => el.textContent?.match(/^Step\s+(\d)\s+of\s+3$/i))
+        .find(Boolean);
+      setStep(match ? Number(match[1]) : null);
+    };
+    update();
+    const root = sheetRef.current;
+    if (!root) return;
+    const obs = new MutationObserver(update);
+    obs.observe(root, { childList: true, subtree: true, characterData: true });
+    return () => obs.disconnect();
+  }, [open]);
+
   const close = () => setOpen(false);
 
   return (
@@ -5132,7 +5172,7 @@ function DemoDrawer() {
 
           {/* Sheet container */}
           <motion.div
-            ref={containerRef}
+            ref={sheetRef}
             initial={reduceMotion ? { opacity: 0 } : { y: "100%" }}
             animate={reduceMotion ? { opacity: 1 } : { y: 0 }}
             exit={reduceMotion ? { opacity: 0 } : { y: "100%" }}
@@ -5142,49 +5182,65 @@ function DemoDrawer() {
           >
             {/* Drag-handle / "grabber" — HIG sheet indicator. Decorative on
                 desktop, signals dismissibility on mobile. */}
-            <div className="flex justify-center pt-3 pb-1 md:hidden">
+            <div className="flex justify-center pt-2.5 pb-1 md:hidden">
               <span className="block w-10 h-1 rounded-full bg-slate-300" aria-hidden="true" />
             </div>
 
-            {/* Header */}
-            <div className="flex items-start gap-3 px-5 md:px-8 pt-3 md:pt-7 pb-4 border-b border-slate-100">
+            {/* Header — title + close + (when known) step badge.
+                Drops a subtle shadow once the body is scrolled, iOS-style. */}
+            <div
+              className={`flex items-center gap-3 px-5 md:px-8 pt-2 md:pt-7 pb-4 border-b transition-colors ${
+                scrolled ? "border-slate-200 shadow-[0_6px_18px_-12px_rgba(15,23,42,0.25)]" : "border-slate-100"
+              }`}
+            >
               <div className="flex-1 min-w-0">
-                <p className="text-[10px] md:text-[11px] font-bold text-blue-600 uppercase tracking-widest-gs mb-1">
-                  Book a free demo
-                </p>
-                <h2 className="text-xl md:text-2xl font-extrabold tracking-tighter-gs text-slate-900 leading-tight">
-                  Your child&apos;s free 50-min demo &amp; counseling
+                <h2 className="text-lg md:text-xl font-extrabold tracking-tighter-gs text-slate-900 leading-tight">
+                  Book your free demo
                 </h2>
-                <p className="hidden md:block text-sm text-slate-500 font-medium mt-1.5">
-                  We ask a few extra questions so the coach can prepare a personalised evaluation.
+                <p className="text-[11px] md:text-xs font-medium text-slate-500 mt-0.5 leading-tight">
+                  Reply on WhatsApp · usually within 4 hours
                 </p>
               </div>
+              {step ? (
+                <div
+                  className="hidden sm:flex shrink-0 items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 text-[10px] font-extrabold uppercase tracking-widest-gs"
+                  aria-label={`Step ${step} of 3`}
+                >
+                  <span className="size-1.5 rounded-full bg-blue-600" />
+                  Step {step}/3
+                </div>
+              ) : null}
               <button
                 type="button"
                 aria-label="Close booking drawer"
                 onClick={close}
-                className="shrink-0 size-9 rounded-full bg-slate-100 hover:bg-slate-200 active:bg-slate-300 flex items-center justify-center text-slate-700 hover:text-slate-900 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                className="shrink-0 size-10 rounded-full bg-slate-100 hover:bg-slate-200 active:bg-slate-300 flex items-center justify-center text-slate-600 hover:text-slate-900 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
               >
-                <XCircle className="size-5" />
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" className="size-4" aria-hidden="true">
+                  <path d="M6 6l12 12M18 6L6 18" />
+                </svg>
               </button>
             </div>
 
-            {/* Trust chips — same content the static section used to show */}
-            <div className="flex flex-wrap items-center gap-2 px-5 md:px-8 py-3 border-b border-slate-100 bg-slate-50/60">
-              <span className="inline-flex items-center gap-1.5 text-[10px] md:text-[11px] font-bold text-slate-700 bg-white border border-slate-200 rounded-full px-2.5 py-1 shadow-sm">
-                <CheckCircle className="size-3 text-emerald-500" /> 50-min demo
-              </span>
-              <span className="inline-flex items-center gap-1.5 text-[10px] md:text-[11px] font-bold text-slate-700 bg-white border border-slate-200 rounded-full px-2.5 py-1 shadow-sm">
-                <CheckCircle className="size-3 text-emerald-500" /> Parents may observe
-              </span>
-              <span className="inline-flex items-center gap-1.5 text-[10px] md:text-[11px] font-bold text-slate-700 bg-white border border-slate-200 rounded-full px-2.5 py-1 shadow-sm">
-                <CheckCircle className="size-3 text-emerald-500" /> WhatsApp reply &lt; 4h
-              </span>
-            </div>
-
-            {/* Body — scrollable, contains the existing form */}
-            <div className="flex-1 overflow-y-auto px-5 md:px-8 py-5 md:py-7 overscroll-contain">
-              <BottomForm compact />
+            {/* Body — scrollable, contains the existing form. Wrapped in a
+                relative container so we can layer a bottom fade hint. */}
+            <div className="relative flex-1 min-h-0">
+              <div
+                ref={bodyRef}
+                className="absolute inset-0 overflow-y-auto px-5 md:px-8 py-5 md:py-7 overscroll-contain"
+              >
+                <BottomForm compact />
+                {/* iOS-style safe-area padding for mobile home indicator */}
+                <div className="h-[env(safe-area-inset-bottom,0px)]" aria-hidden="true" />
+              </div>
+              {/* Bottom fade hint — fades out when scrolled to the end so it
+                  doesn't sit on top of trailing content like the submit button. */}
+              <div
+                aria-hidden="true"
+                className={`pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-white to-transparent transition-opacity duration-200 ${
+                  atBottom ? "opacity-0" : "opacity-100"
+                }`}
+              />
             </div>
           </motion.div>
         </div>
