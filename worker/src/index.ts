@@ -27,6 +27,14 @@ export interface Env {
   RESEND_API_KEY?: string;
   FROM_EMAIL?: string;
   NOTIFY_EMAIL?: string;
+  // Resend Audiences — bulk-email contact list for marketing campaigns.
+  // Every parent (partial OR full) gets added here so the team can run
+  // newsletter / re-engagement / abandoned-form drip sequences later
+  // without rebuilding the recipient list from Zoho. Set with
+  // `wrangler secret put RESEND_AUDIENCE_ID`. Get the id from
+  // resend.com/audiences → click the audience → URL contains the UUID.
+  // If unset, audience sync is silently skipped — Zoho keeps everything.
+  RESEND_AUDIENCE_ID?: string;
 
   // Meta Conversions API
   META_PIXEL_ID?: string;        // "1315250227040245" — defaulted in wrangler.toml [vars]
@@ -397,6 +405,76 @@ async function pushLeadToZoho(env: Env, body: LeadBody, existingId?: string | nu
 /* ─────────────────────────── Resend helpers ─────────────────────────── */
 
 const resendConfigured = (env: Env) => !!(env.RESEND_API_KEY && env.FROM_EMAIL && env.NOTIFY_EMAIL);
+const audienceConfigured = (env: Env) => !!(env.RESEND_API_KEY && env.RESEND_AUDIENCE_ID);
+
+/**
+ * Add a parent to the Resend Audience for marketing campaigns later.
+ *
+ * Idempotent: Resend returns `validation_error: contact_already_exists`
+ * for duplicates — we treat that as success so re-runs of the same
+ * lead_sid don't error. Other failures (rate limit, bad audience id,
+ * Resend down) are logged and swallowed; the rest of the lead-flow
+ * keeps working.
+ *
+ * Why also store partial leads here:
+ *   - Partial parents already trusted us with email + name
+ *   - Re-engagement / abandoned-form drip sequences are exactly the
+ *     campaigns this list will be used for
+ *   - DPDP-friendly: the form's privacy policy link is already shown
+ *     before submit, so the parent has consented to "we'll contact you
+ *     about chess coaching" — same scope as a marketing email
+ */
+async function addToResendAudience(
+  env: Env,
+  body: LeadBody,
+): Promise<{ ok: boolean; id?: string; error?: string; existed?: boolean }> {
+  if (!audienceConfigured(env)) return { ok: false, error: "audience_not_configured" };
+  const email = clean(body.parent_email);
+  if (!email) return { ok: false, error: "no_email" };
+
+  // Resend's contact API splits name into first/last — split on the
+  // first space; fall back to the whole string as first_name. Indian
+  // parents often submit single-name combos ("Rahul") or multi-name
+  // ("Rahul Sharma Reddy"); both shapes work fine here.
+  const fullName = clean(body.parent_name);
+  const [firstName, ...rest] = fullName.split(/\s+/).filter(Boolean);
+  const lastName = rest.join(" ");
+
+  const res = await fetch(
+    `https://api.resend.com/audiences/${encodeURIComponent(env.RESEND_AUDIENCE_ID!)}/contacts`,
+    {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${env.RESEND_API_KEY}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+        first_name: firstName || undefined,
+        last_name: lastName || undefined,
+        unsubscribed: false,
+      }),
+    },
+  );
+
+  if (res.ok) {
+    const data = await res.json<{ id?: string }>().catch(() => ({} as { id?: string }));
+    return { ok: true, id: data.id };
+  }
+
+  // Treat "already exists" as success — Resend's idempotency story.
+  const errBody = await res
+    .json<{ name?: string; message?: string }>()
+    .catch(() => ({} as { name?: string; message?: string }));
+  const looksLikeDuplicate =
+    res.status === 422 ||
+    /already.*exist|duplicat/i.test(errBody.message ?? "") ||
+    errBody.name === "contact_already_exists";
+  if (looksLikeDuplicate) {
+    return { ok: true, existed: true };
+  }
+  return { ok: false, error: `resend_audience_${res.status}: ${errBody.message ?? "unknown"}` };
+}
 
 // Treat empty strings as "missing" everywhere — callers should not see
 // empty parentheses or dangling separators. Matches what `?? "?"` meant in
@@ -1363,6 +1441,20 @@ async function handlePartialLead(request: Request, env: Env, ctx: ExecutionConte
         }
       }),
     );
+    // Sync to Resend Audience the same time we email staff — this is
+    // the moment the parent has given us a recoverable email AND
+    // hasn't yet completed the booking, so the marketing list pick-up
+    // catches every partial-fill (the most valuable retargeting cohort).
+    if (audienceConfigured(env) && lead.parent_email) {
+      ctx.waitUntil(
+        addToResendAudience(env, lead).then((r) => {
+          if (!r.ok) {
+            // eslint-disable-next-line no-console
+            console.warn("[audience] partial-add failed", r.error);
+          }
+        }),
+      );
+    }
   }
 
   await writePartialState(env, leadSid, {
@@ -1472,6 +1564,21 @@ async function handleLead(request: Request, env: Env, ctx: ExecutionContext): Pr
     })());
   }
 
+  // Sync the parent into the Resend Audience for marketing campaigns
+  // later (re-engagement, newsletter, course launches). Idempotent —
+  // a parent who already landed on the partial path won't be added a
+  // second time. Non-blocking via ctx.waitUntil.
+  if (audienceConfigured(env) && lead.parent_email) {
+    ctx.waitUntil(
+      addToResendAudience(env, lead).then((r) => {
+        if (!r.ok) {
+          // eslint-disable-next-line no-console
+          console.warn("[audience] final-add failed", r.error);
+        }
+      }),
+    );
+  }
+
   // Local-dev convenience: when *nothing* is configured (pure localhost
   // wrangler without .dev.vars), treat the submit as stored so the frontend
   // happy path — /thank-you navigation, Meta browser Lead, confirmation
@@ -1536,6 +1643,7 @@ function handleHealth(env: Env): Response {
     integrations: {
       zoho: zohoConfigured(env) ? "configured" : "missing_env",
       resend: resendConfigured(env) ? "configured" : "missing_env",
+      resend_audience: audienceConfigured(env) ? "configured" : "missing_env",
       meta_capi: capiConfigured(env) ? "configured" : "missing_env",
       turnstile: env.TURNSTILE_SECRET_KEY ? "configured" : "missing_env",
     },

@@ -45,6 +45,17 @@ id = "f88b7a2b450e420e89420f37468b9488"
 #   NOTIFY_EMAIL            — internal inbox that receives new-lead emails
 #   FROM_EMAIL              — verified sender, e.g. "ChessWize <noreply@chesswize.com>"
 #
+# Optional — Resend Audiences (marketing list):
+#   RESEND_AUDIENCE_ID      — UUID of a Resend Audience. Every parent
+#                              (partial OR full lead) is auto-added so
+#                              you can send newsletter / re-engagement
+#                              campaigns later without exporting from
+#                              Zoho. Get the id from
+#                              resend.com/audiences → click the
+#                              audience → URL contains the UUID.
+#                              Unset → audience sync is silently
+#                              skipped, Zoho/email keep working.
+#
 # Required for Meta Conversions API (server-side Lead events):
 #   META_CAPI_TOKEN         — Events Manager → Pixel → Conversions API →
 #                              "Generate Access Token". Never commit.
