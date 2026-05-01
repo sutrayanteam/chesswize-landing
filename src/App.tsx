@@ -4392,6 +4392,12 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                       step feels instant on mobile. */}
                   {step === 2 && (
                     <motion.div key="step2-childinfo" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="flex flex-col gap-3 md:gap-4">
+                      <div className="flex flex-col gap-1 md:gap-1.5">
+                        <label htmlFor="bottom_child_name" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">Child&rsquo;s First Name <span className="text-red-500">*</span></label>
+                        <input id="bottom_child_name" {...register("child_name")} type="text" autoComplete="given-name" autoCapitalize="words" spellCheck={false} aria-invalid={!!errors.child_name} className={inputCls(!!errors.child_name)} placeholder="e.g. Aarav" />
+                        {errors.child_name && <p className="text-[10px] text-red-500 font-bold mt-0.5">{errors.child_name.message}</p>}
+                      </div>
+
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                         <div className="flex flex-col gap-1 md:gap-1.5 min-w-0">
                           <label htmlFor="bottom_child_age_range" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">Child&rsquo;s Age <span className="text-red-500">*</span></label>
@@ -4435,7 +4441,7 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                         <Button type="button" onClick={() => setStep(1)} variant="outline" className="h-12 md:h-14 px-6 font-bold text-slate-600 border-slate-200 rounded-xl hover:bg-slate-50">
                           <ArrowLeft className="size-4" />
                         </Button>
-                        <Button type="button" onClick={() => handleNextStep(['child_age_range', 'child_level', 'city'])} className="flex-1 h-12 md:h-14 text-base font-extrabold tracking-tight gs-btn gs-btn-primary rounded-xl shadow-lg">
+                        <Button type="button" onClick={() => handleNextStep(['child_name', 'child_age_range', 'child_level', 'city'])} className="flex-1 h-12 md:h-14 text-base font-extrabold tracking-tight gs-btn gs-btn-primary rounded-xl shadow-lg">
                           Continue <ArrowRight className="ml-2 size-4" />
                         </Button>
                       </div>
@@ -4444,12 +4450,6 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
 
                   {step === 3 && (
                     <motion.div key="step3" initial="hidden" animate="visible" exit="exit" variants={stepVariants} className="flex flex-col gap-3 md:gap-4">
-                      <div className="flex flex-col gap-1 md:gap-1.5">
-                        <label htmlFor="bottom_child_name" className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">Child&rsquo;s First Name <span className="text-red-500">*</span></label>
-                        <input id="bottom_child_name" {...register("child_name")} type="text" autoComplete="given-name" autoCapitalize="words" spellCheck={false} aria-invalid={!!errors.child_name} className={inputCls(!!errors.child_name)} placeholder="e.g. Aarav" />
-                        {errors.child_name && <p className="text-[10px] text-red-500 font-bold mt-0.5">{errors.child_name.message}</p>}
-                      </div>
-
                       <div className="flex flex-col gap-1 md:gap-1.5">
                         <label className="text-[10px] md:text-[11px] font-extrabold tracking-widest-gs text-slate-600 uppercase">
                           What do you want chess to do for your child? <span className="text-red-500">*</span>
@@ -4510,7 +4510,7 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
                         <Button type="button" onClick={() => setStep(2)} variant="outline" className="h-12 md:h-14 px-6 font-bold text-slate-600 border-slate-200 rounded-xl hover:bg-slate-50">
                           <ArrowLeft className="size-4" />
                         </Button>
-                        <Button type="button" onClick={() => handleNextStep(['child_name', 'parent_concern', 'parent_commitment'])} className="flex-1 h-12 md:h-14 text-base font-extrabold tracking-tight gs-btn gs-btn-primary rounded-xl shadow-lg">
+                        <Button type="button" onClick={() => handleNextStep(['parent_concern', 'parent_commitment'])} className="flex-1 h-12 md:h-14 text-base font-extrabold tracking-tight gs-btn gs-btn-primary rounded-xl shadow-lg">
                           Continue <ArrowRight className="ml-2 size-4" />
                         </Button>
                       </div>
