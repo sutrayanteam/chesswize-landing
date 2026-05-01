@@ -457,7 +457,11 @@ function phoneDigits(phone: string | undefined): string {
   return String(phone ?? "").replace(/[^0-9]/g, "");
 }
 
-async function sendLeadEmail(env: Env, body: LeadBody): Promise<{ ok: boolean; recipients?: Array<{ to: string; ok: boolean; error?: string }>; error?: string }> {
+async function sendLeadEmail(
+  env: Env,
+  body: LeadBody,
+  opts: { partial?: boolean; lastStep?: number } = {},
+): Promise<{ ok: boolean; recipients?: Array<{ to: string; ok: boolean; error?: string }>; error?: string }> {
   if (!resendConfigured(env)) return { ok: false, error: "resend_not_configured" };
 
   const parentName = clean(body.parent_name) || clean(body.child_name) || "Unknown";
@@ -476,7 +480,30 @@ async function sendLeadEmail(env: Env, body: LeadBody): Promise<{ ok: boolean; r
   const priority = leadPriority(body);
 
   const subjectSuffix = city ? ` · ${city}` : "";
-  const subject = `🎯 New lead: ${parentName}${subjectSuffix}${slotLabel ? ` · ${slotLabel}` : ""}`;
+  // Subject prefix differentiates the inbox view: "🟡 PARTIAL" reads as
+  // "started but didn't finish" — counsellors can sort/filter on it.
+  // For partials we don't include slotLabel because the parent hasn't
+  // picked a slot yet at that point.
+  const subject = opts.partial
+    ? `🟡 [PARTIAL] Lead in progress: ${parentName}${subjectSuffix}`
+    : `🎯 New lead: ${parentName}${subjectSuffix}${slotLabel ? ` · ${slotLabel}` : ""}`;
+  // Step labels keyed by the step number the user has just *completed*
+  // (the partial fires on the transition leaving that step).
+  const STEP_LABELS: Record<number, string> = {
+    1: "Parent contact captured (name, WhatsApp, email)",
+    2: "Child basics added (name, age, level, city)",
+    3: "Goals & commitment level captured",
+    4: "Calendar slot picked — final submit pending",
+  };
+  const lastStep = Math.max(1, Math.min(4, opts.lastStep ?? 1));
+  const stepLabel = STEP_LABELS[lastStep] ?? "";
+  const partialBanner = opts.partial
+    ? `<tr><td style="padding:16px 28px;background:#fef3c7;border-bottom:1px solid #fcd34d;color:#92400e;font-size:13px;font-weight:600;line-height:1.55;">
+        <div style="font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#92400e;margin-bottom:6px;">⚠️ Partial submission · Step ${lastStep} of 4</div>
+        <div style="font-size:14px;color:#78350f;font-weight:700;line-height:1.4;">Completed ${lastStep} of 4 steps — ${escapeHtml(stepLabel)}.</div>
+        <div style="font-size:12px;color:#92400e;margin-top:6px;">Parent hasn't hit the final submit yet. Reach out on WhatsApp before they cool off — Zoho lead is filed under <em>Open – In Progress</em> and updates with each step they advance.</div>
+       </td></tr>`
+    : "";
 
   // Child summary — build from non-empty parts only so we never render
   // "Aarav · ? · ?" or " · 7 – 9 yrs · " when the parent skipped a field.
@@ -514,7 +541,7 @@ async function sendLeadEmail(env: Env, body: LeadBody): Promise<{ ok: boolean; r
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
           <tr>
             <td>
-              <div style="font-size:11px;font-weight:800;letter-spacing:3px;text-transform:uppercase;opacity:0.9;">ChessWize · New demo booking</div>
+              <div style="font-size:11px;font-weight:800;letter-spacing:3px;text-transform:uppercase;opacity:0.9;">ChessWize · ${opts.partial ? `Partial submission · ${lastStep}/4 steps` : "New demo booking"}</div>
               <div style="font-size:24px;font-weight:800;line-height:1.25;margin-top:6px;">${escapeHtml(parentName)}${city ? ` · <span style=\"opacity:0.9;\">${escapeHtml(city)}</span>` : ""}</div>
               ${slotLabel ? `<div style="font-size:13px;font-weight:500;opacity:0.95;margin-top:6px;">⏰ ${escapeHtml(slotLabel)}</div>` : ""}
             </td>
@@ -525,6 +552,7 @@ async function sendLeadEmail(env: Env, body: LeadBody): Promise<{ ok: boolean; r
         </table>
       </td>
     </tr>
+    ${partialBanner}
 
     <!-- Quick actions -->
     ${(waHref || telHref || mailtoHref) ? `
@@ -1104,6 +1132,10 @@ interface PartialState {
   zoho_id: string;
   last_step: number;
   updated_at: number;
+  // True once we've sent the staff "lead in progress" email for this
+  // session. Dedupes per lead_sid so a parent who advances through 3
+  // partial saves only triggers ONE staff email — not three.
+  email_sent?: boolean;
 }
 
 async function readPartialState(env: Env, leadSid: string): Promise<PartialState | null> {
@@ -1134,7 +1166,7 @@ async function deletePartialState(env: Env, leadSid: string): Promise<void> {
  * keyed by lead_sid (24h TTL) AND returned to the client so the next call
  * can carry it directly — KV is the cache, the client is the ground truth.
  */
-async function handlePartialLead(request: Request, env: Env, _ctx: ExecutionContext): Promise<Response> {
+async function handlePartialLead(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
   // Require an Origin header on this endpoint — unlike a typical fetch+JSON
   // POST (which is exempt from CORS preflight only when same-origin) the
   // partial path also accepts text/plain sendBeacon. Bots can trivially
@@ -1233,10 +1265,34 @@ async function handlePartialLead(request: Request, env: Env, _ctx: ExecutionCont
   }
 
   const cached = await readPartialState(env, leadSid);
+  const lastStep = typeof r.step === "number" ? Math.max(1, Math.min(4, r.step)) : (cached?.last_step ?? 1);
+
+  // ──────────────── One-shot partial-lead email ────────────────
+  // Fire a "lead in progress" email to the counsellor inbox the FIRST
+  // time we see a partial save for this session. Deduped via the
+  // KV `email_sent` flag so subsequent step transitions for the same
+  // parent silently update Zoho without flooding the inbox.
+  // Per parent: at most 1 partial email + 1 final email.
+  // ctx.waitUntil keeps the worker alive long enough to finish the
+  // Resend POST without blocking the client response.
+  let emailJustSent = cached?.email_sent ?? false;
+  if (!emailJustSent && resendConfigured(env)) {
+    emailJustSent = true;
+    ctx.waitUntil(
+      sendLeadEmail(env, lead, { partial: true, lastStep }).then((r) => {
+        if (!r.ok && (r.error || r.recipients?.some((x) => !x.ok))) {
+          // eslint-disable-next-line no-console
+          console.warn("[partial-email] send failed", r.error, r.recipients);
+        }
+      }),
+    );
+  }
+
   await writePartialState(env, leadSid, {
     zoho_id: result.id,
-    last_step: typeof r.step === "number" ? r.step : (cached?.last_step ?? 1),
+    last_step: lastStep,
     updated_at: Date.now(),
+    email_sent: emailJustSent,
   });
 
   // Sign the resolved zoho_id so the client can echo it back on the next
