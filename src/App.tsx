@@ -112,15 +112,15 @@ import {
 } from "@/components/ui/accordion";
 
 /* ─── Utility ─── */
+// Drawer-open signal. Every CTA that used to scroll to the in-page form
+// now triggers the bottom-sheet drawer instead. The form itself (with all
+// its data flow, validation, pixel events, calendar picker, success state,
+// API submission) is unchanged — only the surface that contains it.
+const CW_OPEN_DEMO_EVENT = "cw:open-demo";
 function scrollToForm() {
-  // Land directly on the form card ("Tell us who your child is"), not on
-  // the section intro copy above it. The card has `scroll-mt-24` so the
-  // fixed top nav doesn't cover the heading. Falls back to the section
-  // anchor if the card id is ever removed.
-  const target =
-    document.getElementById("demo-form-card") ??
-    document.getElementById("book-evaluation");
-  target?.scrollIntoView({ behavior: "smooth", block: "start" });
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent(CW_OPEN_DEMO_EVENT));
+  }
 }
 function scrollToSection(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
@@ -3554,7 +3554,7 @@ function buildSlotsForDate(dateKey: string, now: Date): SlotOption[] {
   return slots;
 }
 
-function BottomForm() {
+function BottomForm({ compact = false }: { compact?: boolean } = {}) {
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
   const [spamError, setSpamError] = useState("");
   const [step, setStep] = useState(1);
@@ -3907,32 +3907,48 @@ function BottomForm() {
   };
 
   return (
-    <section id="book-evaluation" className="py-16 md:py-24 bg-slate-50 border-t border-slate-200 gs-grid-pattern relative overflow-hidden">
-      <div className="absolute top-0 left-0 w-full h-1 bg-blue-600" />
-      <div className="max-w-3xl mx-auto px-4 md:px-8 relative z-10">
-        <div className="text-center mb-10 md:mb-12">
-          <h2 className="text-[10px] font-bold text-blue-600 uppercase tracking-widest-gs mb-2 md:mb-3">Take the next step</h2>
-          <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tighter-gs text-slate-900 mb-3 md:mb-4 leading-tight">
-            Book Your Child's Free Demo & Counseling
-          </h3>
-          <p className="text-base md:text-lg text-slate-600 font-medium max-w-2xl mx-auto leading-relaxed">
-            This isn't a generic sign-up form. We ask a few extra questions so our coach can prepare a personalised evaluation — not a cookie-cutter demo. Our academic counsellor uses these answers to match the right coach and batch.
-          </p>
-          <div className="mt-5 md:mt-6 flex flex-wrap justify-center gap-2 md:gap-3">
-            <span className="inline-flex items-center gap-1.5 text-[11px] md:text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-full px-3 py-1.5 shadow-sm">
-              <CheckCircle className="size-3.5 text-emerald-500" /> 50-min demo + counseling
-            </span>
-            <span className="inline-flex items-center gap-1.5 text-[11px] md:text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-full px-3 py-1.5 shadow-sm">
-              <CheckCircle className="size-3.5 text-emerald-500" /> Parents welcome to observe any class
-            </span>
-            <span className="inline-flex items-center gap-1.5 text-[11px] md:text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-full px-3 py-1.5 shadow-sm">
-              <CheckCircle className="size-3.5 text-emerald-500" /> WhatsApp reply in 4 hours
-            </span>
+    <section
+      id="book-evaluation"
+      className={
+        compact
+          ? "relative"
+          : "py-16 md:py-24 bg-slate-50 border-t border-slate-200 gs-grid-pattern relative overflow-hidden"
+      }
+    >
+      {!compact && <div className="absolute top-0 left-0 w-full h-1 bg-blue-600" />}
+      <div className={compact ? "max-w-3xl mx-auto relative z-10" : "max-w-3xl mx-auto px-4 md:px-8 relative z-10"}>
+        {!compact && (
+          <div className="text-center mb-10 md:mb-12">
+            <h2 className="text-[10px] font-bold text-blue-600 uppercase tracking-widest-gs mb-2 md:mb-3">Take the next step</h2>
+            <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tighter-gs text-slate-900 mb-3 md:mb-4 leading-tight">
+              Book Your Child's Free Demo & Counseling
+            </h3>
+            <p className="text-base md:text-lg text-slate-600 font-medium max-w-2xl mx-auto leading-relaxed">
+              This isn't a generic sign-up form. We ask a few extra questions so our coach can prepare a personalised evaluation — not a cookie-cutter demo. Our academic counsellor uses these answers to match the right coach and batch.
+            </p>
+            <div className="mt-5 md:mt-6 flex flex-wrap justify-center gap-2 md:gap-3">
+              <span className="inline-flex items-center gap-1.5 text-[11px] md:text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-full px-3 py-1.5 shadow-sm">
+                <CheckCircle className="size-3.5 text-emerald-500" /> 50-min demo + counseling
+              </span>
+              <span className="inline-flex items-center gap-1.5 text-[11px] md:text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-full px-3 py-1.5 shadow-sm">
+                <CheckCircle className="size-3.5 text-emerald-500" /> Parents welcome to observe any class
+              </span>
+              <span className="inline-flex items-center gap-1.5 text-[11px] md:text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-full px-3 py-1.5 shadow-sm">
+                <CheckCircle className="size-3.5 text-emerald-500" /> WhatsApp reply in 4 hours
+              </span>
+            </div>
           </div>
-        </div>
+        )}
 
-        <div id="demo-form-card" className="scroll-mt-24 md:scroll-mt-28 bg-white rounded-3xl p-6 sm:p-8 md:p-10 gs-border gs-shadow-2xl relative overflow-hidden flex flex-col justify-center">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full blur-[60px] pointer-events-none" />
+        <div
+          id="demo-form-card"
+          className={
+            compact
+              ? "relative"
+              : "scroll-mt-24 md:scroll-mt-28 bg-white rounded-3xl p-6 sm:p-8 md:p-10 gs-border gs-shadow-2xl relative overflow-hidden flex flex-col justify-center"
+          }
+        >
+          {!compact && <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full blur-[60px] pointer-events-none" />}
           
           <AnimatePresence mode="wait">
             {step === 4 ? (
@@ -4691,15 +4707,10 @@ function MobileStickyCTA() {
     const handleScroll = () => {
       const scrolledPastHero = window.scrollY > 400;
       const nearBottom = (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 300;
-      /* Hide the sticky bar when the bottom form itself is in the viewport —
-         having 2 CTAs stacked (sticky + in-form) causes mis-clicks + looks cluttered */
-      const form = document.getElementById("book-evaluation");
-      let formInView = false;
-      if (form) {
-        const rect = form.getBoundingClientRect();
-        formInView = rect.top < window.innerHeight * 0.9 && rect.bottom > 0;
-      }
-      setIsVisible(scrolledPastHero && !nearBottom && !formInView);
+      // Form is now drawer-only — no inline section to compete with, so the
+      // sticky bar simply shows whenever the user is past the hero and not
+      // already near the footer.
+      setIsVisible(scrolledPastHero && !nearBottom);
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
@@ -5053,6 +5064,136 @@ function SyllabusExplorer() {
 }
 
 /* ════════════════════════════════════════════════
+   DEMO DRAWER — Material 3 + Apple HIG bottom sheet
+   ════════════════════════════════════════════════ */
+function DemoDrawer() {
+  const [open, setOpen] = useState(false);
+  const reduceMotion = useReducedMotion();
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  // Listen for the global open signal dispatched by every Book Free Demo CTA.
+  useEffect(() => {
+    const handler = () => setOpen(true);
+    window.addEventListener(CW_OPEN_DEMO_EVENT, handler as EventListener);
+    return () => window.removeEventListener(CW_OPEN_DEMO_EVENT, handler as EventListener);
+  }, []);
+
+  // Body scroll lock + ESC-to-close while open. Mirrors the VideoModal pattern
+  // already used elsewhere in this file (position:fixed on body, restored on
+  // close) so iOS Safari can't rubber-band scroll the page underneath.
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    document.addEventListener("keydown", onKey);
+    const scrollY = window.scrollY;
+    const prev = {
+      overflow: document.body.style.overflow,
+      position: document.body.style.position,
+      top: document.body.style.top,
+      width: document.body.style.width,
+    };
+    document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = "100%";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev.overflow;
+      document.body.style.position = prev.position;
+      document.body.style.top = prev.top;
+      document.body.style.width = prev.width;
+      window.scrollTo(0, scrollY);
+    };
+  }, [open]);
+
+  // Close handler used by backdrop clicks, X button, and ESC.
+  const close = () => setOpen(false);
+
+  return (
+    <AnimatePresence>
+      {open && (
+        <div
+          className="fixed inset-0 z-[120] flex items-end md:items-center md:justify-center"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Book your child's free demo"
+        >
+          {/* Scrim — Material 3 spec: scrim with surface tint + low opacity */}
+          <motion.button
+            type="button"
+            aria-label="Close"
+            onClick={close}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={reduceMotion ? { duration: 0 } : { duration: 0.2 }}
+            className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm cursor-default"
+          />
+
+          {/* Sheet container */}
+          <motion.div
+            ref={containerRef}
+            initial={reduceMotion ? { opacity: 0 } : { y: "100%" }}
+            animate={reduceMotion ? { opacity: 1 } : { y: 0 }}
+            exit={reduceMotion ? { opacity: 0 } : { y: "100%" }}
+            transition={reduceMotion ? { duration: 0 } : { type: "spring", stiffness: 380, damping: 38 }}
+            className="relative w-full md:w-auto md:max-w-2xl md:mx-4 bg-white rounded-t-3xl md:rounded-3xl shadow-2xl flex flex-col overflow-hidden max-h-[92vh] md:max-h-[90vh]"
+            style={{ boxShadow: "0 -20px 60px -12px rgba(15, 23, 42, 0.35), 0 -8px 16px -8px rgba(15, 23, 42, 0.18)" }}
+          >
+            {/* Drag-handle / "grabber" — HIG sheet indicator. Decorative on
+                desktop, signals dismissibility on mobile. */}
+            <div className="flex justify-center pt-3 pb-1 md:hidden">
+              <span className="block w-10 h-1 rounded-full bg-slate-300" aria-hidden="true" />
+            </div>
+
+            {/* Header */}
+            <div className="flex items-start gap-3 px-5 md:px-8 pt-3 md:pt-7 pb-4 border-b border-slate-100">
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] md:text-[11px] font-bold text-blue-600 uppercase tracking-widest-gs mb-1">
+                  Book a free demo
+                </p>
+                <h2 className="text-xl md:text-2xl font-extrabold tracking-tighter-gs text-slate-900 leading-tight">
+                  Your child&apos;s free 50-min demo &amp; counseling
+                </h2>
+                <p className="hidden md:block text-sm text-slate-500 font-medium mt-1.5">
+                  We ask a few extra questions so the coach can prepare a personalised evaluation.
+                </p>
+              </div>
+              <button
+                type="button"
+                aria-label="Close booking drawer"
+                onClick={close}
+                className="shrink-0 size-9 rounded-full bg-slate-100 hover:bg-slate-200 active:bg-slate-300 flex items-center justify-center text-slate-700 hover:text-slate-900 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+              >
+                <XCircle className="size-5" />
+              </button>
+            </div>
+
+            {/* Trust chips — same content the static section used to show */}
+            <div className="flex flex-wrap items-center gap-2 px-5 md:px-8 py-3 border-b border-slate-100 bg-slate-50/60">
+              <span className="inline-flex items-center gap-1.5 text-[10px] md:text-[11px] font-bold text-slate-700 bg-white border border-slate-200 rounded-full px-2.5 py-1 shadow-sm">
+                <CheckCircle className="size-3 text-emerald-500" /> 50-min demo
+              </span>
+              <span className="inline-flex items-center gap-1.5 text-[10px] md:text-[11px] font-bold text-slate-700 bg-white border border-slate-200 rounded-full px-2.5 py-1 shadow-sm">
+                <CheckCircle className="size-3 text-emerald-500" /> Parents may observe
+              </span>
+              <span className="inline-flex items-center gap-1.5 text-[10px] md:text-[11px] font-bold text-slate-700 bg-white border border-slate-200 rounded-full px-2.5 py-1 shadow-sm">
+                <CheckCircle className="size-3 text-emerald-500" /> WhatsApp reply &lt; 4h
+              </span>
+            </div>
+
+            {/* Body — scrollable, contains the existing form */}
+            <div className="flex-1 overflow-y-auto px-5 md:px-8 py-5 md:py-7 overscroll-contain">
+              <BottomForm compact />
+            </div>
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+/* ════════════════════════════════════════════════
    APP ROUTER
    ════════════════════════════════════════════════ */
 function LandingPage() {
@@ -5084,12 +5225,12 @@ function LandingPage() {
         <CertificateSection />
         <SyllabusExplorer />
         <FAQ />
-        <BottomForm />
       </main>
       <Footer />
       {/* ── Removed per consensus: ProgramStats, Transformation, Curriculum, LearningModes,
           FounderStory, ParentAssessmentQuiz, DailyRegimen, MidPageCTA, EloProjectionCalculator,
           InteractivePuzzle — all hurt conversion or duplicated content ── */}
+      <DemoDrawer />
       <WhatsAppWidget />
       <MobileStickyCTA />
       <ScrollToTop />
