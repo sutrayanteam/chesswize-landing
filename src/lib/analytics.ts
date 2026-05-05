@@ -117,13 +117,18 @@ export function initAnalytics(): void {
   if (GA4_ID || GADS_CONVERSION_ID) {
     try {
       window.dataLayer = window.dataLayer || [];
-      // gtag is a thin wrapper that pushes to dataLayer.
-      window.gtag = function gtag(...args: unknown[]) {
-        // Cloudflare's older types are picky here — using any to avoid
-        // pulling in @types/gtag.js for one helper.
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (window.dataLayer as any).push(args);
-      } as unknown as GtagFn;
+      // gtag is a thin wrapper that pushes to dataLayer. Don't redefine
+      // if index.html's static gtag init already installed one (the
+      // canonical Google snippet), so we don't stomp the early calls
+      // it queued (gtag('js', new Date()), gtag('config', AW-...)).
+      if (typeof window.gtag !== "function") {
+        window.gtag = function gtag(...args: unknown[]) {
+          // Cloudflare's older types are picky here — using any to avoid
+          // pulling in @types/gtag.js for one helper.
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (window.dataLayer as any).push(args);
+        } as unknown as GtagFn;
+      }
 
       // Dual-tag config. Loader URL uses whichever id is set first
       // (Google docs confirm a single gtag.js load is sufficient for

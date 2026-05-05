@@ -87,6 +87,22 @@
       fbq('track','PageView');
     </script>
 
+    <!--
+      === Google tag (gtag.js) — Google Ads conversion tag AW-17213475222 ===
+      Loads early + statically so external auditors / static-HTML grepers
+      see it. analytics.ts also runs gtag('config', ...) idempotently
+      (gtag treats duplicate config calls as no-ops on the same id), so
+      a one-line GA4 measurement id added later doesn't need this static
+      block changed.
+    -->
+    <script async id="__cw_gtag_script" src="https://www.googletagmanager.com/gtag/js?id=AW-17213475222"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'AW-17213475222', { allow_enhanced_conversions: true });
+    </script>
+
     <!-- Cloudflare Turnstile — anti-spam challenge on /api/leads.
          Async + defer so it doesn't block LCP. Widget is explicit-render in
          BottomForm (see src/lib/turnstile.ts). -->
