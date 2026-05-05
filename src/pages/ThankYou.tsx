@@ -17,6 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useRouteMeta } from "@/src/lib/useRouteMeta";
 import { trackLead } from "@/src/lib/tracking";
+import { setEnhancedConversionUserData, trackAdsConversion } from "@/src/lib/analytics";
 import { buildWhatsAppHref, onWhatsAppClick } from "@/src/lib/whatsapp";
 
 /**
@@ -94,7 +95,30 @@ export default function ThankYou() {
     } catch {
       /* ignore — still safe to fire once */
     }
+
+    // Pull pre-hashed email/phone (set by BottomForm submit) and feed
+    // them to gtag BEFORE the conversion event — gtag attaches the most
+    // recent user_data set call to the next conversion. Remove the
+    // sessionStorage entry FIRST to narrow the read-process-delete race
+    // window if the same /thank-you tab is duplicated mid-effect.
+    try {
+      const key = `cw_ec_${eid}`;
+      const ecRaw = sessionStorage.getItem(key);
+      if (ecRaw) {
+        sessionStorage.removeItem(key);
+        const parsed = JSON.parse(ecRaw) as { sha256_email_address?: string; sha256_phone_number?: string };
+        setEnhancedConversionUserData(parsed);
+      }
+    } catch {
+      /* swallow — Enhanced Conversions are best-effort */
+    }
+
     trackLead(eid);
+    // Google Ads conversion. transaction_id = same event_id Meta CAPI
+    // uses, so future cross-platform reconciliation is trivial. Default
+    // value (₹1,000 INR) matches the conversion action's static value
+    // in the Ads UI (CWZ - Book Free Demo - Primary).
+    trackAdsConversion({ value: 1000, currency: "INR", transactionId: eid });
     return () => { cancelled = true; };
   }, [eid]);
 

@@ -93,7 +93,7 @@ import {
   trackLeadFormStart,
   trackLeadStep2,
 } from "@/src/lib/tracking";
-import { track, identifyUser, trackError } from "@/src/lib/analytics";
+import { track, identifyUser, trackError, preHashUserData } from "@/src/lib/analytics";
 import { buildWhatsAppHref, onWhatsAppClick } from "@/src/lib/whatsapp";
 // Cloudflare Turnstile was previously imported from "@/src/lib/turnstile".
 // It's been removed from the form because the widget was silently failing
@@ -4205,6 +4205,23 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
       // Happy path — clear the draft, reset the form, navigate to /thank-you
       // so browser+server Lead dedupe.
       track("form_submit_success", { event_id: eventId, lead_sid: leadSidRef.current || undefined });
+
+      // Pre-hash email + phone for Google Ads Enhanced Conversions. Stored
+      // in sessionStorage keyed by event_id so /thank-you can read + flush
+      // without leaving raw PII on disk anywhere. Hashing happens here (not
+      // on /thank-you) because the form fields are still in scope.
+      try {
+        const ec = await preHashUserData({
+          email: cleanData.parent_email,
+          phone: cleanData.phone,
+        });
+        if (ec.sha256_email_address || ec.sha256_phone_number) {
+          sessionStorage.setItem(`cw_ec_${eventId}`, JSON.stringify(ec));
+        }
+      } catch {
+        /* swallow — Enhanced Conversions are best-effort */
+      }
+
       try { localStorage.removeItem(FORM_DRAFT_KEY); } catch { /* no-op */ }
       try { sessionStorage.removeItem("cw.hero.age"); } catch { /* no-op */ }
       // Done — clear the partial-lead session so a future visit mints a
