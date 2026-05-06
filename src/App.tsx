@@ -94,6 +94,7 @@ import {
   trackLeadStep2,
 } from "@/src/lib/tracking";
 import { track, identifyUser, trackError, preHashUserData } from "@/src/lib/analytics";
+import { writeLeadSummary } from "@/src/lib/leadSummary";
 import { buildWhatsAppHref, onWhatsAppClick } from "@/src/lib/whatsapp";
 // Cloudflare Turnstile was previously imported from "@/src/lib/turnstile".
 // It's been removed from the form because the widget was silently failing
@@ -4221,6 +4222,11 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
       } catch {
         /* swallow — Enhanced Conversions are best-effort */
       }
+
+      // Snapshot the form fields /thank-you needs for personalization
+      // (first name, child name, slot, concern, level, city). Phone
+      // intentionally excluded — no UI need for it on /thank-you.
+      writeLeadSummary(eventId, cleanData);
 
       try { localStorage.removeItem(FORM_DRAFT_KEY); } catch { /* no-op */ }
       try { sessionStorage.removeItem("cw.hero.age"); } catch { /* no-op */ }
