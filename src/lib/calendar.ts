@@ -144,33 +144,31 @@ export function icsBlobUrl(ev: CalendarEvent): string | null {
 
 /**
  * Compute the "by when" deadline string for the counsellor's reply
- * promise (4 hours, capped to ChessWize working window 10:00–20:00 IST).
- * If now is outside the window, returns "by 11 AM tomorrow" semantics.
+ * promise. ChessWize working hours are 10:00–20:00 IST; any 4-hour
+ * window that ends past 20:00 (or starts before 10:00) defers to the
+ * next morning to avoid promising replies in the middle of the night.
  */
 export function counsellorReplyDeadline(now = new Date()): string {
-  // Move `now` to IST clock for the math.
+  // Shift `now` by the IST offset so getUTC* on the result reads as
+  // the IST wall-clock — independent of the browser's local zone.
   const istNow = new Date(now.getTime() + IST_OFFSET_MIN * 60_000);
-  const hour = istNow.getUTCHours(); // because we already shifted, getUTC* gives IST clock
-  const min = istNow.getUTCMinutes();
+  const istHour = istNow.getUTCHours();
+  const istMin = istNow.getUTCMinutes();
+
+  // Before working hours: defer to 4h after the 10 AM working start.
+  if (istHour < 10) return "by 2 PM today";
+
+  // istHour + 4 (in 24h) — without modulo, so we can detect a crossover
+  // past 20:00 (working day end) cleanly. Anything that would land at
+  // or after 20:00 IST gets pushed to the next morning at 11 AM.
+  const replyHour24 = istHour + 4 + (istMin >= 30 ? 1 : 0);
+  if (replyHour24 >= 20) return "by 11 AM tomorrow";
 
   const fourHoursLater = new Date(istNow.getTime() + 4 * 60 * 60_000);
-  const replyHour = fourHoursLater.getUTCHours();
-
-  // Out-of-hours rule: anything before 10:00 IST → "by 2 PM today"
-  // (4h after the 10 AM working start). Anything after 16:00 IST whose
-  // +4h crosses 20:00 → "by 11 AM tomorrow" (working start + 1h grace).
-  let label: string;
-  if (hour < 10) {
-    label = "by 2 PM today";
-  } else if (replyHour >= 20 || (hour >= 16 && replyHour > 20)) {
-    label = "by 11 AM tomorrow";
-  } else {
-    const replyMin = fourHoursLater.getUTCMinutes();
-    const ampm = replyHour < 12 ? "AM" : "PM";
-    const display = replyHour % 12 || 12;
-    const minPad = replyMin === 0 ? "" : `:${String(replyMin).padStart(2, "0")}`;
-    label = `by ${display}${minPad} ${ampm} today`;
-  }
-  void min;
-  return label;
+  const h = fourHoursLater.getUTCHours();
+  const m = fourHoursLater.getUTCMinutes();
+  const ampm = h < 12 ? "AM" : "PM";
+  const display = h % 12 || 12;
+  const minPad = m === 0 ? "" : `:${String(m).padStart(2, "0")}`;
+  return `by ${display}${minPad} ${ampm} today`;
 }
