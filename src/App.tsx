@@ -4123,11 +4123,11 @@ function BottomForm({ compact = false }: { compact?: boolean } = {}) {
     setStatus("sending");
     const { website_url: _hp, ...cleanData } = data;
     void _hp;
-    // Prepend the locked country code before sending. RHF stores only the
-    // 10-digit local number so the UI +91 prefix is never double-counted or
-    // typed twice; the worker + Zoho expect a fully-formatted E.164-ish
-    // string so we glue it on here.
-    cleanData.phone = cleanData.phone ? `+91 ${cleanData.phone}` : cleanData.phone;
+    // Send phone as the raw 10-digit RHF value. The worker's Zod validator
+    // expects the same `^[6-9]\d{9}$` shape the form already enforces, and
+    // it normalizes to E.164 server-side before pushing to Zoho / Meta
+    // CAPI. Prepending "+91 " here previously broke validation (5/7-5/9
+    // production drop where every real submit returned 400 invalid_payload).
 
     /*
      * Lead-delivery flow (single-source-of-truth):
