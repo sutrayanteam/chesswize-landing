@@ -15,6 +15,7 @@
 
 import { capiConfigured, sendCapiLead } from "./lib/capi";
 import { writeBackup, updateBackup, exportBackupCsv } from "./lib/backup";
+import { syncToPayload, payloadConfigured } from "./lib/payload";
 
 export interface Env {
   // Zoho
@@ -61,6 +62,15 @@ export interface Env {
   // Bearer token required to download backup CSVs. Set with:
   //   wrangler secret put BACKUP_EXPORT_TOKEN
   BACKUP_EXPORT_TOKEN?: string;
+
+  // Payload admin dashboard ingest endpoint + shared secret. Every
+  // successful /api/leads + /api/leads/partial fires a ctx.waitUntil
+  // call here to upsert the lead into admin.chesswize.in (Payload).
+  // Set with:
+  //   wrangler secret put PAYLOAD_INGEST_URL    (e.g. https://admin.chesswize.in/api/internal/leads/upsert)
+  //   wrangler secret put PAYLOAD_INGEST_SECRET (matches admin app's PAYLOAD_INGEST_SECRET env)
+  PAYLOAD_INGEST_URL?: string;
+  PAYLOAD_INGEST_SECRET?: string;
 
   // HMAC secret used to sign the (lead_sid, zoho_id) tuple returned to the
   // client on every successful partial-save response. The client echoes
@@ -1551,6 +1561,37 @@ async function handlePartialLead(request: Request, env: Env, ctx: ExecutionConte
 
   await updateBackup(env, backupId, { validationOk: true, leadSid, zohoOk: true, httpStatus: 200 });
 
+  // Mirror the partial save into the Payload admin dashboard. Fire-and-
+  // forget — admin going down or being slow must NEVER stall the
+  // user-facing response (which has already happened by the time the
+  // ctx.waitUntil promise resolves).
+  if (payloadConfigured(env)) {
+    ctx.waitUntil(
+      syncToPayload(env, {
+        lead_sid: leadSid,
+        parent_name: lead.parent_name,
+        phone: lead.phone,
+        email: lead.parent_email,
+        child_age_range: lead.child_age_range,
+        child_level: lead.child_level,
+        child_name: lead.child_name,
+        city: lead.city,
+        parent_concern: lead.parent_concern,
+        parent_commitment: lead.parent_commitment,
+        preferred_datetime: lead.preferred_datetime,
+        referral_source: lead.referral_source,
+        source: "website",
+        submission_state: "partial",
+        last_partial_step: typeof r.step === "number" ? Math.max(1, Math.min(4, r.step)) : 1,
+        attribution_snapshot: lead.attribution,
+      }).then(async (res) => {
+        // Stamp payload_ok on the backup row so the daily CSV / reconciler
+        // can spot partial rows where Payload write failed and retry them.
+        await updateBackup(env, backupId, { validationOk: true, leadSid, zohoOk: true, payloadOk: res.ok, httpStatus: 200 });
+      }),
+    );
+  }
+
   const cached = await readPartialState(env, leadSid);
   const lastStep = typeof r.step === "number" ? Math.max(1, Math.min(4, r.step)) : (cached?.last_step ?? 1);
 
@@ -1777,6 +1818,44 @@ async function handleLead(request: Request, env: Env, ctx: ExecutionContext): Pr
     httpStatus: stored ? 200 : 502,
   });
 
+  // Mirror the final submission into the Payload admin dashboard. Same
+  // fire-and-forget pattern as the partial path. submission_state='full'
+  // tells the admin to flip a previously partial row to full + clear
+  // last_partial_step.
+  if (payloadConfigured(env)) {
+    ctx.waitUntil(
+      syncToPayload(env, {
+        lead_sid: leadSid ?? eventId,
+        parent_name: lead.parent_name,
+        phone: lead.phone,
+        email: lead.parent_email,
+        child_age_range: lead.child_age_range,
+        child_level: lead.child_level,
+        child_name: lead.child_name,
+        city: lead.city,
+        parent_concern: lead.parent_concern,
+        parent_commitment: lead.parent_commitment,
+        preferred_datetime: lead.preferred_datetime,
+        referral_source: lead.referral_source,
+        source: "website",
+        submission_state: "full",
+        form_duration_s: lead.form_duration_s,
+        attribution_snapshot: lead.attribution,
+      }).then(async (res) => {
+        await updateBackup(env, backupId, {
+          validationOk: true,
+          leadSid,
+          eventId,
+          zohoOk,
+          resendOk: emailOk,
+          capiOk: capiOkForBackup,
+          payloadOk: res.ok,
+          httpStatus: stored ? 200 : 502,
+        });
+      }),
+    );
+  }
+
   // When nothing persisted, return 502 so the frontend surfaces a retry
   // instead of silently sending the parent to /thank-you. Body still carries
   // the per-integration detail so ops can inspect what failed.
@@ -1844,6 +1923,7 @@ async function handleHealth(env: Env): Promise<Response> {
       // the API key is set but the audience hasn't been bootstrapped.
       resend_audience: (await audienceConfigured(env)) ? "configured" : "missing_env",
       meta_capi: capiConfigured(env) ? "configured" : "missing_env",
+      payload_admin: payloadConfigured(env) ? "configured" : "missing_env",
       turnstile: env.TURNSTILE_SECRET_KEY ? "configured" : "missing_env",
     },
     ts: new Date().toISOString(),

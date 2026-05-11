@@ -28,6 +28,7 @@ export interface BackupOutcome {
   zohoOk?: boolean;
   resendOk?: boolean;
   capiOk?: boolean;
+  payloadOk?: boolean;
   httpStatus?: number;
 }
 
@@ -115,6 +116,7 @@ export async function updateBackup(
         zoho_ok = ?,
         resend_ok = ?,
         capi_ok = ?,
+        payload_ok = ?,
         http_status = ?
        WHERE id = ?`,
     )
@@ -125,6 +127,7 @@ export async function updateBackup(
         outcome.zohoOk === undefined ? null : outcome.zohoOk ? 1 : 0,
         outcome.resendOk === undefined ? null : outcome.resendOk ? 1 : 0,
         outcome.capiOk === undefined ? null : outcome.capiOk ? 1 : 0,
+        outcome.payloadOk === undefined ? null : outcome.payloadOk ? 1 : 0,
         outcome.httpStatus ?? null,
         id,
       )
@@ -153,6 +156,7 @@ const CSV_COLUMNS: { col: string; label: string }[] = [
   { col: "zoho_ok", label: "zoho_ok" },
   { col: "resend_ok", label: "resend_ok" },
   { col: "capi_ok", label: "capi_ok" },
+  { col: "payload_ok", label: "payload_ok" },
   { col: "http_status", label: "http_status" },
   { col: "origin", label: "origin" },
   { col: "ip", label: "ip" },
