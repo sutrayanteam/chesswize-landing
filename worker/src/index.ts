@@ -14,6 +14,7 @@
  */
 
 import { capiConfigured, sendCapiLead } from "./lib/capi";
+import { writeBackup, updateBackup, exportBackupCsv } from "./lib/backup";
 
 export interface Env {
   // Zoho
@@ -51,6 +52,15 @@ export interface Env {
 
   // KV used as an in-memory access-token cache across cold starts
   TOKEN_CACHE?: KVNamespace;
+
+  // D1 — durable submission backup. Every POST to /api/leads(/partial)
+  // is written here BEFORE any validation so we never lose lead data to
+  // a Zod regression again. Read via /api/admin/backups/csv.
+  LEAD_BACKUP_DB?: D1Database;
+
+  // Bearer token required to download backup CSVs. Set with:
+  //   wrangler secret put BACKUP_EXPORT_TOKEN
+  BACKUP_EXPORT_TOKEN?: string;
 
   // HMAC secret used to sign the (lead_sid, zoho_id) tuple returned to the
   // client on every successful partial-save response. The client echoes
@@ -1454,8 +1464,14 @@ async function handlePartialLead(request: Request, env: Env, ctx: ExecutionConte
   }
   const r = body as Record<string, unknown>;
 
+  // Durable backup BEFORE any validation — captures every attempt, even
+  // ones that will get rejected. Added 2026-05-11 after a Zod schema
+  // regression silently dropped ~20 real submissions across 4 days.
+  const backupId = await writeBackup(env, { endpoint: "leads_partial", request, body });
+
   const leadSid = str(r.lead_sid, 100);
   if (!leadSid) {
+    await updateBackup(env, backupId, { validationOk: false, validationReason: "lead_sid_required", httpStatus: 400 });
     return json({ ok: false, error: "lead_sid_required" }, { status: 400 });
   }
 
@@ -1473,12 +1489,14 @@ async function handlePartialLead(request: Request, env: Env, ctx: ExecutionConte
     // 200 with `stored: false` so a sendBeacon failure doesn't fill
     // browser network panels with red — this isn't a "real" error from
     // the user's perspective, just an empty draft.
+    await updateBackup(env, backupId, { validationOk: false, validationReason: validation.reason, leadSid, httpStatus: 200 });
     return json({ ok: true, stored: false, reason: validation.reason });
   }
   const lead = validation.value;
 
   // Honeypot — silently filter.
   if (lead.website_url && lead.website_url.length > 0) {
+    await updateBackup(env, backupId, { validationOk: true, validationReason: "honeypot", leadSid, httpStatus: 200 });
     return json({ ok: true, stored: false, note: "filtered" });
   }
 
@@ -1527,8 +1545,11 @@ async function handlePartialLead(request: Request, env: Env, ctx: ExecutionConte
   }
 
   if (!result.ok || !result.id) {
+    await updateBackup(env, backupId, { validationOk: true, leadSid, zohoOk: false, httpStatus: 502 });
     return json({ ok: false, error: result.error ?? "zoho_failed", lead_sid: leadSid }, { status: 502 });
   }
+
+  await updateBackup(env, backupId, { validationOk: true, leadSid, zohoOk: true, httpStatus: 200 });
 
   const cached = await readPartialState(env, leadSid);
   const lastStep = typeof r.step === "number" ? Math.max(1, Math.min(4, r.step)) : (cached?.last_step ?? 1);
@@ -1602,11 +1623,17 @@ async function handleLead(request: Request, env: Env, ctx: ExecutionContext): Pr
     return json({ ok: false, error: "bad_json" }, { status: 400 });
   }
 
+  // Durable backup BEFORE any validation — captures every attempt, even
+  // ones that will get rejected. Added 2026-05-11 after a Zod schema
+  // regression silently dropped ~20 real submissions across 4 days.
+  const backupId = await writeBackup(env, { endpoint: "leads", request, body });
+
   // Server-side shape validation — don't trust the client.
   // Treat anything malformed as a hard reject (400) so automated scripts
   // can't pollute Zoho with arbitrary data.
   const validation = validateLead(body);
   if (validation.ok === false) {
+    await updateBackup(env, backupId, { validationOk: false, validationReason: validation.reason, httpStatus: 400 });
     return json({ ok: false, error: "invalid_payload", detail: validation.reason }, { status: 400 });
   }
   const lead: LeadBody = validation.value;
@@ -1622,11 +1649,13 @@ async function handleLead(request: Request, env: Env, ctx: ExecutionContext): Pr
 
   // Honeypot
   if (lead.website_url && lead.website_url.length > 0) {
+    await updateBackup(env, backupId, { validationOk: true, validationReason: "honeypot", leadSid, httpStatus: 200 });
     return json({ ok: true, stored: false, note: "filtered" });
   }
 
   // Anti-spam time-gate
   if (typeof lead.form_duration_s === "number" && lead.form_duration_s < 8) {
+    await updateBackup(env, backupId, { validationOk: false, validationReason: "too_fast", leadSid, httpStatus: 429 });
     return json({ ok: false, error: "too_fast" }, { status: 429 });
   }
 
@@ -1636,6 +1665,7 @@ async function handleLead(request: Request, env: Env, ctx: ExecutionContext): Pr
   const remoteIp = request.headers.get("cf-connecting-ip") || request.headers.get("x-real-ip") || undefined;
   const turnstile = await verifyTurnstile(env, lead.turnstile_token, remoteIp);
   if (!turnstile.ok) {
+    await updateBackup(env, backupId, { validationOk: false, validationReason: `turnstile:${turnstile.error}`, leadSid, httpStatus: 403 });
     return json({ ok: false, error: "turnstile_failed", detail: turnstile.error }, { status: 403 });
   }
 
@@ -1735,6 +1765,17 @@ async function handleLead(request: Request, env: Env, ctx: ExecutionContext): Pr
   }
 
   const stored = zohoOk || emailOk || devMockStorage;
+  const capiOkForBackup = capiConfigured(env) ? true : undefined; // we waitUntil'd it; treat config-present as fire-and-forget ok
+
+  await updateBackup(env, backupId, {
+    validationOk: true,
+    leadSid,
+    eventId,
+    zohoOk,
+    resendOk: emailOk,
+    capiOk: capiOkForBackup,
+    httpStatus: stored ? 200 : 502,
+  });
 
   // When nothing persisted, return 502 so the frontend surfaces a retry
   // instead of silently sending the parent to /thank-you. Body still carries
@@ -1751,6 +1792,45 @@ async function handleLead(request: Request, env: Env, ctx: ExecutionContext): Pr
     },
     stored ? {} : { status: 502 },
   );
+}
+
+async function handleBackupCsv(request: Request, env: Env): Promise<Response> {
+  const expected = env.BACKUP_EXPORT_TOKEN;
+  if (!expected) {
+    return json({ ok: false, error: "backup_export_not_configured" }, { status: 503 });
+  }
+  const auth = request.headers.get("authorization") ?? "";
+  const token = auth.startsWith("Bearer ") ? auth.slice(7) : "";
+  if (token !== expected) {
+    return json({ ok: false, error: "unauthorized" }, { status: 401 });
+  }
+  if (!env.LEAD_BACKUP_DB) {
+    return json({ ok: false, error: "d1_not_bound" }, { status: 503 });
+  }
+
+  const url = new URL(request.url);
+  const fromStr = url.searchParams.get("from");
+  const toStr = url.searchParams.get("to");
+  const now = Date.now();
+  const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
+  const fromTs = fromStr ? Date.parse(fromStr) : now - sevenDaysMs;
+  const toTs = toStr ? Date.parse(toStr) + 86_400_000 : now; // toStr is inclusive end-of-day
+
+  if (!isFinite(fromTs) || !isFinite(toTs) || toTs <= fromTs) {
+    return json({ ok: false, error: "invalid_date_range" }, { status: 400 });
+  }
+
+  const csv = await exportBackupCsv(env, fromTs, toTs);
+  const filename = `chesswize-leads-${fromStr || new Date(fromTs).toISOString().slice(0, 10)}_to_${toStr || new Date(toTs - 1).toISOString().slice(0, 10)}.csv`;
+
+  return new Response(csv, {
+    status: 200,
+    headers: {
+      "content-type": "text/csv; charset=utf-8",
+      "content-disposition": `attachment; filename="${filename}"`,
+      "cache-control": "no-store",
+    },
+  });
 }
 
 async function handleHealth(env: Env): Promise<Response> {
@@ -1820,6 +1900,13 @@ export default {
     // secret that can be unset/rotated after first use.
     if (request.method === "POST" && url.pathname === "/api/admin/init-audience") {
       return handleInitAudience(request, env);
+    }
+
+    // Backup CSV export. Auth: Bearer token in Authorization header,
+    // value === env.BACKUP_EXPORT_TOKEN. Query params: from / to as
+    // YYYY-MM-DD (defaults: last 7 days).
+    if (request.method === "GET" && url.pathname === "/api/admin/backups/csv") {
+      return await handleBackupCsv(request, env);
     }
 
     return json({ ok: false, error: "not_found" }, { status: 404 });

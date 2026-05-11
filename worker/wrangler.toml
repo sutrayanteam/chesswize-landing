@@ -92,3 +92,16 @@ ALLOWED_ORIGINS = "chesswize.in,www.chesswize.in,localhost"
 
 # Meta Pixel ID — public, safe to commit. Matches fbq('init', ...) in index.html.
 META_PIXEL_ID = "1315250227040245"
+
+# ── D1 database — durable backup of every form submission ──────────────
+# Writes a row before any validation/destination so we never lose lead
+# data again (created 2026-05-11 after a 4-day prod outage where ~20
+# real submissions were lost to a Zod validator regression).
+[[d1_databases]]
+binding = "LEAD_BACKUP_DB"
+database_name = "cw-lead-backups"
+database_id = "2b660b23-4e60-4a98-9bc6-f18b2853a8f5"
+
+# ── Admin auth — required for /api/admin/backups/csv export ─────────────
+# Set via:  wrangler secret put BACKUP_EXPORT_TOKEN
+# (Random opaque string; rotate by re-running the secret put command.)
