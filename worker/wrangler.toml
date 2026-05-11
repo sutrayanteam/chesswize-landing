@@ -20,6 +20,26 @@ zone_name = "chesswize.in"
 [observability]
 enabled = true
 
+# ── Cron triggers ──────────────────────────────────────────────────────
+# Hourly anomaly check (see `runHourlyAnomalyCheck` in src/index.ts).
+# Fires at UTC minute 30 of every hour, which lands on IST :00 boundary
+# (UTC+5:30 → 30 UTC offset puts cron at IST top-of-hour). So at IST
+# 10:00 cron fires and inspects IST 09:00-10:00 — the first complete
+# business hour window.
+#
+# Three alert conditions:
+#   1. Zod regression — >3 submits AND >50% rejected
+#   2. Silent form — 0 submits when we're checking an in-business-hour
+#      window (IST 09:00-21:00). At cron-fire IST hour H, the previous
+#      hour [H-1, H] is the inspected window.
+#   3. Integration partial failure — Zoho/Resend/Payload destination
+#      failed for a validated lead
+# Dedups per (alert_type, hour) via TOKEN_CACHE — but ONLY after a
+# successful email delivery so a transient Resend outage doesn't silence
+# the alert for an hour.
+[triggers]
+crons = ["30 * * * *"]
+
 # KV namespace used for two unrelated things:
 #   1. Caching the Zoho OAuth access token across cold starts (without
 #      this, every request hits Zoho's refresh endpoint — which is rate

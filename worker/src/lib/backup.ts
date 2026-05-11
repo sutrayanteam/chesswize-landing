@@ -15,7 +15,9 @@ export interface BackupEnv {
 }
 
 export interface BackupInput {
-  endpoint: "leads" | "leads_partial";
+  // "unknown" = catch-all for any /api/* request that didn't match a
+  // known route. Forensic record only — never user-facing.
+  endpoint: "leads" | "leads_partial" | "unknown";
   request: Request;
   body: unknown;
 }

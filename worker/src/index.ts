@@ -1930,6 +1930,199 @@ async function handleHealth(env: Env): Promise<Response> {
   });
 }
 
+/* ──────────────────────── Hourly anomaly check ──────────────────────── */
+
+/** Convert epoch ms → IST hour (0-23). UTC+5:30. */
+function istHourOf(ms: number): number {
+  const d = new Date(ms);
+  const istMinutes = d.getUTCHours() * 60 + d.getUTCMinutes() + 330;
+  return Math.floor(istMinutes / 60) % 24;
+}
+
+interface AnomalyAlert {
+  type: "zod_regression" | "no_submits_business_hours" | "integration_partial_failure";
+  subject: string;
+  body: string;
+}
+
+/**
+ * Queries D1 for the last hour of /api/leads + /api/leads/partial activity
+ * and decides whether to fire any of the three configured alerts. Catch-all
+ * "unknown" rows are excluded — they reflect adversarial scanners, not
+ * legitimate funnel volume. Dedups per (type, hour) via TOKEN_CACHE.
+ */
+async function runHourlyAnomalyCheck(env: Env, ctx: ExecutionContext): Promise<void> {
+  if (!env.LEAD_BACKUP_DB) {
+    // eslint-disable-next-line no-console
+    console.warn("[anomaly] no LEAD_BACKUP_DB — skipping check");
+    return;
+  }
+
+  const now = Date.now();
+  const oneHourAgo = now - 60 * 60 * 1000;
+
+  // Half-open window [oneHourAgo, now) so adjacent cron runs don't both
+  // claim the millisecond at the boundary. created_at is unix ms.
+  const { results } = await env.LEAD_BACKUP_DB.prepare(
+    `SELECT
+        COUNT(*) AS total,
+        SUM(CASE WHEN validation_ok=1 THEN 1 ELSE 0 END) AS validated,
+        SUM(CASE WHEN validation_ok=0 THEN 1 ELSE 0 END) AS rejected,
+        SUM(CASE WHEN validation_ok=1 AND zoho_ok=0 THEN 1 ELSE 0 END) AS zoho_fail,
+        SUM(CASE WHEN validation_ok=1 AND resend_ok=0 THEN 1 ELSE 0 END) AS resend_fail,
+        SUM(CASE WHEN validation_ok=1 AND payload_ok=0 THEN 1 ELSE 0 END) AS payload_fail
+      FROM submissions
+      WHERE created_at >= ? AND created_at < ? AND endpoint IN ('leads','leads_partial')`,
+  )
+    .bind(oneHourAgo, now)
+    .all<{
+      total: number;
+      validated: number;
+      rejected: number;
+      zoho_fail: number;
+      resend_fail: number;
+      payload_fail: number;
+    }>();
+
+  const row = results?.[0];
+  if (!row) return;
+
+  const alerts: AnomalyAlert[] = [];
+
+  // 1. Zod regression — >3 submits AND >50% rejected. Same fingerprint
+  //    as the 5/7-5/10 outage.
+  if (row.total > 3 && row.rejected / row.total > 0.5) {
+    alerts.push({
+      type: "zod_regression",
+      subject: "[ChessWize] 🔴 Zod regression — 50%+ rejected in last hour",
+      body:
+        `Total submits in the last 60 min: ${row.total}\n` +
+        `Rejected by validator:           ${row.rejected} ` +
+        `(${Math.round((100 * row.rejected) / row.total)}%)\n\n` +
+        `Symptom matches the 5/7-5/10 outage: the worker validator is\n` +
+        `rejecting payloads the frontend is sending. Likely cause is a\n` +
+        `recent Worker deploy tightened the schema while the frontend\n` +
+        `still sends the older shape.\n\n` +
+        `Triage:\n` +
+        `  1. wrangler tail chesswize-lead-api  (see live rejects)\n` +
+        `  2. Query D1: SELECT validation_reason, COUNT(*) FROM submissions\n` +
+        `     WHERE created_at >= strftime('%s','now','-1 hour')*1000\n` +
+        `     AND validation_ok=0 GROUP BY validation_reason\n` +
+        `  3. wrangler rollback   (if the cause is the last Worker deploy)`,
+    });
+  }
+
+  // 2. Silent form — 0 submits when the inspected window is fully
+  //    inside IST business hours. Cron fires at IST :00 (UTC :30) so
+  //    fire-hour H inspects window [H-1, H]. Alert when H-1 is in
+  //    [09, 20] inclusive, i.e. cron-fire IST hour in [10, 21].
+  if (row.total === 0) {
+    const hourIst = istHourOf(now);
+    if (hourIst >= 10 && hourIst <= 21) {
+      const windowStart = hourIst - 1;
+      alerts.push({
+        type: "no_submits_business_hours",
+        subject: "[ChessWize] 🟡 No form submissions in last hour",
+        body:
+          `Cron fired at ${hourIst}:00 IST. Inspected window: ` +
+          `${windowStart}:00–${hourIst}:00 IST. Last 60 min: 0 submissions\n` +
+          `to /api/leads or /api/leads/partial.\n\n` +
+          `Possible causes:\n` +
+          `  - Genuine quiet hour (treat as informational)\n` +
+          `  - Form / worker outage (open https://chesswize.in and submit one step)\n` +
+          `  - Ad campaign paused (check Meta Ads Manager spend graph)\n` +
+          `  - /api/* catch-all backup may show typo'd routes from a recent deploy`,
+      });
+    }
+  }
+
+  // 3. Integration partial failure — any destination silently failed
+  //    after validation passed. Reconciler usually catches Payload; this
+  //    surfaces it sooner.
+  if (row.zoho_fail > 0 || row.resend_fail > 0 || row.payload_fail > 0) {
+    alerts.push({
+      type: "integration_partial_failure",
+      subject: "[ChessWize] 🟠 Integration failure in last hour",
+      body:
+        `Validated leads in last 60 min: ${row.validated}\n` +
+        `Per-destination failures (validated only):\n` +
+        `  Zoho:    ${row.zoho_fail}\n` +
+        `  Resend:  ${row.resend_fail}\n` +
+        `  Payload: ${row.payload_fail}\n\n` +
+        `Hetzner reconciler runs every 10 min and retries Payload —\n` +
+        `confirm at /var/log/chesswize-reconcile.log on chesswize-prod-01.\n` +
+        `Zoho/Resend failures need manual triage.`,
+    });
+  }
+
+  // Dedup per (alert_type, hour). Order is important: check FIRST,
+  // send synchronously, then mark dedup ONLY if at least one recipient
+  // got the email. A transient Resend outage thus doesn't suppress the
+  // alert for the entire hour. We still ctx.waitUntil so the scheduled
+  // worker can return even if the send is slow.
+  const hourBucket = Math.floor(now / (60 * 60 * 1000));
+  for (const alert of alerts) {
+    const dedupKey = `alert:${alert.type}:${hourBucket}`;
+    const seen = env.TOKEN_CACHE ? await env.TOKEN_CACHE.get(dedupKey) : null;
+    if (seen) continue;
+    ctx.waitUntil(
+      (async () => {
+        const delivered = await sendAlertEmail(env, alert.subject, alert.body);
+        if (delivered && env.TOKEN_CACHE) {
+          // expirationTtl just over an hour so the next cron tick re-fires
+          // cleanly if the underlying condition persists.
+          await env.TOKEN_CACHE.put(dedupKey, "1", { expirationTtl: 60 * 60 + 60 });
+        }
+      })(),
+    );
+  }
+}
+
+/**
+ * Best-effort alert delivery. Returns true iff at least one recipient
+ * accepted the email (HTTP 2xx). Never throws — alerting must not block
+ * scheduled execution.
+ */
+async function sendAlertEmail(env: Env, subject: string, body: string): Promise<boolean> {
+  if (!env.RESEND_API_KEY) {
+    // eslint-disable-next-line no-console
+    console.warn("[anomaly] no RESEND_API_KEY — would send:", subject);
+    return false;
+  }
+  const recipients = (env.NOTIFY_EMAIL || "support@chesswize.com,chesswize79@gmail.com")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  let anyOk = false;
+  for (const to of recipients) {
+    try {
+      const res = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          authorization: `Bearer ${env.RESEND_API_KEY}`,
+        },
+        body: JSON.stringify({
+          from: env.FROM_EMAIL || "ChessWize Alerts <noreply@updates.chesswize.in>",
+          to,
+          subject,
+          text: body,
+        }),
+      });
+      if (res.ok) {
+        anyOk = true;
+      } else {
+        // eslint-disable-next-line no-console
+        console.warn(`[anomaly] alert email to ${to} failed: HTTP ${res.status}`);
+      }
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.warn(`[anomaly] alert email to ${to} threw`, err);
+    }
+  }
+  return anyOk;
+}
+
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
@@ -1989,6 +2182,113 @@ export default {
       return await handleBackupCsv(request, env);
     }
 
+    // Catch-all backup for any unmatched state-mutating request under
+    // /api/*. Closes the same data-loss class as the 5/7-5/10 outage:
+    // if the frontend regresses and posts to a typo'd route (or sends
+    // invalid JSON before D1 capture), the body still lands in D1 with
+    // endpoint="unknown" for forensics. Read-only methods are skipped
+    // to keep D1 free of scanner GET noise.
+    //
+    // Hardening (per droid panel review 2026-05-11):
+    //   • Per-IP rate limit (10 unknown POSTs / 60s) via TOKEN_CACHE so
+    //     a bot can't fill D1 with garbage. Real outage retries by a
+    //     legitimate client won't trip this — they hit known routes.
+    //   • Content-Length pre-check rejects oversize bodies before we
+    //     buffer them with request.text(), avoiding worker memory spikes
+    //     on adversarial input.
+    //   • truncation marker stamped on validation_reason so the next
+    //     engineer can tell "non-JSON" apart from "JSON cut at 16KB".
+    if (
+      url.pathname.startsWith("/api/") &&
+      (request.method === "POST" ||
+        request.method === "PUT" ||
+        request.method === "PATCH" ||
+        request.method === "DELETE")
+    ) {
+      try {
+        const ip = request.headers.get("cf-connecting-ip") || request.headers.get("x-real-ip") || "unknown";
+        const rlKey = `rl:catchall:${ip}`;
+        const prior = env.TOKEN_CACHE ? await env.TOKEN_CACHE.get(rlKey) : null;
+        const count = prior ? parseInt(prior, 10) || 0 : 0;
+        if (count >= 10) {
+          // Rate-limited — still return 404 so the caller sees the same
+          // shape, but skip the D1 write to protect storage cost.
+          // eslint-disable-next-line no-console
+          console.warn(`[catch-all] rate limited ip=${ip} count=${count}`);
+        } else {
+          // Don't buffer oversize bodies — Content-Length check first.
+          const contentLength = Number(request.headers.get("content-length") || "0");
+          const oversized = contentLength > 16384;
+
+          let parsed: unknown = null;
+          let truncated = false;
+          if (!oversized) {
+            const raw = await request.text().catch((err) => {
+              // eslint-disable-next-line no-console
+              console.warn("[catch-all] body read failed", err);
+              return "";
+            });
+            const capped = raw.slice(0, 16384);
+            truncated = raw.length > capped.length;
+            parsed = capped;
+            if (capped) {
+              try {
+                parsed = JSON.parse(capped);
+              } catch {
+                /* keep capped raw text as the body */
+              }
+            }
+          }
+
+          // Bump the per-IP counter BEFORE the write so a flood gets
+          // throttled inside the same minute even on a slow D1.
+          if (env.TOKEN_CACHE) {
+            await env.TOKEN_CACHE.put(rlKey, String(count + 1), { expirationTtl: 60 });
+          }
+
+          const reasonParts = [
+            `unmatched_route:${request.method}:${url.pathname.slice(0, 256)}`,
+          ];
+          if (oversized) reasonParts.push(`oversized:${contentLength}`);
+          if (truncated) reasonParts.push("truncated");
+
+          const backupId = await writeBackup(env, {
+            endpoint: "unknown",
+            request,
+            body: oversized ? { _skipped: "oversized", content_length: contentLength } : parsed,
+          });
+          await updateBackup(env, backupId, {
+            validationOk: false,
+            validationReason: reasonParts.join("|"),
+            httpStatus: 404,
+          });
+        }
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.warn("[catch-all] backup failed (non-fatal)", err);
+      }
+    }
+
     return json({ ok: false, error: "not_found" }, { status: 404 });
+  },
+
+  /**
+   * Cloudflare Cron Trigger — fires hourly at minute 0 (see wrangler.toml
+   * [triggers] block). Queries D1 for the last hour of submissions and
+   * emails support if any of three anomalies fired:
+   *   1. Zod regression — >3 submits AND >50% rejected
+   *   2. Silent form — 0 submits during IST business hours (9-21)
+   *   3. Integration partial failure — any zoho/resend/payload destination
+   *      failed for a validated lead
+   * Dedups per (type, hour) via TOKEN_CACHE so a single hour can't spam.
+   * Never throws — alerting is best-effort.
+   */
+  async scheduled(_event: ScheduledEvent, env: Env, ctx: ExecutionContext): Promise<void> {
+    try {
+      await runHourlyAnomalyCheck(env, ctx);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("[scheduled] anomaly check threw (non-fatal)", err);
+    }
   },
 };
