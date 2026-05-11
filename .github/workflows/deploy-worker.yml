@@ -41,6 +41,12 @@ jobs:
         with:
           bun-version: '1.2'
 
+      # wrangler 4 requires Node 22+; the default ubuntu-latest image ships
+      # Node 20. Install Node 22 explicitly so wrangler runs.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
       - name: Install worker deps
         working-directory: worker
         run: bun install --frozen-lockfile
