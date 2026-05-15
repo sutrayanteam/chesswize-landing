@@ -199,9 +199,28 @@ export function track(name: string, props: Record<string, unknown> = {}): void {
     try { window.posthog.capture(name, props); } catch { /* swallow */ }
   }
 
-  // GA4
-  if (gtagReady && window.gtag) {
-    try { window.gtag("event", name, props); } catch { /* swallow */ }
+  // GA4 — fire even if our `gtagReady` flag hasn't flipped yet. The
+  // static gtag stub in index.html defines window.gtag immediately
+  // and queues calls via dataLayer, so a custom event submitted before
+  // initAnalytics() finishes still lands once gtag.js loads.
+  //
+  // Two things we ALWAYS want on a custom event call:
+  //   • `send_to: GA4_ID` — without this, gtag.js routes the event to
+  //     the loader product only (Google Ads), and GA4 silently never
+  //     receives it. This is the root cause of `form_submit_success`
+  //     showing 0 in GA4 despite the call site firing on every submit.
+  //   • `transport_type: 'beacon'` — uses navigator.sendBeacon() so
+  //     the request survives the immediate `navigate('/thank-you')`
+  //     that follows a successful form submit.
+  if (window.gtag) {
+    try {
+      const payload: Record<string, unknown> = {
+        ...props,
+        transport_type: "beacon",
+      };
+      if (GA4_ID) payload.send_to = GA4_ID;
+      window.gtag("event", name, payload);
+    } catch { /* swallow */ }
   }
 
   // Meta Pixel — fires as a custom event so it shows up in Events
